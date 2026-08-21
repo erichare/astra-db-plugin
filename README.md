@@ -19,29 +19,35 @@ One skill, one source of truth, three native packagings. The content is the `ast
 
 Pick your agent — one command each.
 
-<table>
-  <tr>
-    <td align="center" width="33%"><img src="assets/install-claude.svg" alt="Install for Claude Code" width="100%"></td>
-    <td align="center" width="33%"><img src="assets/install-codex.svg" alt="Install for OpenAI Codex" width="100%"></td>
-    <td align="center" width="33%"><img src="assets/install-bob.svg" alt="Install for IBM Bob" width="100%"></td>
-  </tr>
-  <tr>
-    <td valign="top">
-<pre><code>claude plugin marketplace add erichare/astra-db-plugin
-claude plugin install astra-db@astra-db-marketplace</code></pre>
-Plugin with the skill, commands, agents, hooks, and MCP server.
-    </td>
-    <td valign="top">
-<pre><code>codex plugin marketplace add erichare/astra-db-plugin</code></pre>
-Then <code>/plugins</code> → <b>Astra DB</b>. Native plugin with the skill, hooks, and MCP server; also shows up in the ChatGPT app's Plugins tab.
-    </td>
-    <td valign="top">
-<pre><code>curl -fsSL https://raw.githubusercontent.com/erichare/astra-db-plugin/main/install.sh \
-  | bash -s -- bob</code></pre>
-Run from your project root; installs <code>.bob/skills/astra-toolkit</code>, the same layout as upstream.
-    </td>
-  </tr>
-</table>
+<p align="center">
+  <a href="#claude-code"><img src="assets/install-claude.svg" alt="Install for Claude Code" width="32%"></a>
+  <a href="#openai-codex"><img src="assets/install-codex.svg" alt="Install for OpenAI Codex" width="32%"></a>
+  <a href="#ibm-bob"><img src="assets/install-bob.svg" alt="Install for IBM Bob" width="32%"></a>
+</p>
+
+### Claude Code
+
+```bash
+claude plugin marketplace add erichare/astra-db-plugin && claude plugin install astra-db@astra-db-marketplace
+```
+
+The full plugin: skill, commands, agents, hooks, and MCP server.
+
+### OpenAI Codex
+
+```bash
+codex plugin marketplace add erichare/astra-db-plugin
+```
+
+Then `/plugins` → **Astra DB**. Native plugin with the skill, hooks, and MCP server; it also appears in the ChatGPT app's Plugins tab.
+
+### IBM Bob
+
+```bash
+curl -fsSL https://raw.githubusercontent.com/erichare/astra-db-plugin/main/install.sh | bash -s -- bob
+```
+
+Run from your project root; installs `.bob/skills/astra-toolkit`, the same layout as upstream.
 
 <details>
 <summary><b>More install options</b> — in-app commands, Cursor / Gemini CLI / any Agent Skills harness, npx, clone</summary>
