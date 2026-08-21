@@ -162,6 +162,22 @@ describe("token + resource server", () => {
     expect(late.status).toBe(400);
     expect((await late.json()).error).toBe("invalid_grant");
   });
+  it("ignores a non-string second argument (host context objects) and still resolves the env secret", async () => {
+    const clientId = await registerClient();
+    const { verifier, challenge } = await pkcePair();
+    const code = new URL((await authorize(clientId, challenge)).headers.get("location")!).searchParams.get("code")!;
+    const tokens = await (await exchange(code, verifier, clientId)).json();
+    process.env.ASTRA_WIDGETS_AUTH_SECRET = SECRET;
+    try {
+      const res = await handleMcpRequest(
+        new Request(`${ORIGIN}/mcp`, { method: "POST", headers: { "content-type": "application/json", accept: "application/json, text/event-stream", authorization: `Bearer ${tokens.access_token}` }, body: JSON.stringify({ jsonrpc: "2.0", id: 1, method: "tools/list" }) }),
+        { waitUntil: () => undefined } as unknown,
+      );
+      expect(res.status).toBe(200);
+    } finally {
+      delete process.env.ASTRA_WIDGETS_AUTH_SECRET;
+    }
+  });
   it("MCP 401s advertise the resource metadata and flag expired sealed tokens", async () => {
     const anon = await handleMcpRequest(new Request(`${ORIGIN}/mcp`, { method: "POST", body: "{}" }), SECRET);
     expect(anon.status).toBe(401);

@@ -51,12 +51,14 @@ export async function resolveCredentials(req: Request, secret: string | undefine
   return credentialsFromRequest(req);
 }
 
-export async function handleMcpRequest(req: Request, secret: string | undefined = process.env.ASTRA_WIDGETS_AUTH_SECRET): Promise<Response> {
+export async function handleMcpRequest(req: Request, secret?: unknown): Promise<Response> {
   if (req.method === "OPTIONS") {
     return new Response(null, { status: 204, headers: corsHeaders() });
   }
   const origin = new URL(req.url).origin;
-  const resolved = await resolveCredentials(req, secret);
+  // Only a string is a secret (hosts may pass a context object as the second argument).
+  const sealingSecret = typeof secret === "string" && secret ? secret : process.env.ASTRA_WIDGETS_AUTH_SECRET;
+  const resolved = await resolveCredentials(req, sealingSecret);
   if (resolved === "expired") return unauthorized(origin, "The access token is invalid or expired; re-authorize.");
   if (!resolved) return unauthorized(origin);
   const creds = resolved;
