@@ -39,5 +39,5 @@ if [ "$remote_sha" != "$local_sha" ]; then
 fi
 
 printf '%s' "$msg" >"$CACHE" 2>/dev/null
-[ -n "$msg" ] && echo "$msg"
+printf '%s' "$msg"
 exit 0

@@ -11,7 +11,7 @@ The skill content is synchronized from [sl-at-ibm/astra-toolkit-skill](https://g
 | Component | Details |
 | --- | --- |
 | **Skill** `astra-toolkit` | `SKILL.md` entry point; per-topic instruction files loaded on demand; `clients/<language>/examples/` snippet library |
-| **Commands** | `/astra-db:setup` (CLI install, token, `.env`), `/astra-db:data-model-review`, `/astra-db:sync-check` (maintainer) |
+| **Commands** | `/astra-db:setup` (CLI install, token, `.env`), `/astra-db:doctor` (setup diagnostics), `/astra-db:data-model-review`, `/astra-db:sync-check` (maintainer) |
 | **Agents** | `astra-reviewer` (Data API usage review), `astra-data-modeler` (schema design), `astra-migration-helper` (staged migration plans) |
 | **MCP server** | [`@datastax/astra-db-mcp`](https://github.com/datastax/astra-db-mcp) wired via `.mcp.json` for live database operations |
 | **Hooks** | Credential guard (blocks hardcoded `AstraCS:` tokens); daily upstream-freshness notice |
@@ -54,7 +54,8 @@ Content flow: `sl-at-ibm/astra-toolkit-skill` → `scripts/sync_upstream.py` →
 
 - **Sync**: `.github/workflows/sync.yml` runs weekly and opens a PR when upstream changed (`sync-manifest.json` records the upstream SHA). Manual refresh: `python3 scripts/sync_upstream.py && python3 scripts/build_layouts.py`.
 - **Content is verbatim** with one deliberate exception: `DESCRIPTION_OVERRIDES` in `scripts/sync_upstream.py` patches the skill's frontmatter description with routing trigger phrasing (proposed upstream; the override is deleted once adopted).
-- **CI** (`.github/workflows/ci.yml`): skillsaw `--strict` plus an A+ grade gate, layout parity, Python/TypeScript snippet syntax checks, and `claude plugin validate`.
+- **CI** (`.github/workflows/ci.yml`): skillsaw `--strict` plus an A+ grade gate, layout parity, Python/TypeScript snippet syntax checks, the pytest suite (sync/build/release scripts, both hooks, and skill-content integrity — 90% coverage gate on `scripts/`), and `claude plugin validate`. Run locally with `pytest tests/`.
+- **Evals** (`evals/`): three `claude plugin eval` cases (Python vector collection, TypeScript filtered find, Collections-vs-Tables reasoning) with `file_exists`, `tool_used: Skill`, and LLM rubric graders. `plugin eval` is early-access; run `claude plugin eval . --no-publish` once enabled for the account.
 - **Releases** (`.github/workflows/release.yml`): merges touching plugin content auto-bump the patch version, tag, and update the changelog. Use `scripts/bump_version.py minor|major` manually for larger changes.
 
 ## License and provenance

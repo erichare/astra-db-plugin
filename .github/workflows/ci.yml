@@ -36,6 +36,11 @@ jobs:
           npm install --no-save typescript@5
           node scripts/check_ts_syntax.mjs skills/astra-toolkit/clients/typescript/examples
 
+      - name: Unit, hook, and integrity tests (90% coverage gate)
+        run: |
+          pip install --quiet pytest pytest-cov
+          pytest tests/ --cov=scripts --cov-fail-under=90 -q
+
       - name: Plugin structure validation
         run: |
           npm install -g @anthropic-ai/claude-code
