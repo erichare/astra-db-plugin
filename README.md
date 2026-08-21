@@ -1,10 +1,77 @@
+<div align="center">
+
 # Astra DB Plugin
 
-![skillsaw grade](https://img.shields.io/endpoint?url=https%3A%2F%2Fraw.githubusercontent.com%2Ferichare%2Fastra-db-plugin%2Fmain%2F.skillsaw-badge.json)
+**Agent-native tooling for [Astra DB](https://astra.datastax.com) (DataStax / IBM) and HCD —<br>one continuously synced content tree, packaged for Claude Code, OpenAI Codex, and IBM Bob.**
 
-First-class agent tooling for [Astra DB](https://astra.datastax.com) (DataStax / IBM) and HCD, packaged for **Claude Code**, **OpenAI Codex**, and **IBM Bob** from a single continuously synced content tree.
+[![CI](https://github.com/erichare/astra-db-plugin/actions/workflows/ci.yml/badge.svg)](https://github.com/erichare/astra-db-plugin/actions/workflows/ci.yml)
+[![Release](https://img.shields.io/github/v/release/erichare/astra-db-plugin?color=brightgreen)](https://github.com/erichare/astra-db-plugin/releases)
+[![skillsaw grade](https://img.shields.io/endpoint?url=https%3A%2F%2Fraw.githubusercontent.com%2Ferichare%2Fastra-db-plugin%2Fmain%2F.skillsaw-badge.json)](https://skillsaw.org/)
+[![License](https://img.shields.io/badge/license-Apache--2.0-blue)](LICENSE)
 
-The skill content is synchronized from [sl-at-ibm/astra-toolkit-skill](https://github.com/sl-at-ibm/astra-toolkit-skill) by Stefano Lottini (IBM / DataStax): progressive-disclosure instructions covering the Astra CLI, application architecture patterns, data modeling for Collections and Tables, and roughly 340 documentation-derived Data API snippets per client language (Python, TypeScript, Java, C#, Go — about 1,660 example files). The skill is self-sufficient by design: the agent gets every Data API detail right without web lookups.
+[![Install for Claude Code](https://img.shields.io/badge/Claude_Code-Install-D97757?style=for-the-badge&logo=claude&logoColor=white)](#claude-code)
+[![Install for OpenAI Codex](https://img.shields.io/badge/OpenAI_Codex-Install-000000?style=for-the-badge&logo=openai&logoColor=white)](#openai-codex)
+[![Install for IBM Bob](https://img.shields.io/badge/IBM_Bob-Install-0F62FE?style=for-the-badge&logo=ibm&logoColor=white)](#ibm-bob)
+[![Install for any Agent Skills harness](https://img.shields.io/badge/Agent_Skills-Install-6B7280?style=for-the-badge)](#any-agent-skills-harness)
+
+</div>
+
+The skill content is synchronized from [sl-at-ibm/astra-toolkit-skill](https://github.com/sl-at-ibm/astra-toolkit-skill) by Stefano Lottini (IBM / DataStax): progressive-disclosure instructions covering the Astra CLI, application architecture patterns, data modeling for Collections and Tables, and roughly 340 documentation-derived Data API snippets per client language (Python, TypeScript, Java, C#, Go — about 1,660 example files). The skill is self-sufficient by design — the agent gets every Data API detail right without web lookups — and costs only ~420 always-on tokens: the snippet library loads on demand.
+
+## Install
+
+### Claude Code
+
+One command in your terminal:
+
+```bash
+claude plugin marketplace add erichare/astra-db-plugin && claude plugin install astra-db@astra-db-marketplace
+```
+
+Or inside a Claude Code session:
+
+```
+/plugin marketplace add erichare/astra-db-plugin
+/plugin install astra-db@astra-db-marketplace
+```
+
+You get the skill plus commands (`/astra-db:setup`, `/astra-db:doctor`, `/astra-db:data-model-review`, `/astra-db:sync-check`), three review/design agents, safety hooks, and the bundled MCP server.
+
+### OpenAI Codex
+
+The canonical skill ships in the standard [Agent Skills](https://agentskills.io) layout:
+
+```bash
+npx skills add erichare/astra-db-plugin
+```
+
+or, without Node:
+
+```bash
+curl -fsSL https://raw.githubusercontent.com/erichare/astra-db-plugin/main/install.sh | bash -s -- codex
+```
+
+which copies the skill into `~/.codex/skills/astra-toolkit` (set `CODEX_HOME` to override).
+
+### IBM Bob
+
+From your project root:
+
+```bash
+curl -fsSL https://raw.githubusercontent.com/erichare/astra-db-plugin/main/install.sh | bash -s -- bob
+```
+
+which installs `.bob/skills/astra-toolkit` — the same layout as the upstream repository, so cloning this repository into place works too.
+
+### Any Agent Skills harness
+
+Cursor, Gemini CLI, or anything else that reads the [agentskills.io](https://agentskills.io) layout:
+
+```bash
+curl -fsSL https://raw.githubusercontent.com/erichare/astra-db-plugin/main/install.sh | bash -s -- skills-dir <your-skills-directory>
+```
+
+From a cloned checkout, `./install.sh <target>` does the same without re-fetching.
 
 ## What's inside
 
@@ -16,28 +83,7 @@ The skill content is synchronized from [sl-at-ibm/astra-toolkit-skill](https://g
 | **MCP server** | [`@datastax/astra-db-mcp`](https://github.com/datastax/astra-db-mcp) wired via `.mcp.json` for live database operations |
 | **Hooks** | Credential guard (blocks hardcoded `AstraCS:` tokens); daily upstream-freshness notice |
 
-## Install
-
-### Claude Code
-
-```
-/plugin marketplace add erichare/astra-db-plugin
-/plugin install astra-db@astra-db-marketplace
-```
-
-### OpenAI Codex and other Agent Skills harnesses
-
-The canonical skill lives at `skills/astra-toolkit/` in the standard [Agent Skills](https://agentskills.io) layout:
-
-```
-npx skills add erichare/astra-db-plugin
-```
-
-or copy `skills/astra-toolkit/` into your harness's skills directory (for Codex: `~/.codex/skills/` globally, or your project's skills directory).
-
-### IBM Bob
-
-This repository ships the Bob layout directly — clone it and Bob discovers `.bob/skills/astra-toolkit/`, exactly as with the upstream repository. Alternatively, copy `.bob/skills/astra-toolkit/` into your project's `.bob/skills/`.
+Commands, agents, hooks, and the MCP server are Claude Code features; Codex, Bob, and other harnesses get the full skill.
 
 ## Live database tools (MCP)
 
@@ -54,10 +100,10 @@ Content flow: `sl-at-ibm/astra-toolkit-skill` → `scripts/sync_upstream.py` →
 
 - **Sync**: `.github/workflows/sync.yml` runs weekly and opens a PR when upstream changed (`sync-manifest.json` records the upstream SHA). Manual refresh: `python3 scripts/sync_upstream.py && python3 scripts/build_layouts.py`.
 - **Content is verbatim** with one deliberate exception: `DESCRIPTION_OVERRIDES` in `scripts/sync_upstream.py` patches the skill's frontmatter description with routing trigger phrasing (proposed upstream; the override is deleted once adopted).
-- **CI** (`.github/workflows/ci.yml`): skillsaw `--strict` plus an A+ grade gate, layout parity, Python/TypeScript snippet syntax checks, the pytest suite (sync/build/release scripts, both hooks, and skill-content integrity — 90% coverage gate on `scripts/`), and `claude plugin validate`. Run locally with `pytest tests/`.
+- **CI** (`.github/workflows/ci.yml`): skillsaw `--strict` plus an A+ grade gate, layout parity, Python/TypeScript snippet syntax checks, the pytest suite (sync/build/release scripts, both hooks, the installer, and skill-content integrity — 90% coverage gate on `scripts/`), and `claude plugin validate`. Run locally with `pytest tests/`.
 - **Evals** (`evals/`): three `claude plugin eval` cases (Python vector collection, TypeScript filtered find, Collections-vs-Tables reasoning) with `file_exists`, `tool_used: Skill`, and LLM rubric graders. `plugin eval` is early-access; run `claude plugin eval . --no-publish` once enabled for the account.
 - **Releases** (`.github/workflows/release.yml`): merges touching plugin content auto-bump the patch version, tag, and update the changelog. Use `scripts/bump_version.py minor|major` manually for larger changes.
 
 ## License and provenance
 
-The packaging in this repository (scripts, commands, agents, hooks, workflows) is licensed under [Apache-2.0](LICENSE). Bundled skill content originates from [sl-at-ibm/astra-toolkit-skill](https://github.com/sl-at-ibm/astra-toolkit-skill) and derives from the [DataStax documentation](https://docs.datastax.com); see [NOTICE](NOTICE) for details. This distribution is maintained in coordination with the upstream author.
+The packaging in this repository (scripts, commands, agents, hooks, workflows) is licensed under [Apache-2.0](LICENSE). Bundled skill content originates from [sl-at-ibm/astra-toolkit-skill](https://github.com/sl-at-ibm/astra-toolkit-skill) and derives from the [DataStax documentation](https://docs.datastax.com); see [NOTICE](NOTICE) for details. This distribution is maintained in coordination with the upstream author. It is a community project, not an official DataStax, IBM, Anthropic, or OpenAI product; product names and logos identify the target platforms only.
