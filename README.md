@@ -28,7 +28,8 @@ Pick your agent — one command each.
 ### Claude Code
 
 ```bash
-claude plugin marketplace add erichare/astra-db-plugin && claude plugin install astra-db@astra-db-marketplace
+claude plugin marketplace add erichare/astra-db-plugin
+claude plugin install astra-db@astra-db-marketplace
 ```
 
 The full plugin: skill, commands, agents, hooks, and MCP server.
@@ -44,7 +45,8 @@ Then `/plugins` → **Astra DB**. Native plugin with the skill, hooks, and MCP s
 ### IBM Bob
 
 ```bash
-curl -fsSL https://raw.githubusercontent.com/erichare/astra-db-plugin/main/install.sh | bash -s -- bob
+curl -fsSL https://raw.githubusercontent.com/erichare/astra-db-plugin/main/install.sh \
+  | bash -s -- bob
 ```
 
 Run from your project root; installs `.bob/skills/astra-toolkit`, the same layout as upstream.
