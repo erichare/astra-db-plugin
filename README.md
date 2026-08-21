@@ -94,11 +94,32 @@ Ask about a collection and get a widget, not a wall of text. The bundled `astra-
 The widgets are proactive too: the skill tells the agent to show the matching view whenever it inspects a collection or runs a vector search for you. Codex gets the same as `$astra-overview` / `$astra-collection` / `$astra-similar` / `$astra-explore`; Bob as `/astra-*` commands — both open the generated HTML page. The server needs `node` 20+ on your PATH and the same two environment variables as the rest of the plugin.
 
 <details>
-<summary><b>ChatGPT (hosted)</b> — inline widgets via MCP Apps</summary>
+<summary><b>Hosted server</b> — Claude Desktop / claude.ai today, ChatGPT once OAuth lands</summary>
 
 <br>
 
-The same server runs as a streamable-HTTP endpoint, hosted at **`https://astra-widgets-mcp.vercel.app/mcp`** (source: `server/api/mcp.ts`, deployed on Vercel; self-host with `vercel --prod` from `server/`). Register it in ChatGPT's developer mode with API-key auth: `Authorization: Bearer <ASTRA_DB_APPLICATION_TOKEN>`, and pass your Data API endpoint with an `X-Astra-Endpoint` header or `?endpoint=<url>` on the connector URL. Nothing is stored server-side; every request carries its own credentials.
+The same server runs as a streamable-HTTP endpoint at **`https://astra-widgets-mcp.vercel.app/mcp`** (source: `server/api/mcp.ts`, deployed on Vercel; self-host with `vercel --prod` from `server/`). Every request carries its own Astra credentials — nothing is stored server-side:
+
+- `Authorization: Bearer <ASTRA_DB_APPLICATION_TOKEN>`
+- the Data API endpoint via an `X-Astra-Endpoint` header, or `?endpoint=<url>` on the URL
+
+**Claude Desktop** (renders MCP Apps inline): add this to `claude_desktop_config.json` and restart —
+
+```json
+{
+  "mcpServers": {
+    "astra-widgets": {
+      "command": "npx",
+      "args": ["-y", "mcp-remote", "https://astra-widgets-mcp.vercel.app/mcp",
+               "--header", "Authorization: Bearer ${ASTRA_DB_APPLICATION_TOKEN}",
+               "--header", "X-Astra-Endpoint: ${ASTRA_DB_API_ENDPOINT}"],
+      "env": { "ASTRA_DB_APPLICATION_TOKEN": "<your token>", "ASTRA_DB_API_ENDPOINT": "<your endpoint>" }
+    }
+  }
+}
+```
+
+**ChatGPT** connectors support only OAuth or no authentication (no API keys or custom headers), so ChatGPT inline widgets need the server's OAuth flow — planned for 1.2.x. Until then, ChatGPT users get the widgets through the Codex plugin's HTML pages.
 
 </details>
 
