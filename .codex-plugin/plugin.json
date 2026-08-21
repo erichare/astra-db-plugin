@@ -1,7 +1,7 @@
 {
   "name": "astra-db",
-  "version": "1.0.1",
-  "description": "First-class Astra DB (DataStax / IBM) toolkit: data modeling for Collections and Tables, Astra CLI workflows, application architecture patterns, and 1,600+ doc-synced Data API code snippets for Python, TypeScript, Java, C#, and Go — plus live database tools via the Astra DB MCP server.",
+  "version": "1.0.2",
+  "description": "First-class Astra DB (DataStax / IBM) toolkit: data modeling for Collections and Tables, Astra CLI workflows, application architecture patterns, and 1,600+ doc-synced Data API code snippets for Python, TypeScript, Java, C#, and Go \u2014 plus live database tools via the Astra DB MCP server.",
   "skills": "./skills/",
   "mcpServers": "./.mcp.codex.json",
   "hooks": "./hooks/hooks.json",
@@ -26,7 +26,7 @@
   "interface": {
     "displayName": "Astra DB",
     "shortDescription": "Build on Astra DB with expert data modeling, CLI workflows, and 1,600+ doc-synced Data API snippets.",
-    "longDescription": "Agent-native tooling for Astra DB (DataStax / IBM) and HCD. The astra-toolkit skill provides progressive-disclosure instructions for the Astra CLI, application architecture patterns, data modeling for Collections and Tables, and roughly 340 documentation-derived Data API snippets per client language (Python, TypeScript, Java, C#, Go) — self-sufficient, no web lookups needed. An optional bundled MCP server adds live database operations when ASTRA_DB_APPLICATION_TOKEN and ASTRA_DB_API_ENDPOINT are set.",
+    "longDescription": "Agent-native tooling for Astra DB (DataStax / IBM) and HCD. The astra-toolkit skill provides progressive-disclosure instructions for the Astra CLI, application architecture patterns, data modeling for Collections and Tables, and roughly 340 documentation-derived Data API snippets per client language (Python, TypeScript, Java, C#, Go) \u2014 self-sufficient, no web lookups needed. An optional bundled MCP server adds live database operations when ASTRA_DB_APPLICATION_TOKEN and ASTRA_DB_API_ENDPOINT are set.",
     "developerName": "Eric Hare",
     "category": "Developer Tools",
     "websiteURL": "https://github.com/erichare/astra-db-plugin",

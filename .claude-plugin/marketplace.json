@@ -6,7 +6,7 @@
   },
   "metadata": {
     "description": "Marketplace for the Astra DB plugin \u2014 Astra DB / HCD Data API skills, commands, agents, and MCP tools.",
-    "version": "1.0.1"
+    "version": "1.0.2"
   },
   "plugins": [
     {
