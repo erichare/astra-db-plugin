@@ -27,7 +27,7 @@ Pick your agent — one command each.
   <a href="#openai-codex"><img src="assets/install-codex.svg" alt="Install for OpenAI Codex" width="32%"></a>
 </p>
 
-### <img src="assets/logos/bob.svg" alt="" height="22" align="absmiddle"> IBM Bob
+### <img src="assets/logos/bob.svg" alt="" height="22" align="absmiddle" hspace="6">IBM Bob
 
 From your project root:
 
@@ -38,7 +38,7 @@ curl -fsSL https://raw.githubusercontent.com/erichare/astra-db-plugin/main/insta
 
 Installs the full bundle into `.bob/` — the skill, `/astra-setup`, `/astra-doctor`, and `/astra-data-model-review` commands, the `astra-reviewer`, `astra-data-modeler`, and `astra-migration-helper` custom modes, the Astra DB MCP server, and a credential-hygiene rule — merging with any `.bob/` config the project already has. Add `--global` to install into `~/.bob/` for every project instead.
 
-### <img src="assets/logos/claude.svg" alt="" height="22" align="absmiddle"> Claude Code
+### <img src="assets/logos/claude.svg" alt="" height="22" align="absmiddle" hspace="6">Claude Code
 
 ```bash
 claude plugin marketplace add erichare/astra-db-plugin
@@ -47,7 +47,7 @@ claude plugin install astra-db@astra-db-marketplace
 
 The full plugin: skill, commands, agents, hooks, and MCP server.
 
-### <img src="assets/logos/openai.svg" alt="" height="22" align="absmiddle"> OpenAI Codex
+### <img src="assets/logos/openai.svg" alt="" height="22" align="absmiddle" hspace="6">OpenAI Codex
 
 ```bash
 codex plugin marketplace add erichare/astra-db-plugin

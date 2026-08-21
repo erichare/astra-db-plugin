@@ -51,3 +51,18 @@ def test_bob_card_comes_first():
 def test_logo_assets_present():
     for name in ("bob", "claude", "openai", "ibm", "datastax", "datastax-wordmark", "datastax-wordmark-dark"):
         assert (ASSETS / "logos" / f"{name}.svg").is_file(), f"missing logo asset: {name}"
+
+
+def github_slug(heading_text: str) -> str:
+    """Approximate GitHub's heading-anchor rule: strip tags, lowercase, drop punctuation, spaces -> dashes."""
+    text = re.sub(r"<[^>]+>", "", heading_text).lower()
+    text = re.sub(r"[^\w\- ]", "", text)
+    return text.replace(" ", "-")
+
+
+def test_install_card_links_target_real_headings():
+    text = README.read_text()
+    headings = re.findall(r"^#{1,6} (.+)$", text, flags=re.MULTILINE)
+    slugs = {github_slug(h) for h in headings}
+    for href in re.findall(r'href="#([^"]+)"', text):
+        assert href in slugs, f"README link #{href} matches no heading anchor (have: {sorted(slugs)})"
