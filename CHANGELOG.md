@@ -1,5 +1,9 @@
 # Changelog
 
+## Unreleased
+
+- **OAuth for the hosted server.** ChatGPT and claude.ai connectors (OAuth-only) can now use the hosted widgets: the server ships an OAuth 2.1 authorization server (protected-resource + AS discovery, dynamic client registration, PKCE `/authorize` with a "Connect Astra DB" page, `/token` with refresh) whose tokens are AES-GCM-sealed blobs carrying the user's Astra credentials — stateless, never stored. `/mcp` accepts those tokens or the raw bearer + `X-Astra-Endpoint` form; 401s advertise the resource metadata.
+
 ## 1.2.0 — 2026-08-21
 
 - **Widgets.** New `astra-widgets` MCP server (TypeScript, bundled at `server/dist/index.js`, no npm publish) with four read-only tools — `database_overview`, `collection_card`, `similarity_search`, `explore_collection` — each returning `structuredContent` plus an MCP Apps UI resource (`ui://astra-widgets/*`): collection card, similarity results (ranked bars + constellation map), collection explorer (filters, paging, click-to-drill), and database overview. `emit: "html_file"` writes a self-contained page for harnesses without inline rendering.

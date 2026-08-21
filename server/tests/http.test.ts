@@ -32,7 +32,7 @@ describe("handleMcpRequest", () => {
   it("returns 401 without credentials", async () => {
     const res = await handleMcpRequest(rpc(INIT, {}));
     expect(res.status).toBe(401);
-    expect(res.headers.get("www-authenticate")).toBe("Bearer");
+    expect(res.headers.get("www-authenticate")).toContain("Bearer");
     expect((await res.json()).message).toContain("X-Astra-Endpoint");
   });
 

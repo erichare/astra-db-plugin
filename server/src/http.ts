@@ -2,6 +2,9 @@ import { McpServer } from "@modelcontextprotocol/sdk/server/mcp.js";
 import { WebStandardStreamableHTTPServerTransport } from "@modelcontextprotocol/sdk/server/webStandardStreamableHttp.js";
 import type { Credentials } from "./core/client.js";
 import { registerAstraWidgetTools, registerWidgetResources } from "./core/tools.js";
+import { credentialsFromAccessToken } from "./oauth/authorize.js";
+import { isSealedToken } from "./oauth/crypto.js";
+import { wwwAuthenticate } from "./oauth/metadata.js";
 
 export const SERVER_INFO = { name: "astra-widgets", version: "1.2.0" };
 export const ENDPOINT_HEADER = "x-astra-endpoint";
@@ -17,22 +20,46 @@ export function credentialsFromRequest(req: Request): Credentials | null {
   return { token, endpoint, keyspace: keyspace || undefined };
 }
 
-function unauthorized(): Response {
+function unauthorized(origin: string, description?: string): Response {
   return new Response(
     JSON.stringify({
       error: "unauthorized",
-      message: "Send Authorization: Bearer <ASTRA_DB_APPLICATION_TOKEN> and the Data API endpoint via the X-Astra-Endpoint header (or ?endpoint=).",
+      message:
+        description ??
+        "Authenticate with OAuth (see /.well-known/oauth-protected-resource), or send Authorization: Bearer <ASTRA_DB_APPLICATION_TOKEN> plus the Data API endpoint via the X-Astra-Endpoint header (or ?endpoint=).",
     }),
-    { status: 401, headers: { "content-type": "application/json", "www-authenticate": "Bearer" } },
+    {
+      status: 401,
+      headers: {
+        "content-type": "application/json",
+        "www-authenticate": wwwAuthenticate(origin, description ? "invalid_token" : undefined, description),
+        ...corsHeaders(),
+      },
+    },
   );
 }
 
-export async function handleMcpRequest(req: Request): Promise<Response> {
+/** Sealed OAuth access token first; raw Astra token + endpoint header/query otherwise. */
+export async function resolveCredentials(req: Request, secret: string | undefined): Promise<Credentials | null | "expired"> {
+  const auth = req.headers.get("authorization") ?? "";
+  const bearer = auth.replace(/^Bearer\s+/i, "").trim();
+  if (bearer && isSealedToken(bearer)) {
+    if (!secret) return null;
+    const creds = await credentialsFromAccessToken(bearer, secret);
+    return creds ?? "expired";
+  }
+  return credentialsFromRequest(req);
+}
+
+export async function handleMcpRequest(req: Request, secret: string | undefined = process.env.ASTRA_WIDGETS_AUTH_SECRET): Promise<Response> {
   if (req.method === "OPTIONS") {
     return new Response(null, { status: 204, headers: corsHeaders() });
   }
-  const creds = credentialsFromRequest(req);
-  if (!creds) return unauthorized();
+  const origin = new URL(req.url).origin;
+  const resolved = await resolveCredentials(req, secret);
+  if (resolved === "expired") return unauthorized(origin, "The access token is invalid or expired; re-authorize.");
+  if (!resolved) return unauthorized(origin);
+  const creds = resolved;
   const server = new McpServer(SERVER_INFO);
   registerAstraWidgetTools(server, { resolveCredentials: () => creds });
   registerWidgetResources(server);

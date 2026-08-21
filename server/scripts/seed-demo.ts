@@ -60,7 +60,7 @@ function article(i: number): Record<string, unknown> {
 }
 
 async function main(): Promise<void> {
-  const db = new DataAPIClient(token).db(endpoint);
+  const db = new DataAPIClient(token as string).db(endpoint as string);
   const existing = await db.listCollections({ nameOnly: true });
   if (!existing.includes(COLLECTION)) {
     await db.createCollection(COLLECTION, {
@@ -80,7 +80,7 @@ async function main(): Promise<void> {
   }
   const coll = db.collection(COLLECTION);
   const docs = Array.from({ length: 50 }, (_, i) => article(i));
-  await coll.deleteMany({ _id: { $in: docs.map((d) => d._id) } });
+  await coll.deleteMany({ _id: { $in: docs.map((d) => d._id as string) } });
   const result = await coll.insertMany(docs, { ordered: false });
   console.log(`inserted ${result.insertedCount} documents into ${COLLECTION}`);
 }

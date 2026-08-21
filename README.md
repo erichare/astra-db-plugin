@@ -94,16 +94,15 @@ Ask about a collection and get a widget, not a wall of text. The bundled `astra-
 The widgets are proactive too: the skill tells the agent to show the matching view whenever it inspects a collection or runs a vector search for you. Codex gets the same as `$astra-overview` / `$astra-collection` / `$astra-similar` / `$astra-explore`; Bob as `/astra-*` commands — both open the generated HTML page. The server needs `node` 20+ on your PATH and the same two environment variables as the rest of the plugin.
 
 <details>
-<summary><b>Hosted server</b> — Claude Desktop / claude.ai today, ChatGPT once OAuth lands</summary>
+<summary><b>Hosted server</b> — ChatGPT, claude.ai, Claude Desktop</summary>
 
 <br>
 
-The same server runs as a streamable-HTTP endpoint at **`https://astra-widgets-mcp.vercel.app/mcp`** (source: `server/api/mcp.ts`, deployed on Vercel; self-host with `vercel --prod` from `server/`). Every request carries its own Astra credentials — nothing is stored server-side:
+The same server runs as a streamable-HTTP endpoint at **`https://astra-widgets-mcp.vercel.app/mcp`** (source: `server/api/mcp.ts` + `server/api/oauth.ts`, deployed on Vercel; self-host with `vercel --prod` from `server/` and set `ASTRA_WIDGETS_AUTH_SECRET`). Nothing is stored server-side: OAuth tokens are encrypted blobs that carry your own Astra credentials.
 
-- `Authorization: Bearer <ASTRA_DB_APPLICATION_TOKEN>`
-- the Data API endpoint via an `X-Astra-Endpoint` header, or `?endpoint=<url>` on the URL
+**ChatGPT** — Settings → Security and login → turn on Developer mode → Plugins (Connectors) → **+** → name it, paste the URL above, choose **OAuth**, create. A "Connect Astra DB" page asks once for your Database Administrator token and Data API endpoint, then the four widget tools appear with inline MCP Apps UI. (Copy the connection's `plugin_asdk_app_…` id from the browser URL if you want to reference it from `codex/.app.json`.) **claude.ai** custom connectors work the same way (OAuth).
 
-**Claude Desktop** (renders MCP Apps inline): add this to `claude_desktop_config.json` and restart —
+**Claude Desktop / any MCP client** — OAuth as above, or headers directly via `mcp-remote` in `claude_desktop_config.json`:
 
 ```json
 {
@@ -119,7 +118,7 @@ The same server runs as a streamable-HTTP endpoint at **`https://astra-widgets-m
 }
 ```
 
-**ChatGPT** connectors support only OAuth or no authentication (no API keys or custom headers), so ChatGPT inline widgets need the server's OAuth flow — planned for 1.2.x. Until then, ChatGPT users get the widgets through the Codex plugin's HTML pages.
+Raw bearer requests (`Authorization: Bearer <ASTRA_DB_APPLICATION_TOKEN>` + `X-Astra-Endpoint` header or `?endpoint=`) keep working for scripts and curl.
 
 </details>
 
