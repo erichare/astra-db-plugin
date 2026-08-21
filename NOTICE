@@ -1,0 +1,16 @@
+Astra DB Plugin
+Copyright 2026 Eric Hare
+
+This distribution bundles agent-skill content synchronized from
+https://github.com/sl-at-ibm/astra-toolkit-skill (Stefano Lottini, IBM /
+DataStax), which itself derives its instruction files and code examples from
+the DataStax documentation (https://docs.datastax.com). The exact upstream
+commit for the bundled content is recorded in sync-manifest.json.
+
+The upstream repository does not yet declare an explicit license; this
+redistribution is maintained in coordination with the upstream author, and
+this NOTICE will be updated when upstream licensing is formalized.
+
+Astra DB and DataStax are trademarks of DataStax, Inc. (an IBM company).
+This is a community-maintained plugin and is not an official DataStax or IBM
+product.

@@ -1,0 +1,25 @@
+{
+  "name": "astra-db",
+  "version": "1.0.0",
+  "description": "First-class Astra DB (DataStax / IBM) toolkit: data modeling for Collections and Tables, Astra CLI workflows, application architecture patterns, and 1,600+ doc-synced Data API code snippets for Python, TypeScript, Java, C#, and Go — plus live database tools via the Astra DB MCP server.",
+  "author": {
+    "name": "Eric Hare",
+    "email": "ericrhare@gmail.com",
+    "url": "https://github.com/erichare"
+  },
+  "homepage": "https://github.com/erichare/astra-db-plugin",
+  "repository": "https://github.com/erichare/astra-db-plugin",
+  "license": "Apache-2.0",
+  "keywords": [
+    "astra",
+    "astra-db",
+    "datastax",
+    "ibm",
+    "cassandra",
+    "vector-database",
+    "data-api",
+    "hcd"
+  ],
+  "hooks": "./hooks/hooks.json",
+  "mcpServers": "./.mcp.json"
+}

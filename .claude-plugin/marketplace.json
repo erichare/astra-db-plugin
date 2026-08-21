@@ -1,0 +1,20 @@
+{
+  "name": "astra-db-marketplace",
+  "owner": {
+    "name": "Eric Hare",
+    "email": "ericrhare@gmail.com"
+  },
+  "metadata": {
+    "description": "Marketplace for the Astra DB plugin — Astra DB / HCD Data API skills, commands, agents, and MCP tools.",
+    "version": "1.0.0"
+  },
+  "plugins": [
+    {
+      "name": "astra-db",
+      "source": "./",
+      "description": "First-class Astra DB (DataStax / IBM) toolkit: data modeling, Astra CLI workflows, architecture patterns, and 1,600+ doc-synced Data API snippets for Python, TypeScript, Java, C#, and Go — plus live database tools via MCP.",
+      "category": "database",
+      "keywords": ["astra", "astra-db", "datastax", "cassandra", "vector-database", "data-api"]
+    }
+  ]
+}

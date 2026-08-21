@@ -1,0 +1,41 @@
+name: Release
+
+on:
+  push:
+    branches: [main]
+    paths:
+      - "skills/**"
+      - "commands/**"
+      - "agents/**"
+      - "hooks/**"
+      - ".mcp.json"
+      - ".claude-plugin/**"
+
+permissions:
+  contents: write
+
+jobs:
+  release:
+    if: "!startsWith(github.event.head_commit.message, 'chore(release):')"
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+
+      - name: Bump patch version
+        id: bump
+        run: echo "version=$(python3 scripts/bump_version.py patch)" >> "$GITHUB_OUTPUT"
+
+      - name: Commit, tag, and push
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "github-actions[bot]@users.noreply.github.com"
+          git add .claude-plugin CHANGELOG.md
+          git commit -m "chore(release): v${{ steps.bump.outputs.version }}"
+          git tag "v${{ steps.bump.outputs.version }}"
+          git push origin main --tags

@@ -1,0 +1,6 @@
+{
+  "upstream_repo": "https://github.com/sl-at-ibm/astra-toolkit-skill.git",
+  "upstream_sha": "aebf0d6e2a297bf7c2a049f238acf82832303b8f",
+  "upstream_skill_path": ".bob/skills/astra-toolkit",
+  "synced_at": "2026-08-21T02:58:04+00:00"
+}

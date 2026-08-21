@@ -1,0 +1,39 @@
+name: Sync upstream
+
+on:
+  schedule:
+    - cron: "0 6 * * 1"
+  workflow_dispatch:
+
+permissions:
+  contents: write
+  pull-requests: write
+
+jobs:
+  sync:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+
+      - name: Sync content and rebuild layouts
+        run: |
+          python3 scripts/sync_upstream.py
+          python3 scripts/build_layouts.py
+
+      - name: Open PR if content changed
+        uses: peter-evans/create-pull-request@v7
+        with:
+          branch: sync/upstream
+          delete-branch: true
+          title: "chore: sync skill content from upstream astra-toolkit-skill"
+          commit-message: "chore: sync skill content from upstream astra-toolkit-skill"
+          body: |
+            Automated content sync from [sl-at-ibm/astra-toolkit-skill](https://github.com/sl-at-ibm/astra-toolkit-skill).
+
+            `sync-manifest.json` records the new upstream SHA. CI (skillsaw strict + A+ gate,
+            layout parity, snippet syntax checks, plugin validation) must pass before merge.
+            Merging to main triggers an automatic patch release.

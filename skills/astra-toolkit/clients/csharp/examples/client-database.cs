@@ -1,0 +1,16 @@
+using DataStax.AstraDB.DataApi;
+using DataStax.AstraDB.DataApi.Core;
+
+namespace Examples;
+
+public class Program
+{
+  static void Main()
+  {
+    var client = new DataAPIClient();
+    var database = client.GetDatabase(
+      "**API_ENDPOINT**",
+      "**APPLICATION_TOKEN**"
+    );
+  }
+}

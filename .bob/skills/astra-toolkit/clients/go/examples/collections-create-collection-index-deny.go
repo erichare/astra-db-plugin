@@ -1,0 +1,31 @@
+package main
+
+import (
+	"context"
+	"log"
+
+	"github.com/datastax/astra-db-go/v2/astra"
+	"github.com/datastax/astra-db-go/v2/astra/options"
+)
+
+func main() {
+	ctx := context.Background()
+
+	// Get an existing database
+	client := astra.NewClient()
+
+	database := client.Database(
+		"**API_ENDPOINT**",
+		options.API().SetToken("**APPLICATION_TOKEN**"),
+	)
+
+	// Create a collection
+	_, err := database.CreateCollection(
+		ctx,
+		"**COLLECTION_NAME**",
+		options.CreateCollection().UpdateIndexingDeny("city", "country"),
+	)
+	if err != nil {
+		log.Fatal(err)
+	}
+}

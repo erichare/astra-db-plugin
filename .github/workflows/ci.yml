@@ -1,0 +1,42 @@
+name: CI
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+
+jobs:
+  quality:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+
+      - name: Layout parity
+        run: bash scripts/check_layout_parity.sh
+
+      - name: skillsaw lint (strict — no warnings)
+        run: |
+          pip install --quiet skillsaw
+          skillsaw lint . --strict
+
+      - name: skillsaw grade gate (A+)
+        run: |
+          skillsaw badge . -o /tmp/badge.json
+          python3 -c "import json; grade = json.load(open('/tmp/badge.json'))['message']; assert grade == 'A+', f'grade {grade} is below A+'"
+
+      - name: Python snippet syntax
+        run: python3 -m compileall -q skills/astra-toolkit/clients/python/examples
+
+      - name: TypeScript snippet syntax
+        run: |
+          npm install --no-save typescript@5
+          node scripts/check_ts_syntax.mjs skills/astra-toolkit/clients/typescript/examples
+
+      - name: Plugin structure validation
+        run: |
+          npm install -g @anthropic-ai/claude-code
+          claude plugin validate .
