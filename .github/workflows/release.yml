@@ -27,15 +27,35 @@ jobs:
         with:
           python-version: "3.12"
 
+      - name: Decide whether to tag current version or bump
+        id: decide
+        run: |
+          version=$(python3 -c "import json; print(json.load(open('.claude-plugin/plugin.json'))['version'])")
+          if git rev-parse "v$version" >/dev/null 2>&1; then
+            echo "bump=true" >> "$GITHUB_OUTPUT"
+          else
+            echo "bump=false" >> "$GITHUB_OUTPUT"
+            echo "version=$version" >> "$GITHUB_OUTPUT"
+          fi
+
       - name: Bump patch version
         id: bump
+        if: steps.decide.outputs.bump == 'true'
         run: echo "version=$(python3 scripts/bump_version.py patch)" >> "$GITHUB_OUTPUT"
 
-      - name: Commit, tag, and push
+      - name: Commit release
+        if: steps.decide.outputs.bump == 'true'
         run: |
           git config user.name "github-actions[bot]"
           git config user.email "github-actions[bot]@users.noreply.github.com"
           git add .claude-plugin CHANGELOG.md
           git commit -m "chore(release): v${{ steps.bump.outputs.version }}"
-          git tag "v${{ steps.bump.outputs.version }}"
-          git push origin main --tags
+          git push origin main
+
+      - name: Tag and push
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "github-actions[bot]@users.noreply.github.com"
+          version="${{ steps.bump.outputs.version || steps.decide.outputs.version }}"
+          git tag "v$version"
+          git push origin "v$version"
