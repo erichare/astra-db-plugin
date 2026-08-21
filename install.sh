@@ -21,8 +21,11 @@ Usage: install.sh <target> [options]
 
 Targets:
   claude              Register the marketplace and install the plugin via the claude CLI
-  codex               Copy the skill into ~/.codex/skills/astra-toolkit (set CODEX_HOME to override)
-  bob                 Copy the skill into ./.bob/skills/astra-toolkit (run from your project root)
+  codex-plugin        Register the marketplace and install the native plugin via the codex CLI
+  codex               Copy the skill only into ~/.codex/skills/astra-toolkit (set CODEX_HOME to override)
+  bob [--global]      Install the full Bob bundle (skill, slash commands, custom modes, MCP
+                      config, rules) into ./.bob/ of the current project, merging with
+                      existing files; --global targets ~/.bob/ instead
   skills-dir <path>   Copy the skill into <path>/astra-toolkit (any Agent Skills harness)
 USAGE
 }
@@ -76,21 +79,45 @@ install_claude() {
   log "done — restart Claude Code sessions to pick up the plugin"
 }
 
+install_codex_plugin() {
+  command -v codex >/dev/null 2>&1 \
+    || fail "codex CLI not found — install Codex first, or use 'codex' for a skill-only install"
+  if codex plugin marketplace add "$REPO_SLUG"; then
+    log "marketplace registered"
+  else
+    log "marketplace add did not succeed (already registered?) — continuing"
+  fi
+  codex plugin add "$PLUGIN@$MARKETPLACE"
+  log "done — Codex loads the astra-db plugin (astra-* skills, hooks, MCP) on its next session"
+}
+
 install_codex() {
   copy_skill_into "${CODEX_HOME:-$HOME/.codex}/skills"
   log "done — Codex discovers the skill on its next session"
 }
 
 install_bob() {
-  copy_skill_into "$PWD/.bob/skills"
-  log "done — Bob discovers .bob/skills/$SKILL in this project"
+  local scope="${1:-}"
+  command -v python3 >/dev/null 2>&1 || fail "python3 is required for the Bob installer"
+  local source
+  source="$(resolve_source)"
+  if [ "$scope" = "--global" ]; then
+    python3 "$source/scripts/bob_install.py" --source "$source" --target "$HOME/.bob" --global
+    log "done — Bob loads the global bundle from ~/.bob on its next session"
+  elif [ -z "$scope" ]; then
+    python3 "$source/scripts/bob_install.py" --source "$source" --target "$PWD/.bob"
+    log "done — Bob loads .bob/ in this project (skill, /astra-* commands, Astra modes, MCP server, rule)"
+  else
+    fail "unknown option for bob: '$scope' (expected --global)"
+  fi
 }
 
 main() {
   case "${1:-}" in
     claude) install_claude ;;
+    codex-plugin) install_codex_plugin ;;
     codex) install_codex ;;
-    bob) install_bob ;;
+    bob) install_bob "${2:-}" ;;
     skills-dir)
       [ -n "${2:-}" ] || { usage >&2; fail "skills-dir requires a path"; }
       copy_skill_into "$2"

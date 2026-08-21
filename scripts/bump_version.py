@@ -14,7 +14,7 @@ from pathlib import Path
 
 REPO_ROOT = Path(__file__).resolve().parent.parent
 PLUGIN_MANIFEST = REPO_ROOT / ".claude-plugin" / "plugin.json"
-CODEX_MANIFEST = REPO_ROOT / ".codex-plugin" / "plugin.json"
+CODEX_MANIFEST = REPO_ROOT / "codex" / ".codex-plugin" / "plugin.json"
 MARKETPLACE_MANIFEST = REPO_ROOT / ".claude-plugin" / "marketplace.json"
 CHANGELOG = REPO_ROOT / "CHANGELOG.md"
 CHANGELOG_HEADER = "# Changelog\n"
@@ -38,12 +38,20 @@ def update_json(path: Path, mutate) -> None:
     path.write_text(json.dumps(data, indent=2) + "\n")
 
 
+UNRELEASED_HEADING = "## Unreleased"
+
+
 def prepend_changelog(version: str, note: str) -> None:
     today = datetime.date.today().isoformat()
-    entry = f"## {version} — {today}\n\n- {note}\n"
     existing = CHANGELOG.read_text() if CHANGELOG.is_file() else CHANGELOG_HEADER
     if not existing.startswith(CHANGELOG_HEADER):
         raise ValueError(f"{CHANGELOG} does not start with '{CHANGELOG_HEADER.strip()}'")
+    heading = f"## {version} — {today}"
+    if UNRELEASED_HEADING in existing:
+        # A hand-written entry is waiting: promote it instead of adding a generic line.
+        CHANGELOG.write_text(existing.replace(UNRELEASED_HEADING, heading, 1))
+        return
+    entry = f"{heading}\n\n- {note}\n"
     body = existing[len(CHANGELOG_HEADER):].lstrip("\n")
     CHANGELOG.write_text(f"{CHANGELOG_HEADER}\n{entry}\n{body}")
 

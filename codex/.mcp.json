@@ -1,0 +1,9 @@
+{
+  "astra-db": {
+    "command": "npx",
+    "args": [
+      "-y",
+      "@datastax/astra-db-mcp"
+    ]
+  }
+}

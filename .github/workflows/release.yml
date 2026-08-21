@@ -11,8 +11,9 @@ on:
       - ".mcp.json"
       - ".mcp.codex.json"
       - ".claude-plugin/**"
-      - ".codex-plugin/**"
       - ".agents/**"
+      - "codex/**"
+      - ".bob/**"
 
 permissions:
   contents: write
@@ -41,17 +42,22 @@ jobs:
             echo "version=$version" >> "$GITHUB_OUTPUT"
           fi
 
-      - name: Bump patch version
+      - name: Bump version (level from conventional commit)
         id: bump
         if: steps.decide.outputs.bump == 'true'
-        run: echo "version=$(python3 scripts/bump_version.py patch)" >> "$GITHUB_OUTPUT"
+        env:
+          HEAD_MSG: ${{ github.event.head_commit.message }}
+        run: |
+          level=$(python3 scripts/bump_level.py "$HEAD_MSG")
+          echo "bumping $level"
+          echo "version=$(python3 scripts/bump_version.py "$level")" >> "$GITHUB_OUTPUT"
 
       - name: Commit release
         if: steps.decide.outputs.bump == 'true'
         run: |
           git config user.name "github-actions[bot]"
           git config user.email "github-actions[bot]@users.noreply.github.com"
-          git add .claude-plugin .codex-plugin CHANGELOG.md
+          git add .claude-plugin codex/.codex-plugin CHANGELOG.md
           git commit -m "chore(release): v${{ steps.bump.outputs.version }}"
           git push origin main
 

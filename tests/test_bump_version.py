@@ -71,3 +71,16 @@ def test_main_rejects_malformed_changelog(manifests, monkeypatch):
     manifests["changelog"].write_text("no header here\n")
     monkeypatch.setattr(sys, "argv", ["bump_version.py", "patch"])
     assert bump_version.main() == 1
+
+
+def test_main_promotes_unreleased_section(manifests, monkeypatch):
+    manifests["changelog"].write_text(
+        "# Changelog\n\n## Unreleased\n\n- hand-written notes\n\n## 1.2.3 — 2026-01-01\n\n- old entry\n"
+    )
+    monkeypatch.setattr(sys, "argv", ["bump_version.py", "minor"])
+    assert bump_version.main() == 0
+    changelog = manifests["changelog"].read_text()
+    assert "## Unreleased" not in changelog
+    assert changelog.startswith("# Changelog\n\n## 1.3.0 — ")
+    assert "- hand-written notes" in changelog
+    assert "Content sync / maintenance release." not in changelog

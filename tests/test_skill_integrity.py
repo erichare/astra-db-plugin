@@ -136,7 +136,7 @@ def content_files(root: Path) -> dict[Path, bytes]:
 
 
 def test_codex_plugin_manifest():
-    codex = json.loads((REPO_ROOT / ".codex-plugin" / "plugin.json").read_text())
+    codex = json.loads((REPO_ROOT / "codex" / ".codex-plugin" / "plugin.json").read_text())
     claude = json.loads((REPO_ROOT / ".claude-plugin" / "plugin.json").read_text())
     assert codex["name"] == claude["name"] == "astra-db"
     assert codex["version"] == claude["version"]
@@ -144,7 +144,7 @@ def test_codex_plugin_manifest():
     for pointer in ("skills", "mcpServers", "hooks"):
         target = codex[pointer]
         assert target.startswith("./"), f"{pointer} must be a ./ relative path"
-        assert (REPO_ROOT / target.removeprefix("./")).exists(), (
+        assert (REPO_ROOT / "codex" / target.removeprefix("./")).exists(), (
             f"{pointer} points at a missing path: {target}"
         )
 
@@ -154,7 +154,7 @@ def test_codex_plugin_manifest():
 
 
 def test_codex_mcp_manifest_has_no_secrets():
-    mcp = json.loads((REPO_ROOT / ".mcp.codex.json").read_text())
+    mcp = json.loads((REPO_ROOT / "codex" / ".mcp.json").read_text())
     server = mcp["astra-db"]
     assert server["command"] == "npx"
     assert "@datastax/astra-db-mcp" in server["args"]
@@ -173,7 +173,7 @@ def test_codex_marketplace_manifest():
     entry = marketplace["plugins"][0]
     assert entry["name"] == "astra-db"
     assert entry["source"]["source"] == "local"
-    assert entry["source"]["path"].startswith("./")
+    assert entry["source"]["path"] == "./codex"
     assert entry["policy"]["installation"] in {
         "AVAILABLE",
         "INSTALLED_BY_DEFAULT",

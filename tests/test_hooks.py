@@ -32,6 +32,12 @@ def test_guard_blocks_real_token():
     assert "Blocked" in result.stderr
 
 
+def test_guard_blocks_token_in_codex_apply_patch_payload():
+    payload = {"tool_name": "apply_patch", "tool_input": {"input": "+token = 'AstraCS:abcDEF123456789012345678'"}}
+    result = run_guard(payload)
+    assert result.returncode == 2
+
+
 def test_guard_allows_placeholder():
     result = run_guard(write_payload("# set ASTRA_DB_APPLICATION_TOKEN=AstraCS:your-token"))
     assert result.returncode == 0

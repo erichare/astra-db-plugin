@@ -38,7 +38,7 @@ jobs:
 
       - name: Unit, hook, and integrity tests (90% coverage gate)
         run: |
-          pip install --quiet pytest pytest-cov
+          pip install --quiet pytest pytest-cov pyyaml
           pytest tests/ --cov=scripts --cov-fail-under=90 -q
 
       - name: Plugin structure validation

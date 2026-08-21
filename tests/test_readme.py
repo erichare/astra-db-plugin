@@ -40,3 +40,9 @@ def test_install_cards_present():
     text = README.read_text()
     for platform in ("install-claude.svg", "install-codex.svg", "install-bob.svg"):
         assert platform in text, f"README is missing the {platform} install card"
+
+
+def test_bob_card_comes_first():
+    text = README.read_text()
+    assert text.index("install-bob.svg") < text.index("install-claude.svg") < text.index("install-codex.svg")
+    assert "Built for IBM Bob" in text
