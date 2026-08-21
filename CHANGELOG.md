@@ -1,6 +1,6 @@
 # Changelog
 
-## Unreleased
+## 1.2.0 — 2026-08-21
 
 - **Widgets.** New `astra-widgets` MCP server (TypeScript, bundled at `server/dist/index.js`, no npm publish) with four read-only tools — `database_overview`, `collection_card`, `similarity_search`, `explore_collection` — each returning `structuredContent` plus an MCP Apps UI resource (`ui://astra-widgets/*`): collection card, similarity results (ranked bars + constellation map), collection explorer (filters, paging, click-to-drill), and database overview. `emit: "html_file"` writes a self-contained page for harnesses without inline rendering.
 - New `astra-widgets` skill with a design spec and Claude Code desktop widget templates; new commands `/astra-db:overview`, `/astra-db:collection`, `/astra-db:similar`, `/astra-db:explore` (ported to Codex as `$astra-*` skills and to Bob as `/astra-*` commands). The server ships in every layout (`codex/server`, `.bob/server`) and in all three MCP configs; `install.sh bob` installs it too.
