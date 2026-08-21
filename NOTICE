@@ -14,3 +14,11 @@ this NOTICE will be updated when upstream licensing is formalized.
 Astra DB and DataStax are trademarks of DataStax, Inc. (an IBM company).
 This is a community-maintained plugin and is not an official DataStax or IBM
 product.
+
+Logos under assets/logos/ are trademarks of their respective owners and are
+used solely to identify compatible products: DataStax mark and wordmark
+(DataStax, Inc., an IBM company), IBM logo (International Business Machines
+Corporation), IBM Bob mark (IBM, from bob.ibm.com), Claude mark (Anthropic),
+OpenAI symbol (OpenAI). Mark files were obtained from the Simple Icons
+collection (CC0), Wikimedia Commons, and bob.ibm.com; no endorsement is
+implied.

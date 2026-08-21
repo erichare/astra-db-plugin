@@ -29,7 +29,7 @@ def test_readme_local_references_resolve(target: str):
     assert (REPO_ROOT / target).exists(), f"README references missing path: {target}"
 
 
-@pytest.mark.parametrize("svg", sorted(ASSETS.glob("*.svg")), ids=lambda p: p.name)
+@pytest.mark.parametrize("svg", sorted(ASSETS.rglob("*.svg")), ids=lambda p: str(p.relative_to(ASSETS)))
 def test_svg_assets_are_valid_xml(svg: Path):
     root = ET.parse(svg).getroot()
     assert root.tag.endswith("svg")
@@ -46,3 +46,8 @@ def test_bob_card_comes_first():
     text = README.read_text()
     assert text.index("install-bob.svg") < text.index("install-claude.svg") < text.index("install-codex.svg")
     assert "Built for IBM Bob" in text
+
+
+def test_logo_assets_present():
+    for name in ("bob", "claude", "openai", "ibm", "datastax", "datastax-wordmark", "datastax-wordmark-dark"):
+        assert (ASSETS / "logos" / f"{name}.svg").is_file(), f"missing logo asset: {name}"

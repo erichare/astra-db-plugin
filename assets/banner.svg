@@ -1,32 +1,49 @@
 <svg xmlns="http://www.w3.org/2000/svg" width="1280" height="260" viewBox="0 0 1280 260" role="img" aria-label="Astra DB Plugin">
   <defs>
-    <linearGradient id="g" x1="0" y1="0" x2="1" y2="1">
-      <stop offset="0" stop-color="#7C3AED"/>
-      <stop offset="1" stop-color="#A78BFA"/>
-    </linearGradient>
     <linearGradient id="t" x1="0" y1="0" x2="1" y2="0">
       <stop offset="0" stop-color="#7C3AED"/>
       <stop offset="1" stop-color="#A78BFA"/>
     </linearGradient>
   </defs>
-  <!-- orbit motif -->
-  <g transform="translate(150 130)">
-    <ellipse cx="0" cy="0" rx="112" ry="42" fill="none" stroke="#A78BFA" stroke-width="2" opacity="0.55" transform="rotate(-22)"/>
-    <ellipse cx="0" cy="0" rx="112" ry="42" fill="none" stroke="#7C3AED" stroke-width="2" opacity="0.35" transform="rotate(38)"/>
-    <circle cx="0" cy="0" r="38" fill="url(#g)"/>
-    <circle cx="0" cy="0" r="38" fill="none" stroke="#C4B5FD" stroke-width="1.5" opacity="0.7"/>
-    <!-- vector points -->
-    <circle cx="-96" cy="-44" r="5" fill="#A78BFA"/>
-    <circle cx="104" cy="20" r="5" fill="#A78BFA"/>
-    <circle cx="-30" cy="88" r="5" fill="#7C3AED"/>
-    <circle cx="72" cy="-80" r="4" fill="#C4B5FD"/>
-    <line x1="-96" y1="-44" x2="-30" y2="-18" stroke="#A78BFA" stroke-width="1.5" opacity="0.6"/>
-    <line x1="104" y1="20" x2="36" y2="8" stroke="#A78BFA" stroke-width="1.5" opacity="0.6"/>
-    <line x1="-30" y1="88" x2="-12" y2="36" stroke="#7C3AED" stroke-width="1.5" opacity="0.6"/>
-    <line x1="72" y1="-80" x2="28" y2="-26" stroke="#C4B5FD" stroke-width="1.5" opacity="0.6"/>
+  <g transform="translate(84 58) scale(5.8333)"><path fill="url(#t)" d="M10.863 8.818v6.364l-2.181 1.683H0v-9.73h8.682l2.181 1.683Zm-9.18 6.366h7.498V8.818H1.683v6.366Zm13.243-6.296v2.26h6.919L24 12.793v2.318l-2.155 1.646h-8.153v-1.646h8.645v-2.318h-6.919l-2.155-1.645v-2.26l2.155-1.645h7.939v1.645h-8.431Z"/></g>
+  <text x="262" y="118" font-family="-apple-system, BlinkMacSystemFont, 'Segoe UI', Helvetica, Arial, sans-serif" font-size="60" font-weight="700" fill="url(#t)" letter-spacing="-1">Astra DB Plugin</text>
+  <text x="264" y="164" font-family="-apple-system, BlinkMacSystemFont, 'Segoe UI', Helvetica, Arial, sans-serif" font-size="23" fill="#8B8F98">Agent-native tooling for Astra DB &amp; HCD.</text>
+  <text x="264" y="196" font-family="-apple-system, BlinkMacSystemFont, 'Segoe UI', Helvetica, Arial, sans-serif" font-size="23" fill="#8B8F98">Native packaging for IBM Bob · Claude Code · OpenAI Codex / ChatGPT.</text>
+  <text x="1042" y="86" font-family="-apple-system, BlinkMacSystemFont, 'Segoe UI', Helvetica, Arial, sans-serif" font-size="12" font-weight="600" letter-spacing="2.5" fill="#8B8F98">WORKS WITH</text>
+  <rect x="1010" y="100" width="64" height="64" rx="16" fill="#FFFFFF" stroke="#E5E7EB" stroke-width="1.5"/><svg x="1022" y="112" width="40" height="40" viewBox="0 0 32 32">
+  <defs>
+    <linearGradient id="grad-top" x1="-2016.953" y1="4199.361" x2="-2005.859" y2="4199.361" gradientTransform="matrix(0 .631 1 0 -4183.361 1279.682)" gradientUnits="userSpaceOnUse">
+      <stop offset=".134" stop-opacity="0"/>
+      <stop offset=".873"/>
+    </linearGradient>
+    <linearGradient id="grad-fill" x1="0" y1="32" x2="32" y2="0" gradientUnits="userSpaceOnUse">
+      <stop offset=".1" stop-color="#a16efb"/>
+      <stop offset=".9" stop-color="#0e61fa"/>
+    </linearGradient>
+    <mask id="icon-mask" x="0" y="0" width="32" height="32" maskUnits="userSpaceOnUse">
+      <path d="M29.718 15.25a13.67 13.67 0 0 0-9.991-12.476A1.747 1.747 0 0 0 18 1.25h-4c-.887 0-1.615.667-1.727 1.524A13.67 13.67 0 0 0 2.282 15.25H0v1.5h32v-1.5h-2.282zM12.25 4.337V13h1.5V3a.25.25 0 0 1 .25-.25h4a.25.25 0 0 1 .25.25v10h1.5V4.337a12.183 12.183 0 0 1 8.468 10.913H3.782A12.183 12.183 0 0 1 12.25 4.337z" style="fill:#fff"/>
+      <path d="M21 7v7H11V7h10z" style="fill:url(#grad-top)"/>
+    </mask>
+  </defs>
+  <g style="mask:url(#icon-mask)">
+    <path style="fill:url(#grad-fill)" d="M0 0h32v32H0z"/>
   </g>
-  <!-- title -->
-  <text x="320" y="118" font-family="-apple-system, BlinkMacSystemFont, 'Segoe UI', Helvetica, Arial, sans-serif" font-size="60" font-weight="700" fill="url(#t)" letter-spacing="-1">Astra DB Plugin</text>
-  <text x="322" y="164" font-family="-apple-system, BlinkMacSystemFont, 'Segoe UI', Helvetica, Arial, sans-serif" font-size="23" fill="#8B8F98">Agent-native tooling for Astra DB &amp; HCD.</text>
-  <text x="322" y="196" font-family="-apple-system, BlinkMacSystemFont, 'Segoe UI', Helvetica, Arial, sans-serif" font-size="23" fill="#8B8F98">Native packaging for Claude Code · OpenAI Codex / ChatGPT · IBM Bob.</text>
+  <path d="M24 30.75H8a4.756 4.756 0 0 1-4.69-4H3c-.965 0-1.75-.785-1.75-1.75v-6h1.5v6c0 .138.112.25.25.25h1.75V26A3.254 3.254 0 0 0 8 29.25h16A3.254 3.254 0 0 0 27.25 26v-.75H29a.25.25 0 0 0 .25-.25v-6h1.5v6c0 .965-.785 1.75-1.75 1.75h-.31a4.756 4.756 0 0 1-4.69 4z" style="fill:#001d6c"/>
+  <circle cx="22" cy="21" r="2" style="fill:#001d6c"/>
+  <circle cx="10" cy="21" r="2" style="fill:#001d6c"/>
+  <path d="M16 27.75a5.695 5.695 0 0 1-3.451-1.15.75.75 0 0 1 .903-1.199c1.476 1.111 3.617 1.111 5.099 0a.75.75 0 1 1 .901 1.199 5.696 5.696 0 0 1-3.45 1.15z" style="fill:#001d6c"/>
+</svg>
+  <rect x="1090" y="100" width="64" height="64" rx="16" fill="#FFFFFF" stroke="#E5E7EB" stroke-width="1.5"/><g transform="translate(1102 112) scale(1.6667)"><path fill="#D97757" d="m4.7144 15.9555 4.7174-2.6471.079-.2307-.079-.1275h-.2307l-.7893-.0486-2.6956-.0729-2.3375-.0971-2.2646-.1214-.5707-.1215-.5343-.7042.0546-.3522.4797-.3218.686.0608 1.5179.1032 2.2767.1578 1.6514.0972 2.4468.255h.3886l.0546-.1579-.1336-.0971-.1032-.0972L6.973 9.8356l-2.55-1.6879-1.3356-.9714-.7225-.4918-.3643-.4614-.1578-1.0078.6557-.7225.8803.0607.2246.0607.8925.686 1.9064 1.4754 2.4893 1.8336.3643.3035.1457-.1032.0182-.0728-.164-.2733-1.3539-2.4467-1.445-2.4893-.6435-1.032-.17-.6194c-.0607-.255-.1032-.4674-.1032-.7285L6.287.1335 6.6997 0l.9957.1336.419.3642.6192 1.4147 1.0018 2.2282 1.5543 3.0296.4553.8985.2429.8318.091.255h.1579v-.1457l.1275-1.706.2368-2.0947.2307-2.6957.0789-.7589.3764-.9107.7468-.4918.5828.2793.4797.686-.0668.4433-.2853 1.8517-.5586 2.9021-.3643 1.9429h.2125l.2429-.2429.9835-1.3053 1.6514-2.0643.7286-.8196.85-.9046.5464-.4311h1.0321l.759 1.1293-.34 1.1657-1.0625 1.3478-.8804 1.1414-1.2628 1.7-.7893 1.36.0729.1093.1882-.0183 2.8535-.607 1.5421-.2794 1.8396-.3157.8318.3886.091.3946-.3278.8075-1.967.4857-2.3072.4614-3.4364.8136-.0425.0304.0486.0607 1.5482.1457.6618.0364h1.621l3.0175.2247.7892.522.4736.6376-.079.4857-1.2142.6193-1.6393-.3886-3.825-.9107-1.3113-.3279h-.1822v.1093l1.0929 1.0686 2.0035 1.8092 2.5075 2.3314.1275.5768-.3218.4554-.34-.0486-2.2039-1.6575-.85-.7468-1.9246-1.621h-.1275v.17l.4432.6496 2.3436 3.5214.1214 1.0807-.17.3521-.6071.2125-.6679-.1214-1.3721-1.9246L14.38 17.959l-1.1414-1.9428-.1397.079-.674 7.2552-.3156.3703-.7286.2793-.6071-.4614-.3218-.7468.3218-1.4753.3886-1.9246.3157-1.53.2853-1.9004.17-.6314-.0121-.0425-.1397.0182-1.4328 1.9672-2.1796 2.9446-1.7243 1.8456-.4128.164-.7164-.3704.0667-.6618.4008-.5889 2.386-3.0357 1.4389-1.882.929-1.0868-.0062-.1579h-.0546l-6.3385 4.1164-1.1293.1457-.4857-.4554.0608-.7467.2307-.2429 1.9064-1.3114Z"/></g>
+  <rect x="1170" y="100" width="64" height="64" rx="16" fill="#FFFFFF" stroke="#E5E7EB" stroke-width="1.5"/><g transform="translate(1182 112) scale(0.1250)"><path fill="#000000" d="M123.2,118.3V85c0-2.2,0.6-3.8,2.9-5.1L187.9,44c8.3-4.8,18.9-7,29.2-7c39.1,0,63.8,30.1,63.8,62.5
+	c0,2.6,0,6.1-0.6,9l-64.7-37.8c-3.2-1.9-6.7-2.2-10.6,0L123.2,118.3z M266.1,236.6v-74c0-4.2-1.6-7-5.4-9.3l-82-47.7l28.8-16.7
+	c1.6-1,4.2-1,5.8,0l62.2,35.9c17.6,10.3,29.8,32.7,29.8,54.1C305.2,204.2,289.8,227.6,266.1,236.6z M106.2,172.8l-28.5-17
+	c-2.2-1.3-2.9-2.9-2.9-5.1V79.3c0-34.9,26.6-61.2,62.8-61.2c14.1,0,27.6,4.8,38.4,13.5L111.7,69c-3.8,2.2-5.4,5.1-5.4,9.3V172.8z
+	 M162,204.9l-38.8-21.8v-46.1l38.8-21.8l38.4,21.8v46.1L162,204.9z M186,301.9c-14.1,0-27.6-4.8-38.4-13.5L212,251
+	c3.8-2.2,5.4-5.1,5.4-9.3v-94.5l28.8,17c2.2,1.3,2.9,2.9,2.9,5.1v71.5C249.1,275.7,222.2,301.9,186,301.9z M110.4,231.1l-62.2-35.9
+	c-17.6-10.3-29.8-32.7-29.8-54.1c0-25.6,15.7-48.7,39.4-57.7v74.3c0,4.2,1.6,7,5.4,9.3l81.7,47.4l-28.8,16.7
+	C114.6,232.1,112,232.1,110.4,231.1z M106.5,283c-36.8,0-63.8-27.6-63.8-61.8c0-3.2,0.3-6.4,0.6-9.3l64.4,37.2c3.8,2.2,7,2.2,10.9,0
+	l81.7-47.4V235c0,2.2-0.6,3.8-2.9,5.1L135.7,276C127.4,280.8,116.8,283,106.5,283z M186,319.2c38.4,0,70.5-27.6,77.5-64.1
+	c35.9-9,59-42.3,59-76.3c0-22.4-9.6-43.9-27.2-59.6c1.6-6.7,2.9-13.8,2.9-20.5c0-45.2-36.8-79.1-79.1-79.1c-8.7,0-17.3,1.6-25.6,4.5
+	C179,9.7,159.4,0.8,137.6,0.8c-38.4,0-70.5,27.6-77.5,64.1c-35.9,9-59,42.3-59,76.3c0,22.4,9.6,43.9,27.2,59.6
+	c-1.6,6.7-2.9,13.8-2.9,20.5c0,45.2,36.8,79.1,79.1,79.1c8.7,0,17.3-1.6,25.6-4.5C144.7,310.3,164.2,319.2,186,319.2z"/></g>
 </svg>

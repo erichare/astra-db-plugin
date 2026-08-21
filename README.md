@@ -13,7 +13,7 @@
   <b>5 client languages · ~1,660 doc-synced Data API snippets · ~420 always-on tokens · skillsaw A+</b>
 </p>
 
-> **Built for IBM Bob.** Bob gets the complete bundle — the skill, three custom modes, `/astra-*` slash commands, the Astra DB MCP server, and a credential-hygiene rule — installed into a project with one command (or globally with `--global`). Claude Code and OpenAI Codex get the same capabilities in their native forms.
+> <img src="assets/logos/ibm.svg" alt="IBM" height="14"> **Built for IBM Bob.** Bob gets the complete bundle — the skill, three custom modes, `/astra-*` slash commands, the Astra DB MCP server, and a credential-hygiene rule — installed into a project with one command (or globally with `--global`). Claude Code and OpenAI Codex get the same capabilities in their native forms.
 
 One skill, one source of truth, three native packagings. The content is the `astra-toolkit` skill by Stefano Lottini (IBM / DataStax) — progressive-disclosure instructions for the Astra CLI, application architecture, data modeling for Collections and Tables, and roughly 340 documentation-derived Data API snippets for each of Python, TypeScript, Java, C#, and Go. It is self-sufficient (no web lookups) and synced automatically from [sl-at-ibm/astra-toolkit-skill](https://github.com/sl-at-ibm/astra-toolkit-skill).
 
@@ -27,7 +27,7 @@ Pick your agent — one command each.
   <a href="#openai-codex"><img src="assets/install-codex.svg" alt="Install for OpenAI Codex" width="32%"></a>
 </p>
 
-### IBM Bob
+### <img src="assets/logos/bob.svg" alt="" height="22" align="absmiddle"> IBM Bob
 
 From your project root:
 
@@ -38,7 +38,7 @@ curl -fsSL https://raw.githubusercontent.com/erichare/astra-db-plugin/main/insta
 
 Installs the full bundle into `.bob/` — the skill, `/astra-setup`, `/astra-doctor`, and `/astra-data-model-review` commands, the `astra-reviewer`, `astra-data-modeler`, and `astra-migration-helper` custom modes, the Astra DB MCP server, and a credential-hygiene rule — merging with any `.bob/` config the project already has. Add `--global` to install into `~/.bob/` for every project instead.
 
-### Claude Code
+### <img src="assets/logos/claude.svg" alt="" height="22" align="absmiddle"> Claude Code
 
 ```bash
 claude plugin marketplace add erichare/astra-db-plugin
@@ -47,7 +47,7 @@ claude plugin install astra-db@astra-db-marketplace
 
 The full plugin: skill, commands, agents, hooks, and MCP server.
 
-### OpenAI Codex
+### <img src="assets/logos/openai.svg" alt="" height="22" align="absmiddle"> OpenAI Codex
 
 ```bash
 codex plugin marketplace add erichare/astra-db-plugin
@@ -101,4 +101,11 @@ Content flow: `sl-at-ibm/astra-toolkit-skill` → `scripts/sync_upstream.py` →
 
 ## License and provenance
 
-Packaging (scripts, commands, agents, hooks, workflows, assets) is [Apache-2.0](LICENSE). Bundled skill content originates from [sl-at-ibm/astra-toolkit-skill](https://github.com/sl-at-ibm/astra-toolkit-skill) and derives from the [DataStax documentation](https://docs.datastax.com); see [NOTICE](NOTICE). Maintained in coordination with the upstream author. This is a community project, not an official DataStax, IBM, Anthropic, or OpenAI product; platform names identify compatibility only.
+<p align="center">
+  <picture>
+    <source media="(prefers-color-scheme: dark)" srcset="assets/logos/datastax-wordmark-dark.svg">
+    <img src="assets/logos/datastax-wordmark.svg" alt="DataStax" height="26">
+  </picture>
+</p>
+
+Packaging (scripts, commands, agents, hooks, workflows, assets) is [Apache-2.0](LICENSE). Bundled skill content originates from [sl-at-ibm/astra-toolkit-skill](https://github.com/sl-at-ibm/astra-toolkit-skill) and derives from the [DataStax documentation](https://docs.datastax.com); see [NOTICE](NOTICE). Maintained in coordination with the upstream author. This is a community project, not an official DataStax, IBM, Anthropic, or OpenAI product; platform names and logos identify compatibility only and are trademarks of their respective owners (see [NOTICE](NOTICE)).
