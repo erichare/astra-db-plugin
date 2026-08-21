@@ -9,7 +9,10 @@ on:
       - "agents/**"
       - "hooks/**"
       - ".mcp.json"
+      - ".mcp.codex.json"
       - ".claude-plugin/**"
+      - ".codex-plugin/**"
+      - ".agents/**"
 
 permissions:
   contents: write
@@ -48,7 +51,7 @@ jobs:
         run: |
           git config user.name "github-actions[bot]"
           git config user.email "github-actions[bot]@users.noreply.github.com"
-          git add .claude-plugin CHANGELOG.md
+          git add .claude-plugin .codex-plugin CHANGELOG.md
           git commit -m "chore(release): v${{ steps.bump.outputs.version }}"
           git push origin main
 

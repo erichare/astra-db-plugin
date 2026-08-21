@@ -14,15 +14,23 @@ import bump_version
 @pytest.fixture
 def manifests(monkeypatch, tmp_path: Path) -> dict[str, Path]:
     plugin = tmp_path / "plugin.json"
+    codex = tmp_path / "codex-plugin.json"
     marketplace = tmp_path / "marketplace.json"
     changelog = tmp_path / "CHANGELOG.md"
     plugin.write_text(json.dumps({"name": "astra-db", "version": "1.2.3"}))
+    codex.write_text(json.dumps({"name": "astra-db", "version": "1.2.3"}))
     marketplace.write_text(json.dumps({"metadata": {"version": "1.2.3"}}))
     changelog.write_text("# Changelog\n\n## 1.2.3 — 2026-01-01\n\n- old entry\n")
     monkeypatch.setattr(bump_version, "PLUGIN_MANIFEST", plugin)
+    monkeypatch.setattr(bump_version, "CODEX_MANIFEST", codex)
     monkeypatch.setattr(bump_version, "MARKETPLACE_MANIFEST", marketplace)
     monkeypatch.setattr(bump_version, "CHANGELOG", changelog)
-    return {"plugin": plugin, "marketplace": marketplace, "changelog": changelog}
+    return {
+        "plugin": plugin,
+        "codex": codex,
+        "marketplace": marketplace,
+        "changelog": changelog,
+    }
 
 
 @pytest.mark.parametrize(
@@ -44,6 +52,7 @@ def test_main_updates_all_files(manifests, monkeypatch, capsys):
     assert capsys.readouterr().out.strip() == "1.2.4"
 
     assert json.loads(manifests["plugin"].read_text())["version"] == "1.2.4"
+    assert json.loads(manifests["codex"].read_text())["version"] == "1.2.4"
     assert json.loads(manifests["marketplace"].read_text())["metadata"]["version"] == "1.2.4"
 
     changelog = manifests["changelog"].read_text()

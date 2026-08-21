@@ -135,6 +135,53 @@ def content_files(root: Path) -> dict[Path, bytes]:
     }
 
 
+def test_codex_plugin_manifest():
+    codex = json.loads((REPO_ROOT / ".codex-plugin" / "plugin.json").read_text())
+    claude = json.loads((REPO_ROOT / ".claude-plugin" / "plugin.json").read_text())
+    assert codex["name"] == claude["name"] == "astra-db"
+    assert codex["version"] == claude["version"]
+
+    for pointer in ("skills", "mcpServers", "hooks"):
+        target = codex[pointer]
+        assert target.startswith("./"), f"{pointer} must be a ./ relative path"
+        assert (REPO_ROOT / target.removeprefix("./")).exists(), (
+            f"{pointer} points at a missing path: {target}"
+        )
+
+    interface = codex["interface"]
+    assert interface["displayName"]
+    assert interface["shortDescription"]
+
+
+def test_codex_mcp_manifest_has_no_secrets():
+    mcp = json.loads((REPO_ROOT / ".mcp.codex.json").read_text())
+    server = mcp["astra-db"]
+    assert server["command"] == "npx"
+    assert "@datastax/astra-db-mcp" in server["args"]
+    assert "AstraCS:" not in json.dumps(mcp)
+
+
+def test_codex_marketplace_manifest():
+    marketplace = json.loads(
+        (REPO_ROOT / ".agents" / "plugins" / "marketplace.json").read_text()
+    )
+    claude_marketplace = json.loads(
+        (REPO_ROOT / ".claude-plugin" / "marketplace.json").read_text()
+    )
+    assert marketplace["name"] == claude_marketplace["name"]
+
+    entry = marketplace["plugins"][0]
+    assert entry["name"] == "astra-db"
+    assert entry["source"]["source"] == "local"
+    assert entry["source"]["path"].startswith("./")
+    assert entry["policy"]["installation"] in {
+        "AVAILABLE",
+        "INSTALLED_BY_DEFAULT",
+        "NOT_AVAILABLE",
+    }
+    assert entry["policy"]["authentication"] in {"ON_INSTALL", "ON_USE"}
+
+
 def test_bob_layout_matches_canonical():
     bob = REPO_ROOT / ".bob" / "skills" / "astra-toolkit"
     canonical_files = content_files(SKILL_DIR)

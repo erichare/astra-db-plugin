@@ -14,6 +14,7 @@ from pathlib import Path
 
 REPO_ROOT = Path(__file__).resolve().parent.parent
 PLUGIN_MANIFEST = REPO_ROOT / ".claude-plugin" / "plugin.json"
+CODEX_MANIFEST = REPO_ROOT / ".codex-plugin" / "plugin.json"
 MARKETPLACE_MANIFEST = REPO_ROOT / ".claude-plugin" / "marketplace.json"
 CHANGELOG = REPO_ROOT / "CHANGELOG.md"
 CHANGELOG_HEADER = "# Changelog\n"
@@ -55,6 +56,7 @@ def main() -> int:
         current = json.loads(PLUGIN_MANIFEST.read_text())["version"]
         new_version = bump(current, level)
         update_json(PLUGIN_MANIFEST, lambda d: d.update(version=new_version))
+        update_json(CODEX_MANIFEST, lambda d: d.update(version=new_version))
         update_json(
             MARKETPLACE_MANIFEST,
             lambda d: d.setdefault("metadata", {}).update(version=new_version),

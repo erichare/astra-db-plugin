@@ -2,7 +2,7 @@
 
 # Astra DB Plugin
 
-**Agent-native tooling for [Astra DB](https://astra.datastax.com) (DataStax / IBM) and HCD —<br>one continuously synced content tree, packaged for Claude Code, OpenAI Codex, and IBM Bob.**
+**Agent-native tooling for [Astra DB](https://astra.datastax.com) (DataStax / IBM) and HCD —<br>one continuously synced content tree, packaged natively for Claude Code, OpenAI Codex / ChatGPT, and IBM Bob.**
 
 [![CI](https://github.com/erichare/astra-db-plugin/actions/workflows/ci.yml/badge.svg)](https://github.com/erichare/astra-db-plugin/actions/workflows/ci.yml)
 [![Release](https://img.shields.io/github/v/release/erichare/astra-db-plugin?color=brightgreen)](https://github.com/erichare/astra-db-plugin/releases)
@@ -39,7 +39,15 @@ You get the skill plus commands (`/astra-db:setup`, `/astra-db:doctor`, `/astra-
 
 ### OpenAI Codex
 
-The canonical skill ships in the standard [Agent Skills](https://agentskills.io) layout:
+**Native plugin** (recommended) — this repository ships a [Codex plugin manifest](.codex-plugin/plugin.json) and repo marketplace (`.agents/plugins/marketplace.json`) per the [OpenAI plugin spec](https://developers.openai.com/plugins/build/plugins):
+
+```bash
+codex plugin marketplace add erichare/astra-db-plugin
+```
+
+then run `/plugins` inside Codex (or open the Plugins tab in the ChatGPT app) and install **Astra DB**. The native plugin carries the skill, the bundled MCP server (`.mcp.codex.json`, active when `ASTRA_DB_APPLICATION_TOKEN` and `ASTRA_DB_API_ENDPOINT` are in your environment), and the lifecycle hooks.
+
+**Skill-only fallback** — the canonical skill also ships in the standard [Agent Skills](https://agentskills.io) layout:
 
 ```bash
 npx skills add erichare/astra-db-plugin
@@ -83,7 +91,7 @@ From a cloned checkout, `./install.sh <target>` does the same without re-fetchin
 | **MCP server** | [`@datastax/astra-db-mcp`](https://github.com/datastax/astra-db-mcp) wired via `.mcp.json` for live database operations |
 | **Hooks** | Credential guard (blocks hardcoded `AstraCS:` tokens); daily upstream-freshness notice |
 
-Commands, agents, hooks, and the MCP server are Claude Code features; Codex, Bob, and other harnesses get the full skill.
+Claude Code gets every component. The native Codex/ChatGPT plugin gets the skill, MCP server, and hooks (commands and agents are Claude Code concepts). Bob and other Agent Skills harnesses get the full skill.
 
 ## Live database tools (MCP)
 
