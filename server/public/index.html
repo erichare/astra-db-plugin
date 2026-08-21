@@ -1,0 +1,12 @@
+<!doctype html>
+<html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1"><title>Astra widgets MCP</title>
+<style>body{font:15px/1.6 -apple-system,BlinkMacSystemFont,"Segoe UI",Helvetica,Arial,sans-serif;max-width:680px;margin:48px auto;padding:0 20px;color:#111827}code,pre{font-family:ui-monospace,SFMono-Regular,Menlo,Consolas,monospace;font-size:13px}pre{background:#F3F4F6;padding:12px 14px;border-radius:10px;overflow:auto}h1{font-size:22px;font-weight:600;color:#4C1D95}a{color:#6D28D9}@media(prefers-color-scheme:dark){body{background:#0B0F19;color:#F9FAFB}pre{background:#1F2937}h1{color:#C4B5FD}a{color:#A78BFA}}</style></head>
+<body>
+<h1>Astra widgets MCP</h1>
+<p>A hosted <a href="https://modelcontextprotocol.io/extensions/apps/overview">MCP Apps</a> server for <a href="https://github.com/erichare/astra-db-plugin">astra-db-plugin</a>: database overview, collection card, similarity search, and collection explorer widgets for Astra DB.</p>
+<p>Endpoint: <code>POST /mcp</code> (streamable HTTP, stateless). Every request carries its own Astra credentials — nothing is stored server-side.</p>
+<pre>Authorization: Bearer &lt;ASTRA_DB_APPLICATION_TOKEN&gt;
+X-Astra-Endpoint: https://&lt;db-id&gt;-&lt;region&gt;.apps.astra.datastax.com
+# or append ?endpoint=&lt;url&gt; to the connector URL</pre>
+<p>Register it in ChatGPT's developer mode with API-key auth, or point any MCP client at <code>/mcp</code>.</p>
+</body></html>

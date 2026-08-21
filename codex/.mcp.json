@@ -4,12 +4,28 @@
     "args": [
       "-y",
       "@datastax/astra-db-mcp"
+    ],
+    "cwd": ".",
+    "env_vars": [
+      "ASTRA_DB_APPLICATION_TOKEN",
+      "ASTRA_DB_API_ENDPOINT",
+      "ASTRA_DB_KEYSPACE",
+      "PATH",
+      "HOME"
     ]
   },
   "astra-widgets": {
     "command": "node",
     "args": [
-      "${PLUGIN_ROOT}/server/index.js"
+      "./server/index.js"
+    ],
+    "cwd": ".",
+    "env_vars": [
+      "ASTRA_DB_APPLICATION_TOKEN",
+      "ASTRA_DB_API_ENDPOINT",
+      "ASTRA_DB_KEYSPACE",
+      "PATH",
+      "HOME"
     ]
   }
 }

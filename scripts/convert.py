@@ -49,9 +49,12 @@ BOB_MODE_SUBSTITUTIONS = [
     *[(old, f"{name} mode") for old, name in _AGENT_WORDING],
 ]
 
-CODEX_MCP_CONFIG = {  # Codex "direct" format: server names at the top level
-    "astra-db": {"command": "npx", "args": ["-y", "@datastax/astra-db-mcp"]},
-    "astra-widgets": {"command": "node", "args": ["${PLUGIN_ROOT}/server/index.js"]},
+# Codex "direct" format: server names at the top level. Codex launches bundled servers with
+# cwd = plugin root (no ${PLUGIN_ROOT} expansion) and only passes the env vars listed in env_vars.
+CODEX_ENV_VARS = ["ASTRA_DB_APPLICATION_TOKEN", "ASTRA_DB_API_ENDPOINT", "ASTRA_DB_KEYSPACE", "PATH", "HOME"]
+CODEX_MCP_CONFIG = {
+    "astra-db": {"command": "npx", "args": ["-y", "@datastax/astra-db-mcp"], "cwd": ".", "env_vars": CODEX_ENV_VARS},
+    "astra-widgets": {"command": "node", "args": ["./server/index.js"], "cwd": ".", "env_vars": CODEX_ENV_VARS},
 }
 
 BOB_MCP_CONFIG = {

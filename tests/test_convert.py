@@ -145,7 +145,9 @@ def test_render_codex_skills_covers_ported_items():
     }
     mcp = json.loads(rendered[".mcp.json"])
     assert set(mcp) == {"astra-db", "astra-widgets"}
-    assert mcp["astra-widgets"]["args"] == ["${PLUGIN_ROOT}/server/index.js"]
+    assert mcp["astra-widgets"]["args"] == ["./server/index.js"]
+    assert mcp["astra-widgets"]["cwd"] == "."
+    assert "ASTRA_DB_APPLICATION_TOKEN" in mcp["astra-widgets"]["env_vars"]
     for path, content in rendered.items():
         if not path.endswith("SKILL.md"):
             continue

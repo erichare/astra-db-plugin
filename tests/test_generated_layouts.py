@@ -110,4 +110,5 @@ def test_server_bundle_copies_match_build():
     assert (REPO_ROOT / "codex" / "server" / "index.js").read_bytes() == bundle
     assert (BOB / "server" / "index.js").read_bytes() == bundle
     codex_mcp = json.loads((REPO_ROOT / "codex" / ".mcp.json").read_text())
-    assert codex_mcp["astra-widgets"]["args"] == ["${PLUGIN_ROOT}/server/index.js"]
+    assert codex_mcp["astra-widgets"]["args"] == ["./server/index.js"]
+    assert codex_mcp["astra-widgets"]["cwd"] == "."

@@ -98,7 +98,7 @@ The widgets are proactive too: the skill tells the agent to show the matching vi
 
 <br>
 
-The same server runs as a streamable-HTTP endpoint (`server/api/mcp.ts`, deployable to Vercel). Register it in ChatGPT's developer mode with API-key auth: `Authorization: Bearer <ASTRA_DB_APPLICATION_TOKEN>`, and pass your Data API endpoint with an `X-Astra-Endpoint` header or `?endpoint=<url>` on the connector URL. Nothing is stored server-side; every request carries its own credentials.
+The same server runs as a streamable-HTTP endpoint, hosted at **`https://astra-widgets-mcp.vercel.app/mcp`** (source: `server/api/mcp.ts`, deployed on Vercel; self-host with `vercel --prod` from `server/`). Register it in ChatGPT's developer mode with API-key auth: `Authorization: Bearer <ASTRA_DB_APPLICATION_TOKEN>`, and pass your Data API endpoint with an `X-Astra-Endpoint` header or `?endpoint=<url>` on the connector URL. Nothing is stored server-side; every request carries its own credentials.
 
 </details>
 
