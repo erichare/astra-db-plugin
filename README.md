@@ -4,7 +4,7 @@
 
 <p align="center">
   <a href="https://github.com/erichare/astra-db-plugin/actions/workflows/ci.yml"><img src="https://github.com/erichare/astra-db-plugin/actions/workflows/ci.yml/badge.svg" alt="CI"></a>
-  <a href="https://github.com/erichare/astra-db-plugin/releases"><img src="https://img.shields.io/github/v/release/erichare/astra-db-plugin?color=brightgreen" alt="Release"></a>
+  <a href="https://github.com/erichare/astra-db-plugin/tags"><img src="https://img.shields.io/github/v/tag/erichare/astra-db-plugin?label=release&color=brightgreen" alt="Release"></a>
   <a href="https://skillsaw.org/"><img src="https://img.shields.io/endpoint?url=https%3A%2F%2Fraw.githubusercontent.com%2Ferichare%2Fastra-db-plugin%2Fmain%2F.skillsaw-badge.json" alt="skillsaw grade"></a>
   <a href="LICENSE"><img src="https://img.shields.io/badge/license-Apache--2.0-blue" alt="License"></a>
 </p>
