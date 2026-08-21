@@ -63,9 +63,25 @@ jobs:
           git push origin main
 
       - name: Tag and push
+        id: tag
         run: |
           git config user.name "github-actions[bot]"
           git config user.email "github-actions[bot]@users.noreply.github.com"
           version="${{ steps.bump.outputs.version || steps.decide.outputs.version }}"
           git tag "v$version"
           git push origin "v$version"
+          echo "version=$version" >> "$GITHUB_OUTPUT"
+
+      - name: GitHub Release from the changelog section
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          version="${{ steps.tag.outputs.version }}"
+          python3 - "$version" > /tmp/release-notes.md <<'PY'
+          import re, sys
+          version = sys.argv[1]
+          text = open("CHANGELOG.md").read()
+          m = re.search(rf"## {re.escape(version)} — [^\n]+\n(.*?)(?=\n## |\Z)", text, re.S)
+          print((m.group(1).strip() if m else "See CHANGELOG.md.") + "\n")
+          PY
+          gh release create "v$version" --title "v$version" --notes-file /tmp/release-notes.md --latest
