@@ -14,6 +14,7 @@ on:
       - ".agents/**"
       - "codex/**"
       - ".bob/**"
+      - "server/**"
 
 permissions:
   contents: write

@@ -15,7 +15,20 @@ jobs:
         with:
           python-version: "3.12"
 
-      - name: Layout parity
+      - uses: actions/setup-node@v4
+        with:
+          node-version: "22"
+          cache: npm
+          cache-dependency-path: server/package-lock.json
+
+      - name: Widget server — install, test, build
+        working-directory: server
+        run: |
+          npm ci --no-fund --no-audit
+          npm test
+          npm run build
+
+      - name: Layout parity (generated layouts + committed server bundle)
         run: bash scripts/check_layout_parity.sh
 
       - name: skillsaw lint (strict — no warnings)

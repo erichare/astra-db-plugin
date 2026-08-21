@@ -1,0 +1,44 @@
+<h2 class="sr-only">{{hits.length}} similarity results for “{{query}}” in {{collection}}.</h2>
+<div style="background: var(--surface-2); border: 0.5px solid var(--border); border-radius: 12px; padding: 1rem 1.25rem;">
+  <div style="display:flex; align-items:center; justify-content:space-between; gap:12px; flex-wrap:wrap;">
+    <div style="display:flex; align-items:center; gap:10px;">
+      <i class="ti ti-search" style="font-size:18px; color: var(--text-pro);" aria-hidden="true"></i>
+      <div><p style="margin:0; font-size:16px; font-weight:500;">Similar to <span style="color: var(--text-pro);">“{{query}}”</span></p><p style="margin:0; font-size:13px; color: var(--text-secondary);">{{collection}} · {{mode}} · top {{hits.length}}</p></div>
+    </div>
+    <div style="display:inline-flex; border:0.5px solid var(--border-strong); border-radius: var(--radius); overflow:hidden;">
+      <button id="v-ranked" onclick="setView('ranked')" style="border:0; border-radius:0; font-size:12px; padding:5px 10px; background: var(--fill-pro); color: var(--on-pro);">Ranked</button>
+      <button id="v-map" onclick="setView('map')" style="border:0; border-radius:0; font-size:12px; padding:5px 10px;">Constellation</button>
+    </div>
+  </div>
+  <div style="display:flex; gap:6px; margin:10px 0 4px;">
+    <span style="display:inline-flex; padding:2px 9px; border-radius:999px; font-size:12px; background: var(--bg-pro); color: var(--text-pro);">best {{stats.max}}</span>
+    <span style="display:inline-flex; padding:2px 9px; border-radius:999px; font-size:12px; background: var(--surface-1); border:0.5px solid var(--border); color: var(--text-secondary);">mean {{stats.mean}}</span>
+    <span style="display:inline-flex; padding:2px 9px; border-radius:999px; font-size:12px; background: var(--surface-1); border:0.5px solid var(--border); color: var(--text-secondary);">lowest {{stats.min}}</span>
+  </div>
+  <div id="ranked">
+    <!-- repeat per hit; bar width = similarity × 100% -->
+    <div style="display:grid; grid-template-columns:28px minmax(0,1fr) 64px; gap:10px; align-items:center; padding:8px 4px; border-top:0.5px solid var(--border); cursor:pointer;" onclick="sendPrompt('Find documents similar to {{hit.id}} in {{collection}}')">
+      <div style="text-align:right; font-size:12px; color: var(--text-muted); font-variant-numeric:tabular-nums;">{{hit.rank}}</div>
+      <div style="min-width:0;">
+        <div style="font-weight:500; overflow:hidden; text-overflow:ellipsis; white-space:nowrap;">{{hit.title}}</div>
+        <div style="font-size:12px; color: var(--text-muted); overflow:hidden; text-overflow:ellipsis; white-space:nowrap;">{{hit.fields as "key: value · key: value"}}</div>
+        <div style="height:6px; border-radius:999px; background: var(--surface-1); margin-top:5px; overflow:hidden;"><div style="height:100%; width:{{similarity × 100}}%; background: var(--fill-pro); border-radius:999px;"></div></div>
+      </div>
+      <div style="text-align:right; font-size:12px; color: var(--text-pro); font-variant-numeric:tabular-nums;">{{hit.similarity}}</div>
+    </div>
+  </div>
+  <div id="map" style="display:none;">
+    <svg viewBox="0 0 640 360" width="100%" role="img" aria-label="Constellation of results: closer to the center means more similar to the query.">
+      <circle cx="320" cy="180" r="75" fill="none" stroke="var(--border)" stroke-dasharray="3 3"/><circle cx="320" cy="180" r="120" fill="none" stroke="var(--border)" stroke-dasharray="3 3"/><circle cx="320" cy="180" r="165" fill="none" stroke="var(--border)" stroke-dasharray="3 3"/>
+      <circle cx="320" cy="180" r="7" fill="var(--fill-pro)"/><text x="320" y="202" text-anchor="middle" font-size="11" fill="var(--text-secondary)">query</text>
+      <!-- repeat per hit: angle = rank × 2.39996 rad − π/2; radius = 30 + 135 × (1 − (sim − min)/(max − min)); label offset ±10px -->
+      <circle cx="{{x}}" cy="{{y}}" r="{{6 + 4 × norm}}" fill="var(--fill-pro)" style="cursor:pointer" onclick="sendPrompt('Find documents similar to {{hit.id}} in {{collection}}')"><title>{{hit.rank}}. {{hit.title}} ({{hit.similarity}})</title></circle>
+      <text x="{{x + 10}}" y="{{y + 4}}" font-size="11" fill="var(--text-primary)">{{hit.title, ≤28 chars}}</text>
+    </svg>
+    <p style="margin:4px 0 0; text-align:center; font-size:12px; color: var(--text-muted);">Closer to the center = more similar</p>
+  </div>
+  <p style="margin:10px 0 0; font-size:12px; color: var(--text-muted);">Click a result to find documents similar to it.</p>
+</div>
+<script>
+function setView(v){const r=document.getElementById('ranked'),m=document.getElementById('map');const on=v==='ranked';r.style.display=on?'':'none';m.style.display=on?'none':'';const a=document.getElementById('v-ranked'),b=document.getElementById('v-map');a.style.background=on?'var(--fill-pro)':'transparent';a.style.color=on?'var(--on-pro)':'';b.style.background=on?'transparent':'var(--fill-pro)';b.style.color=on?'':'var(--on-pro)';}
+</script>

@@ -5,5 +5,11 @@
       "-y",
       "@datastax/astra-db-mcp"
     ]
+  },
+  "astra-widgets": {
+    "command": "node",
+    "args": [
+      "${PLUGIN_ROOT}/server/index.js"
+    ]
   }
 }

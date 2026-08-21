@@ -13,9 +13,9 @@ import re
 from pathlib import Path
 
 PREFIX = "astra-"
-PORTED_COMMANDS = ("setup", "doctor", "data-model-review")  # sync-check is maintainer-only
+PORTED_COMMANDS = ("setup", "doctor", "data-model-review", "overview", "collection", "similar", "explore")  # sync-check is maintainer-only
 AGENT_NAMES = ("astra-reviewer", "astra-data-modeler", "astra-migration-helper")
-SKILL_PATH_IN_PLUGIN = "${CLAUDE_PLUGIN_ROOT}/skills/astra-toolkit/"
+SKILL_PATH_IN_PLUGIN = "${CLAUDE_PLUGIN_ROOT}/skills/"  # any plugin skill dir
 
 COMMAND_TRIGGERS = {
     "setup": "Use when the user wants to connect a project to Astra DB or install the Astra CLI.",
@@ -23,35 +23,41 @@ COMMAND_TRIGGERS = {
     "data-model-review": (
         "Use when the user asks to review or audit an Astra DB data model or Data API usage."
     ),
+    "overview": "Use when the user wants to see what is in an Astra DB database: keyspaces, collections, tables, counts.",
+    "collection": "Use when the user asks about one Astra DB collection's configuration, vector settings, or a sample document.",
+    "similar": "Use when the user wants a vector or similarity search in an Astra DB collection and wants to see the results.",
+    "explore": "Use when the user wants to browse, filter, or page through documents in an Astra DB collection.",
 }
 
 _AGENT_WORDING = [(f"{name} agent", name) for name in AGENT_NAMES]
 
 CODEX_SUBSTITUTIONS = [
-    (SKILL_PATH_IN_PLUGIN, "${PLUGIN_ROOT}/skills/astra-toolkit/"),
+    (SKILL_PATH_IN_PLUGIN, "${PLUGIN_ROOT}/skills/"),
     ("../skills/astra-toolkit/", "../astra-toolkit/"),
     ("/astra-db:", "$astra-"),
     *[(old, f"${name} skill") for old, name in _AGENT_WORDING],
 ]
 BOB_COMMAND_SUBSTITUTIONS = [
-    (SKILL_PATH_IN_PLUGIN, ".bob/skills/astra-toolkit/"),
+    (SKILL_PATH_IN_PLUGIN, ".bob/skills/"),
     ("/astra-db:", "/astra-"),
     *[(old, f"{name} mode") for old, name in _AGENT_WORDING],
 ]
 BOB_MODE_SUBSTITUTIONS = [
-    (SKILL_PATH_IN_PLUGIN, ".bob/skills/astra-toolkit/"),
+    (SKILL_PATH_IN_PLUGIN, ".bob/skills/"),
     ("../skills/astra-toolkit/", ".bob/skills/astra-toolkit/"),
     ("/astra-db:", "/astra-"),
     *[(old, f"{name} mode") for old, name in _AGENT_WORDING],
 ]
 
 CODEX_MCP_CONFIG = {  # Codex "direct" format: server names at the top level
-    "astra-db": {"command": "npx", "args": ["-y", "@datastax/astra-db-mcp"]}
+    "astra-db": {"command": "npx", "args": ["-y", "@datastax/astra-db-mcp"]},
+    "astra-widgets": {"command": "node", "args": ["${PLUGIN_ROOT}/server/index.js"]},
 }
 
 BOB_MCP_CONFIG = {
     "mcpServers": {
-        "astra-db": {"command": "npx", "args": ["-y", "@datastax/astra-db-mcp"]}
+        "astra-db": {"command": "npx", "args": ["-y", "@datastax/astra-db-mcp"]},
+        "astra-widgets": {"command": "node", "args": [".bob/server/index.js"]},
     }
 }
 

@@ -1,0 +1,29 @@
+<h2 class="sr-only">Explorer for collection {{collection}}: {{documents.length}} documents loaded.</h2>
+<div style="background: var(--surface-2); border: 0.5px solid var(--border); border-radius: 12px; padding: 1rem 1.25rem;">
+  <div style="display:flex; align-items:center; justify-content:space-between; gap:12px; flex-wrap:wrap;">
+    <div style="display:flex; align-items:center; gap:10px;">
+      <i class="ti ti-list-details" style="font-size:18px; color: var(--text-pro);" aria-hidden="true"></i>
+      <div><p style="margin:0; font-size:16px; font-weight:500;">{{collection}}</p><p style="margin:0; font-size:13px; color: var(--text-secondary);">Explorer · keyspace {{keyspace}} · {{documents.length}} loaded{{nextPageState ? " · more available" : ""}}</p></div>
+    </div>
+    <!-- only when a filter is active -->
+    <div style="display:flex; gap:6px; align-items:center;"><span style="font-size:12px; color: var(--text-muted);">filter</span><span style="display:inline-flex; padding:2px 9px; border-radius:999px; font-size:12px; background: var(--bg-pro); color: var(--text-pro);">{{field}} = {{value}}</span><button onclick="sendPrompt('Explore {{collection}} without filters')">Clear ↗</button></div>
+  </div>
+  <div style="display:flex; gap:6px; flex-wrap:wrap; margin-top:10px;"><!-- one chip per field (max 12) --><span style="display:inline-flex; padding:2px 9px; border-radius:999px; font-size:11.5px; font-family: var(--font-mono); background: var(--surface-1); border:0.5px solid var(--border); color: var(--text-secondary);">{{field.name}} · {{field.type}}</span></div>
+  <table style="width:100%; border-collapse:collapse; table-layout:fixed; font-size:13px; margin-top:12px;">
+    <thead><tr style="color: var(--text-muted); font-size:12px; text-align:left;"><th style="padding:6px 8px; font-weight:500;">_id</th><th style="padding:6px 8px; font-weight:500;">{{displayFields[0]}}</th><th style="padding:6px 8px; font-weight:500;">{{displayFields[1]}}</th><th style="padding:6px 8px; font-weight:500;">{{displayFields[2]}}</th><th style="padding:6px 8px; width:90px;"></th></tr></thead>
+    <tbody>
+      <!-- repeat per document (first 10); value cells filter via sendPrompt; the row toggles a JSON detail row -->
+      <tr style="border-top:0.5px solid var(--border);">
+        <td style="padding:8px; overflow:hidden; text-overflow:ellipsis; white-space:nowrap; font-family: var(--font-mono); font-size:12px;">{{doc._id}}</td>
+        <td style="padding:8px; overflow:hidden; text-overflow:ellipsis; white-space:nowrap; cursor:pointer; color: var(--text-primary);" onclick="sendPrompt('Explore {{collection}} filtered by {{field}} = {{value}}')">{{value}}</td>
+        <td style="padding:8px; overflow:hidden; text-overflow:ellipsis; white-space:nowrap;">{{value}}</td>
+        <td style="padding:8px; overflow:hidden; text-overflow:ellipsis; white-space:nowrap;">{{value}}</td>
+        <td style="padding:8px;"><button style="padding:3px 8px; font-size:12px;" onclick="sendPrompt('Find documents similar to {{doc._id}} in {{collection}}')">Similar ↗</button></td>
+      </tr>
+    </tbody>
+  </table>
+  <div style="display:flex; gap:8px; margin-top:10px;">
+    <button onclick="sendPrompt('Show the next page of {{collection}}')">Load next page ↗</button>
+  </div>
+  <p style="margin:10px 0 0; font-size:12px; color: var(--text-muted);">Click a value to filter, or Similar to search by that document.</p>
+</div>

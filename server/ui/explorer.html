@@ -1,0 +1,76 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Astra DB collection explorer</title>
+<style>/*@shared-css*/
+td.val{cursor:default}td.val.filterable{cursor:pointer}td.val.filterable:hover{color:var(--accent-text);text-decoration:underline}
+tr.expand td{white-space:normal;background:var(--surface-2)}
+</style>
+</head>
+<body>
+<div id="root"></div>
+<script>/*@shared-js*/</script>
+<script>/*@bridge*/</script>
+<script>
+(function () {
+  const { h, chip, json, srSummary } = window.AstraUI;
+  const PAGE = 10;
+  let shown = PAGE;
+  function render(data, api) {
+    const root = document.getElementById("root");
+    root.replaceChildren();
+    const docs = data.documents || [];
+    root.append(srSummary(`Explorer for collection ${data.collection}: ${docs.length} documents loaded.`));
+    const card = h("div", { class: "card" });
+    const header = h("div", { class: "row between" },
+      h("div", null, h("p", { class: "title" }, data.collection), h("p", { class: "sub" }, `Explorer · keyspace ${data.keyspace} · ${docs.length} loaded${data.nextPageState ? " · more available" : ""}`)));
+    if (data.filter) {
+      const f = h("div", { class: "row", style: "gap:6px" }, h("span", { class: "muted" }, "filter"),
+        ...Object.entries(data.filter).map(([k, v]) => chip(`${k} = ${typeof v === "object" ? JSON.stringify(v) : v}`, "accent")));
+      if (api.canCall) f.append(h("button", { class: "btn", onclick: () => { shown = PAGE; api.callTool("explore_collection", { collection: data.collection, keyspace: data.keyspace }); } }, "Clear"));
+      header.append(f);
+    }
+    card.append(header);
+    if (data.fields && data.fields.length) {
+      card.append(h("div", { class: "row", style: "gap:6px;margin-top:10px" }, ...data.fields.slice(0, 12).map((f) => chip(`${f.name} · ${f.type}`, "mono"))));
+    }
+    if (docs.length === 0) { card.append(h("div", { class: "empty", style: "margin-top:12px" }, "No documents match")); root.append(card); return; }
+    const cols = ["_id", ...(data.displayFields || []).filter((c) => c !== "_id")].slice(0, 5);
+    const table = h("table", { class: "grid", style: "margin-top:12px" },
+      h("thead", null, h("tr", null, ...cols.map((c) => h("th", null, c)), api.canCall ? h("th", { style: "width:90px" }, "") : null)));
+    const body = h("tbody");
+    docs.slice(0, shown).forEach((doc, i) => {
+      const tr = h("tr", { class: "clickable", title: "Show full document" });
+      for (const c of cols) {
+        const v = doc[c];
+        const scalar = v === null || ["string", "number", "boolean"].includes(typeof v);
+        const text = v === undefined ? "" : scalar ? String(v) : JSON.stringify(v);
+        const td = h("td", { class: `val ${api.canCall && scalar && c !== "_id" ? "filterable" : ""}`, title: text }, text.length > 60 ? text.slice(0, 59) + "…" : text);
+        if (api.canCall && scalar && c !== "_id") td.addEventListener("click", (e) => { e.stopPropagation(); shown = PAGE; api.callTool("explore_collection", { collection: data.collection, keyspace: data.keyspace, filter: { [c]: v } }); });
+        tr.append(td);
+      }
+      if (api.canCall) tr.append(h("td", null, h("button", { class: "btn", style: "padding:3px 8px;font-size:12px", onclick: (e) => { e.stopPropagation(); api.callTool("similarity_search", { collection: data.collection, keyspace: data.keyspace, documentId: String(doc._id) }); } }, "Similar")));
+      let expanded = null;
+      tr.addEventListener("click", () => {
+        if (expanded) { expanded.remove(); expanded = null; return; }
+        expanded = h("tr", { class: "expand" }, h("td", { colspan: cols.length + (api.canCall ? 1 : 0) }, json(doc)));
+        tr.after(expanded);
+      });
+      body.append(tr);
+    });
+    table.append(body);
+    card.append(table);
+    const actions = h("div", { class: "row", style: "margin-top:10px" });
+    if (shown < docs.length) actions.append(h("button", { class: "btn", onclick: () => { shown += PAGE; render(data, api); } }, `Show ${Math.min(PAGE, docs.length - shown)} more`));
+    if (api.canCall && data.nextPageState) actions.append(h("button", { class: "btn primary", onclick: () => { shown = PAGE; api.callTool("explore_collection", { collection: data.collection, keyspace: data.keyspace, filter: data.filter || undefined, pageState: data.nextPageState }); } }, "Load next page"));
+    if (actions.childElementCount) card.append(actions);
+    if (api.canCall) card.append(h("p", { class: "note" }, "Click a value to filter, a row to expand, or Similar to search by that document."));
+    root.append(card);
+  }
+  window.AstraBridge.mount(render);
+})();
+</script>
+</body>
+</html>

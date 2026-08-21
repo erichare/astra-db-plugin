@@ -1,0 +1,66 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Astra DB collection</title>
+<style>/*@shared-css*/</style>
+</head>
+<body>
+<div id="root"></div>
+<script>/*@shared-js*/</script>
+<script>/*@bridge*/</script>
+<script>
+(function () {
+  const { h, fmt, chip, json, vectorLabel, srSummary } = window.AstraUI;
+  function render(data, api) {
+    const root = document.getElementById("root");
+    root.replaceChildren();
+    const v = data.vector;
+    root.append(srSummary(`Collection ${data.name} in keyspace ${data.keyspace}${v ? `, ${v.dimension} dimensional ${v.metric} vectors` : ""}, about ${fmt(data.estimatedCount)} documents.`));
+    const card = h("div", { class: "card" });
+    const chips = h("div", { class: "row", style: "gap:6px" });
+    if (v) chips.append(chip(vectorLabel(v), "accent"));
+    if (v && v.model) chips.append(chip(`${v.provider} · ${v.model}`, "mono"));
+    if (data.lexical && data.lexical.enabled) chips.append(chip("lexical"));
+    if (data.rerank && data.rerank.enabled) chips.append(chip("rerank", "good"));
+    if (!v) chips.append(chip("no vector"));
+    card.append(h("div", { class: "row between" },
+      h("div", null, h("p", { class: "title" }, data.name), h("p", { class: "sub" }, `Collection · keyspace ${data.keyspace}`)), chips));
+    card.append(h("div", { class: "tiles" },
+      tile("Documents", data.estimatedCount === null ? "—" : `~${fmt(data.estimatedCount)}`),
+      tile("Dimension", v && v.dimension ? fmt(v.dimension) : "—"),
+      tile("Metric", v && v.metric ? v.metric : "—"),
+      tile("Default id", data.defaultIdType || "uuid")));
+    const details = h("table", { class: "grid" });
+    const row = (k, val) => details.append(h("tr", null, h("td", { style: "width:38%;color:var(--text-3)" }, k), h("td", { style: "white-space:normal" }, val)));
+    row("Vectorize", v && v.model ? `${v.provider} / ${v.model}` : "none (client-side vectors)");
+    row("Rerank", data.rerank && data.rerank.enabled ? `${data.rerank.provider} / ${data.rerank.model}` : "off");
+    row("Lexical", data.lexical && data.lexical.enabled ? "enabled" : "off");
+    const idx = data.indexing || {};
+    row("Indexing", idx.allow ? `allow: ${idx.allow.join(", ")}` : idx.deny ? `deny: ${idx.deny.join(", ")}` : "all fields");
+    card.append(h("div", { class: "section" }, h("h3", null, "Definition"), details));
+    if (data.sampleDocument) {
+      card.append(h("div", { class: "section" }, h("h3", null, "Sample document"), json(data.sampleDocument)));
+    }
+    if (data.fields && data.fields.length) {
+      card.append(h("div", { class: "section" }, h("h3", null, "Fields"), h("div", { class: "row", style: "gap:6px" }, ...data.fields.map((f) => chip(`${f.name} · ${f.type}`, "mono")))));
+    }
+    if (api.canCall) {
+      const input = h("input", { class: "txt", placeholder: v && v.model ? "Find similar to…" : "Find similar to document id…" });
+      const go = h("button", { class: "btn primary", onclick: () => {
+        const q = input.value.trim(); if (!q) return;
+        const args = { collection: data.name, keyspace: data.keyspace };
+        if (v && v.model) args.query = q; else args.documentId = q;
+        api.callTool("similarity_search", args);
+      } }, "Search");
+      card.append(h("div", { class: "section row" }, h("button", { class: "btn", onclick: () => api.callTool("explore_collection", { collection: data.name, keyspace: data.keyspace }) }, "Explore documents"), input, go));
+    }
+    root.append(card);
+  }
+  function tile(k, v) { return h("div", { class: "tile" }, h("div", { class: "k" }, k), h("div", { class: "v" }, v)); }
+  window.AstraBridge.mount(render);
+})();
+</script>
+</body>
+</html>

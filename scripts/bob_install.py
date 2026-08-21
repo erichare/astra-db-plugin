@@ -17,6 +17,8 @@ from pathlib import Path
 
 SKILL_NAME = "astra-toolkit"
 MCP_SERVER_KEY = "astra-db"
+MCP_SERVER_PREFIX = "astra"
+WIDGETS_SERVER_KEY = "astra-widgets"
 BEGIN_MARKER = "# astra-db:begin"
 END_MARKER = "# astra-db:end"
 _MODES_KEY = re.compile(r"^customModes:[ \t]*(\[[ \t]*\])?[ \t]*$", re.MULTILINE)
@@ -44,14 +46,32 @@ def install_files(source_bob: Path, target: Path, subdir: str) -> list[Path]:
     return written
 
 
-def merge_mcp(source_bob: Path, dest: Path) -> Path:
-    server = json.loads((source_bob / "mcp.json").read_text())["mcpServers"][MCP_SERVER_KEY]
+def merge_mcp(source_bob: Path, dest: Path, server_path: str | None = None) -> Path:
+    """Add/replace every astra-* server from the bundle; keep the project's other servers."""
+    ours = json.loads((source_bob / "mcp.json").read_text())["mcpServers"]
     dest.parent.mkdir(parents=True, exist_ok=True)
     data: dict = {}
     if dest.is_file():
         data = json.loads(dest.read_text())  # invalid JSON -> raise, never overwrite
-    data.setdefault("mcpServers", {})[MCP_SERVER_KEY] = server
+    servers = data.setdefault("mcpServers", {})
+    for name, config in ours.items():
+        if not name.startswith(MCP_SERVER_PREFIX):
+            continue
+        config = dict(config)
+        if name == WIDGETS_SERVER_KEY and server_path:
+            config["args"] = [server_path]
+        servers[name] = config
     dest.write_text(json.dumps(data, indent=2) + "\n")
+    return dest
+
+
+def install_server(source_bob: Path, target: Path) -> Path | None:
+    bundle = source_bob / "server" / "index.js"
+    if not bundle.is_file():
+        return None
+    dest = target / "server" / "index.js"
+    dest.parent.mkdir(parents=True, exist_ok=True)
+    shutil.copy(bundle, dest)
     return dest
 
 
@@ -120,7 +140,12 @@ def main() -> int:
         written = [install_skill(source_bob, target)]
         written += install_files(source_bob, target, "commands")
         written += install_files(source_bob, target, "rules")
-        written.append(merge_mcp(source_bob, mcp_dest))
+        server_dest = install_server(source_bob, target)
+        if server_dest:
+            written.append(server_dest)
+        # Global installs need an absolute path to the bundle; project installs stay relative to the workspace.
+        server_path = str(server_dest) if (server_dest and args.is_global) else None
+        written.append(merge_mcp(source_bob, mcp_dest, server_path))
         written.append(merge_custom_modes(source_bob, modes_dest))
     except (OSError, json.JSONDecodeError, KeyError) as exc:
         print(f"bob install failed: {exc}", file=sys.stderr)

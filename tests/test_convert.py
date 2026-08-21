@@ -73,7 +73,7 @@ def test_command_to_codex_skill_rewrites_for_codex():
     assert content.startswith("---\nname: astra-doctor\ndescription: ")
     assert "Use when Astra DB connectivity" in content
     assert "`$astra-setup`" in content
-    assert "${PLUGIN_ROOT}/skills/astra-toolkit/" in content
+    assert "${PLUGIN_ROOT}/skills/astra-toolkit/" in content  # generic skills/ prefix rewrite
     assert "](../astra-toolkit/data-modeling/README-tables.md)" in content
     assert "$astra-data-modeler skill" in content
     assert "/astra-db:" not in content and "CLAUDE_PLUGIN_ROOT" not in content
@@ -134,12 +134,18 @@ def test_render_codex_skills_covers_ported_items():
         "skills/astra-setup/SKILL.md",
         "skills/astra-doctor/SKILL.md",
         "skills/astra-data-model-review/SKILL.md",
+        "skills/astra-overview/SKILL.md",
+        "skills/astra-collection/SKILL.md",
+        "skills/astra-similar/SKILL.md",
+        "skills/astra-explore/SKILL.md",
         "skills/astra-reviewer/SKILL.md",
         "skills/astra-data-modeler/SKILL.md",
         "skills/astra-migration-helper/SKILL.md",
         ".mcp.json",
     }
-    assert "astra-db" in json.loads(rendered[".mcp.json"])
+    mcp = json.loads(rendered[".mcp.json"])
+    assert set(mcp) == {"astra-db", "astra-widgets"}
+    assert mcp["astra-widgets"]["args"] == ["${PLUGIN_ROOT}/server/index.js"]
     for path, content in rendered.items():
         if not path.endswith("SKILL.md"):
             continue
@@ -154,9 +160,14 @@ def test_render_bob_bundle_covers_all_assets():
         "commands/astra-setup.md",
         "commands/astra-doctor.md",
         "commands/astra-data-model-review.md",
+        "commands/astra-overview.md",
+        "commands/astra-collection.md",
+        "commands/astra-similar.md",
+        "commands/astra-explore.md",
         "custom_modes.yaml",
         "mcp.json",
         "rules/astra-db.md",
     }
+    assert set(json.loads(rendered["mcp.json"])["mcpServers"]) == {"astra-db", "astra-widgets"}
     assert rendered["custom_modes.yaml"].count("- slug: ") == 3
     assert "AstraCS" in rendered["rules/astra-db.md"]

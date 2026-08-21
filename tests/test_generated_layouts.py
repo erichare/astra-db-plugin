@@ -17,14 +17,19 @@ PORTED_SKILLS = {
     "astra-setup",
     "astra-doctor",
     "astra-data-model-review",
+    "astra-overview",
+    "astra-collection",
+    "astra-similar",
+    "astra-explore",
     "astra-reviewer",
     "astra-data-modeler",
     "astra-migration-helper",
 }
+PLUGIN_SKILLS = {"astra-toolkit", "astra-widgets"}
 
 
 def test_codex_skills_collection_is_complete():
-    assert {p.name for p in CODEX_SKILLS.iterdir() if p.is_dir()} == PORTED_SKILLS | {"astra-toolkit"}
+    assert {p.name for p in CODEX_SKILLS.iterdir() if p.is_dir()} == PORTED_SKILLS | PLUGIN_SKILLS
 
 
 @pytest.mark.parametrize("skill", sorted(PORTED_SKILLS))
@@ -57,7 +62,7 @@ def test_codex_plugin_root_is_self_contained():
 
 def test_bob_commands_present_and_rewritten():
     names = sorted(p.name for p in (BOB / "commands").glob("*.md"))
-    assert names == ["astra-data-model-review.md", "astra-doctor.md", "astra-setup.md"]
+    assert names == sorted(f"astra-{c}.md" for c in ("setup", "doctor", "data-model-review", "overview", "collection", "similar", "explore"))
     for name in names:
         text = (BOB / "commands" / name).read_text()
         assert frontmatter(BOB / "commands" / name)["description"]
@@ -79,8 +84,9 @@ def test_bob_custom_modes_yaml_is_valid_and_scoped():
 
 
 def test_bob_mcp_and_rule():
-    mcp = json.loads((BOB / "mcp.json").read_text())["mcpServers"]["astra-db"]
-    assert mcp == {"command": "npx", "args": ["-y", "@datastax/astra-db-mcp"]}
+    servers = json.loads((BOB / "mcp.json").read_text())["mcpServers"]
+    assert servers["astra-db"] == {"command": "npx", "args": ["-y", "@datastax/astra-db-mcp"]}
+    assert servers["astra-widgets"] == {"command": "node", "args": [".bob/server/index.js"]}
     rule = (BOB / "rules" / "astra-db.md").read_text()
     assert "AstraCS" in rule and ".bob/skills/astra-toolkit/" in rule
 
@@ -89,3 +95,19 @@ def test_hooks_matcher_covers_codex_edit_tool():
     hooks = json.loads((REPO_ROOT / "hooks" / "hooks.json").read_text())["hooks"]
     assert hooks["PreToolUse"][0]["matcher"] == "Write|Edit|apply_patch"
     assert hooks["SessionStart"][0]["hooks"][0]["statusMessage"]
+
+
+def test_plugin_skills_ship_to_both_layouts():
+    for root in (CODEX_SKILLS, BOB / "skills"):
+        assert (root / "astra-widgets" / "SKILL.md").is_file()
+        assert (root / "astra-widgets" / "templates" / "similarity.html").is_file()
+    assert content_files(CODEX_SKILLS / "astra-widgets") == content_files(REPO_ROOT / "skills" / "astra-widgets")
+
+
+def test_server_bundle_copies_match_build():
+    bundle = (REPO_ROOT / "server" / "dist" / "index.js").read_bytes()
+    assert len(bundle) > 100_000
+    assert (REPO_ROOT / "codex" / "server" / "index.js").read_bytes() == bundle
+    assert (BOB / "server" / "index.js").read_bytes() == bundle
+    codex_mcp = json.loads((REPO_ROOT / "codex" / ".mcp.json").read_text())
+    assert codex_mcp["astra-widgets"]["args"] == ["${PLUGIN_ROOT}/server/index.js"]

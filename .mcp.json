@@ -2,7 +2,20 @@
   "mcpServers": {
     "astra-db": {
       "command": "npx",
-      "args": ["-y", "@datastax/astra-db-mcp"],
+      "args": [
+        "-y",
+        "@datastax/astra-db-mcp"
+      ],
+      "env": {
+        "ASTRA_DB_APPLICATION_TOKEN": "${ASTRA_DB_APPLICATION_TOKEN}",
+        "ASTRA_DB_API_ENDPOINT": "${ASTRA_DB_API_ENDPOINT}"
+      }
+    },
+    "astra-widgets": {
+      "command": "node",
+      "args": [
+        "${CLAUDE_PLUGIN_ROOT}/server/dist/index.js"
+      ],
       "env": {
         "ASTRA_DB_APPLICATION_TOKEN": "${ASTRA_DB_APPLICATION_TOKEN}",
         "ASTRA_DB_API_ENDPOINT": "${ASTRA_DB_API_ENDPOINT}"

@@ -10,7 +10,7 @@
 </p>
 
 <p align="center">
-  <b>5 client languages · ~1,660 doc-synced Data API snippets · ~420 always-on tokens · skillsaw A+</b>
+  <b>5 client languages · ~1,660 doc-synced Data API snippets · 4 inline widgets · ~420 always-on tokens · skillsaw A+</b>
 </p>
 
 > <img src="assets/logos/ibm.svg" alt="IBM" height="14"> **Built for IBM Bob.** Bob gets the complete bundle — the skill, three custom modes, `/astra-*` slash commands, the Astra DB MCP server, and a credential-hygiene rule — installed into a project with one command (or globally with `--global`). Claude Code and OpenAI Codex get the same capabilities in their native forms.
@@ -69,6 +69,39 @@ Native plugin (per the [OpenAI plugin spec](https://developers.openai.com/plugin
 
 </details>
 
+## Widgets
+
+Ask about a collection and get a widget, not a wall of text. The bundled `astra-widgets` MCP server supplies the data; the `astra-widgets` skill renders it inline where the harness can (Claude Code desktop, Claude.ai/Desktop and ChatGPT via MCP Apps) and opens a self-contained page everywhere else.
+
+<table>
+  <tr>
+    <td width="50%"><img src="assets/widgets/similarity-light.png" alt="Similarity results widget: ranked hits with score bars and stats"></td>
+    <td width="50%"><img src="assets/widgets/card-dark.png" alt="Collection card widget: vector config, metric tiles, definition, sample document"></td>
+  </tr>
+  <tr>
+    <td><img src="assets/widgets/overview-light.png" alt="Database overview widget: keyspaces, collections, vector config, counts"></td>
+    <td><img src="assets/widgets/explorer-dark.png" alt="Collection explorer widget: filterable documents table with field inventory"></td>
+  </tr>
+</table>
+
+| Command | Widget | Drill-downs |
+| --- | --- | --- |
+| `/astra-db:overview` | keyspaces → collections (vector dims · metric, vectorize model, lexical/rerank, ~count) and tables | open a collection card |
+| `/astra-db:collection <name>` | full metadata + sample document | explore documents, search |
+| `/astra-db:similar "<query>" --collection <name>` (`--doc <id>`, `--hybrid`, `--limit`) | ranked bars with `$similarity`, constellation map, score stats | similar-to-this-document |
+| `/astra-db:explore <name>` (`--filter '{…}'`, `--fields a,b`) | documents table, field inventory, paging | filter by value, next page, similar |
+
+The widgets are proactive too: the skill tells the agent to show the matching view whenever it inspects a collection or runs a vector search for you. Codex gets the same as `$astra-overview` / `$astra-collection` / `$astra-similar` / `$astra-explore`; Bob as `/astra-*` commands — both open the generated HTML page. The server needs `node` 20+ on your PATH and the same two environment variables as the rest of the plugin.
+
+<details>
+<summary><b>ChatGPT (hosted)</b> — inline widgets via MCP Apps</summary>
+
+<br>
+
+The same server runs as a streamable-HTTP endpoint (`server/api/mcp.ts`, deployable to Vercel). Register it in ChatGPT's developer mode with API-key auth: `Authorization: Bearer <ASTRA_DB_APPLICATION_TOKEN>`, and pass your Data API endpoint with an `X-Astra-Endpoint` header or `?endpoint=<url>` on the connector URL. Nothing is stored server-side; every request carries its own credentials.
+
+</details>
+
 ## What you get
 
 | Component | Details | IBM Bob | Claude Code | Codex / ChatGPT | Other Agent Skills harnesses |
@@ -77,6 +110,7 @@ Native plugin (per the [OpenAI plugin spec](https://developers.openai.com/plugin
 | **Commands** | setup (CLI, token, `.env`), doctor (diagnostics), data-model-review | ✓ `/astra-*` | ✓ `/astra-db:*` | ✓ `$astra-*` skills | — |
 | **Agents** | reviewer (Data API usage review), data-modeler (schema design), migration-helper (staged migration plans) | ✓ custom modes | ✓ subagents | ✓ `$astra-*` persona skills | — |
 | **MCP server** | [`@datastax/astra-db-mcp`](https://github.com/datastax/astra-db-mcp) for live database operations | ✓ | ✓ | ✓ | — |
+| **Widgets** | `astra-widgets` MCP server + skill: overview, collection card, similarity view, explorer | ✓ HTML page | ✓ inline | ✓ inline (ChatGPT) · HTML page (Codex CLI) | — |
 | **Hooks** | Credential guard (blocks hardcoded `AstraCS:` tokens); daily upstream-freshness notice | ≈ rule¹ | ✓ | ✓ | — |
 
 ¹ Bob has no hook system; the bundle ships a `.bob/rules/astra-db.md` rule that enforces the same credential hygiene as guidance.

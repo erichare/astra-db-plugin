@@ -1,0 +1,69 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Astra DB overview</title>
+<style>/*@shared-css*/</style>
+</head>
+<body>
+<div id="root"></div>
+<script>/*@shared-js*/</script>
+<script>/*@bridge*/</script>
+<script>
+(function () {
+  const { h, fmt, chip, vectorLabel, srSummary } = window.AstraUI;
+  function render(data, api) {
+    const root = document.getElementById("root");
+    root.replaceChildren();
+    const t = data.totals || {};
+    root.append(srSummary(`Astra DB overview for ${data.endpointHost}: ${t.keyspaces} keyspaces, ${t.collections} collections, ${t.tables} tables.`));
+    const card = h("div", { class: "card" });
+    card.append(h("div", { class: "row between" },
+      h("div", null, h("p", { class: "title" }, "Database overview"), h("p", { class: "sub" }, data.endpointHost)),
+      chip("Astra DB", "accent")));
+    const tiles = h("div", { class: "tiles" },
+      tile("Keyspaces", fmt(t.keyspaces)), tile("Collections", fmt(t.collections)),
+      tile("Tables", fmt(t.tables)), tile("Documents", t.documents === null ? "—" : `~${fmt(t.documents)}`));
+    card.append(tiles);
+    for (const ks of data.keyspaces || []) {
+      const section = h("div", { class: "section" });
+      section.append(h("h3", null, `Keyspace ${ks.name}`, ks.isDefault ? " " : "", ks.isDefault ? chip("default") : null));
+      if (ks.collections.length === 0 && ks.tables.length === 0) {
+        section.append(h("div", { class: "empty" }, "No collections or tables"));
+      }
+      if (ks.collections.length > 0) {
+        const table = h("table", { class: "grid" },
+          h("colgroup", null, h("col", { style: "width:34%" }), h("col", { style: "width:22%" }), h("col", { style: "width:28%" }), h("col", { style: "width:16%" })),
+          h("thead", null, h("tr", null, h("th", null, "Collection"), h("th", null, "Vector"), h("th", null, "Capabilities"), h("th", { style: "text-align:right" }, "Documents"))));
+        const body = h("tbody");
+        for (const c of ks.collections) {
+          const caps = h("div", { class: "row", style: "gap:6px" });
+          if (c.vector && c.vector.model) caps.append(chip(c.vector.model, "mono"));
+          if (c.lexical) caps.append(chip("lexical"));
+          if (c.rerank) caps.append(chip("rerank", "good"));
+          const tr = h("tr", { class: api.canCall ? "clickable" : "", title: api.canCall ? "Open collection card" : "" ,
+            onclick: api.canCall ? () => api.callTool("collection_card", { collection: c.name, keyspace: ks.name }) : null },
+            h("td", null, h("strong", null, c.name)),
+            h("td", { style: "white-space:normal" }, c.vector ? chip(vectorLabel(c.vector), "accent") : h("span", { class: "muted" }, "no vector")),
+            h("td", null, caps),
+            h("td", { style: "text-align:right;font-variant-numeric:tabular-nums" }, c.estimatedCount === null ? "—" : `~${fmt(c.estimatedCount)}`));
+          body.append(tr);
+        }
+        table.append(body);
+        section.append(table);
+      }
+      if (ks.tables.length > 0) {
+        section.append(h("div", { class: "row", style: "margin-top:8px" }, h("span", { class: "muted" }, "Tables:"), ...ks.tables.map((n) => chip(n, "mono"))));
+      }
+      card.append(section);
+    }
+    if (data.truncated) card.append(h("p", { class: "note" }, "Showing the first collections only — raise maxCollections to see more."));
+    root.append(card);
+  }
+  function tile(k, v) { return h("div", { class: "tile" }, h("div", { class: "k" }, k), h("div", { class: "v" }, v)); }
+  window.AstraBridge.mount(render);
+})();
+</script>
+</body>
+</html>

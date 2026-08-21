@@ -109,7 +109,7 @@ def test_bob_install_merges_existing_config(tmp_path: Path):
 
     assert (bob / "commands" / "team-review.md").read_text() == "team command"
     servers = json.loads((bob / "mcp.json").read_text())["mcpServers"]
-    assert set(servers) == {"github", "astra-db"}
+    assert set(servers) == {"github", "astra-db", "astra-widgets"}
     modes = (bob / "custom_modes.yaml").read_text()
     assert "- slug: team-mode" in modes and modes.count("- slug: astra-reviewer") == 1
     assert "# astra-db:begin" in modes and "# astra-db:end" in modes

@@ -1,0 +1,32 @@
+<h2 class="sr-only">Astra DB overview for {{endpointHost}}: {{totals.keyspaces}} keyspaces, {{totals.collections}} collections, {{totals.tables}} tables.</h2>
+<div style="background: var(--surface-2); border: 0.5px solid var(--border); border-radius: 12px; padding: 1rem 1.25rem;">
+  <div style="display:flex; align-items:center; justify-content:space-between; gap:12px;">
+    <div style="display:flex; align-items:center; gap:10px;">
+      <i class="ti ti-database" style="font-size:18px; color: var(--text-pro);" aria-hidden="true"></i>
+      <div><p style="margin:0; font-size:16px; font-weight:500;">Database overview</p><p style="margin:0; font-size:13px; color: var(--text-secondary);">{{endpointHost}}</p></div>
+    </div>
+    <span style="display:inline-flex; padding:2px 9px; border-radius:999px; font-size:12px; background: var(--bg-pro); color: var(--text-pro);">Astra DB</span>
+  </div>
+  <div style="display:grid; grid-template-columns: repeat(auto-fit, minmax(130px, 1fr)); gap:12px; margin:14px 0;">
+    <div style="background: var(--surface-1); border-radius: var(--radius); padding:10px 12px;"><div style="font-size:12px; color: var(--text-muted);">Keyspaces</div><div style="font-size:22px; font-weight:500;">{{totals.keyspaces}}</div></div>
+    <div style="background: var(--surface-1); border-radius: var(--radius); padding:10px 12px;"><div style="font-size:12px; color: var(--text-muted);">Collections</div><div style="font-size:22px; font-weight:500;">{{totals.collections}}</div></div>
+    <div style="background: var(--surface-1); border-radius: var(--radius); padding:10px 12px;"><div style="font-size:12px; color: var(--text-muted);">Tables</div><div style="font-size:22px; font-weight:500;">{{totals.tables}}</div></div>
+    <div style="background: var(--surface-1); border-radius: var(--radius); padding:10px 12px;"><div style="font-size:12px; color: var(--text-muted);">Documents</div><div style="font-size:22px; font-weight:500;">~{{totals.documents}}</div></div>
+  </div>
+  <!-- repeat this block per keyspace -->
+  <p style="margin:12px 0 6px; font-size:13px; color: var(--text-secondary);">Keyspace {{keyspace.name}} <span style="display:inline-flex; padding:1px 8px; border-radius:999px; font-size:11px; background: var(--surface-1); border:0.5px solid var(--border); margin-left:6px;">default</span></p>
+  <table style="width:100%; border-collapse:collapse; table-layout:fixed; font-size:13px;">
+    <colgroup><col style="width:34%"><col style="width:22%"><col style="width:28%"><col style="width:16%"></colgroup>
+    <thead><tr style="color: var(--text-muted); font-size:12px; text-align:left;"><th style="padding:6px 8px; font-weight:500;">Collection</th><th style="padding:6px 8px; font-weight:500;">Vector</th><th style="padding:6px 8px; font-weight:500;">Capabilities</th><th style="padding:6px 8px; font-weight:500; text-align:right;">Documents</th></tr></thead>
+    <tbody>
+      <!-- repeat this row per collection; sendPrompt opens its card -->
+      <tr style="cursor:pointer; border-top:0.5px solid var(--border);" onclick="sendPrompt('Show the collection card for {{collection.name}}')">
+        <td style="padding:8px; font-weight:500; overflow:hidden; text-overflow:ellipsis; white-space:nowrap;">{{collection.name}}</td>
+        <td style="padding:8px;"><span style="display:inline-flex; padding:2px 9px; border-radius:999px; font-size:12px; background: var(--bg-pro); color: var(--text-pro);">{{vector.dimension}}d · {{vector.metric}}</span></td>
+        <td style="padding:8px; overflow:hidden; text-overflow:ellipsis; white-space:nowrap;"><span style="font-family: var(--font-mono); font-size:11.5px; color: var(--text-secondary);">{{vector.model}}</span> <span style="font-size:12px; color: var(--text-success);">rerank</span></td>
+        <td style="padding:8px; text-align:right; font-variant-numeric:tabular-nums;">~{{collection.estimatedCount}}</td>
+      </tr>
+    </tbody>
+  </table>
+  <p style="margin:8px 0 0; font-size:12px; color: var(--text-muted);">Tables: <span style="font-family: var(--font-mono);">{{tables}}</span></p>
+</div>

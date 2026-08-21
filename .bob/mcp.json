@@ -6,6 +6,12 @@
         "-y",
         "@datastax/astra-db-mcp"
       ]
+    },
+    "astra-widgets": {
+      "command": "node",
+      "args": [
+        ".bob/server/index.js"
+      ]
     }
   }
 }

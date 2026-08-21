@@ -77,8 +77,9 @@ def test_merge_mcp_preserves_other_servers(tmp_path: Path):
     dest.write_text(json.dumps({"mcpServers": {"github": {"command": "gh-mcp"}}, "other": 1}))
     bob_install.merge_mcp(SOURCE_BOB, dest)
     data = json.loads(dest.read_text())
-    assert set(data["mcpServers"]) == {"github", "astra-db"}
+    assert set(data["mcpServers"]) == {"github", "astra-db", "astra-widgets"}
     assert data["other"] == 1
+    assert data["mcpServers"]["astra-widgets"]["args"] == [".bob/server/index.js"]
 
 
 def test_merge_mcp_rejects_invalid_json(tmp_path: Path):
@@ -91,7 +92,10 @@ def test_install_files_only_touches_astra_files(tmp_path: Path):
     (tmp_path / "commands").mkdir()
     (tmp_path / "commands" / "team.md").write_text("team")
     written = bob_install.install_files(SOURCE_BOB, tmp_path, "commands")
-    assert {p.name for p in written} == {"astra-setup.md", "astra-doctor.md", "astra-data-model-review.md"}
+    assert {p.name for p in written} == {
+        "astra-setup.md", "astra-doctor.md", "astra-data-model-review.md",
+        "astra-overview.md", "astra-collection.md", "astra-similar.md", "astra-explore.md",
+    }
     assert (tmp_path / "commands" / "team.md").read_text() == "team"
 
 
@@ -128,3 +132,21 @@ def test_main_reports_invalid_existing_config(tmp_path: Path, monkeypatch, capsy
     monkeypatch.setattr(sys, "argv", ["bob_install.py", "--source", str(REPO_ROOT), "--target", str(target)])
     assert bob_install.main() == 1
     assert "bob install failed" in capsys.readouterr().err
+
+
+def test_global_install_points_widgets_server_at_absolute_bundle(tmp_path: Path, monkeypatch):
+    target = tmp_path / "home" / ".bob"
+    monkeypatch.setattr(sys, "argv", ["bob_install.py", "--source", str(REPO_ROOT), "--target", str(target), "--global"])
+    assert bob_install.main() == 0
+    mcp = json.loads((target / "settings" / "mcp.json").read_text())["mcpServers"]
+    assert mcp["astra-widgets"]["args"] == [str(target / "server" / "index.js")]
+    assert (target / "server" / "index.js").is_file()
+
+
+def test_project_install_keeps_relative_server_path(tmp_path: Path, monkeypatch):
+    target = tmp_path / ".bob"
+    monkeypatch.setattr(sys, "argv", ["bob_install.py", "--source", str(REPO_ROOT), "--target", str(target)])
+    assert bob_install.main() == 0
+    mcp = json.loads((target / "mcp.json").read_text())["mcpServers"]
+    assert mcp["astra-widgets"]["args"] == [".bob/server/index.js"]
+    assert (target / "server" / "index.js").is_file()
