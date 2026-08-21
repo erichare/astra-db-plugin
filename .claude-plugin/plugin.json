@@ -1,7 +1,7 @@
 {
   "name": "astra-db",
-  "version": "1.0.0",
-  "description": "First-class Astra DB (DataStax / IBM) toolkit: data modeling for Collections and Tables, Astra CLI workflows, application architecture patterns, and 1,600+ doc-synced Data API code snippets for Python, TypeScript, Java, C#, and Go — plus live database tools via the Astra DB MCP server.",
+  "version": "1.0.1",
+  "description": "First-class Astra DB (DataStax / IBM) toolkit: data modeling for Collections and Tables, Astra CLI workflows, application architecture patterns, and 1,600+ doc-synced Data API code snippets for Python, TypeScript, Java, C#, and Go \u2014 plus live database tools via the Astra DB MCP server.",
   "author": {
     "name": "Eric Hare",
     "email": "ericrhare@gmail.com",
