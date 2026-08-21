@@ -1,6 +1,6 @@
 # Changelog
 
-## Unreleased
+## 1.2.1 — 2026-08-21
 
 - **OAuth for the hosted server.** ChatGPT and claude.ai connectors (OAuth-only) can now use the hosted widgets: the server ships an OAuth 2.1 authorization server (protected-resource + AS discovery, dynamic client registration, PKCE `/authorize` with a "Connect Astra DB" page, `/token` with refresh) whose tokens are AES-GCM-sealed blobs carrying the user's Astra credentials — stateless, never stored. `/mcp` accepts those tokens or the raw bearer + `X-Astra-Endpoint` form; 401s advertise the resource metadata.
 
