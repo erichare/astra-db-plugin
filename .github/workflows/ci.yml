@@ -29,7 +29,7 @@ jobs:
           python3 -c "import json; grade = json.load(open('/tmp/badge.json'))['message']; assert grade == 'A+', f'grade {grade} is below A+'"
 
       - name: Python snippet syntax
-        run: python3 -m compileall -q skills/astra-toolkit/clients/python/examples
+        run: PYTHONPYCACHEPREFIX="${RUNNER_TEMP}/pycache" python3 -m compileall -q skills/astra-toolkit/clients/python/examples
 
       - name: TypeScript snippet syntax
         run: |

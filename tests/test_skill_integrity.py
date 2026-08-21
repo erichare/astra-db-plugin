@@ -118,12 +118,29 @@ def test_mcp_manifest_uses_env_passthrough():
         assert value == f"${{{variable}}}", "env must pass through, never hardcode"
 
 
+def is_generated_artifact(path: Path) -> bool:
+    """Build/OS artifacts that may appear in a working tree but are not content."""
+    return (
+        "__pycache__" in path.parts
+        or path.suffix == ".pyc"
+        or path.name == ".DS_Store"
+    )
+
+
+def content_files(root: Path) -> dict[Path, bytes]:
+    return {
+        p.relative_to(root): p.read_bytes()
+        for p in root.rglob("*")
+        if p.is_file() and not is_generated_artifact(p)
+    }
+
+
 def test_bob_layout_matches_canonical():
     bob = REPO_ROOT / ".bob" / "skills" / "astra-toolkit"
-    canonical_files = {
-        p.relative_to(SKILL_DIR): p.read_bytes() for p in SKILL_DIR.rglob("*") if p.is_file()
-    }
-    bob_files = {
-        p.relative_to(bob): p.read_bytes() for p in bob.rglob("*") if p.is_file()
-    }
-    assert canonical_files == bob_files
+    canonical_files = content_files(SKILL_DIR)
+    bob_files = content_files(bob)
+    assert set(canonical_files) == set(bob_files)
+    mismatched = [
+        str(path) for path, data in canonical_files.items() if bob_files[path] != data
+    ]
+    assert mismatched == []
