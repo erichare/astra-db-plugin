@@ -1,0 +1,176 @@
+{
+  "$schema": "https://raw.githubusercontent.com/modelcontextprotocol/mcpb/main/dist/mcpb-manifest.schema.json",
+  "manifest_version": "0.3",
+  "name": "astra-db",
+  "display_name": "Astra DB",
+  "version": "1.2.1",
+  "description": "Inspect, query, vector-search, and safely change your Astra DB databases, with interactive views.",
+  "long_description": "Connects Claude to Astra DB (DataStax / IBM). Explore keyspaces, collections, and tables; read with filters; run vector and hybrid search; insert, update, and create schema — destructive operations always ask first. Results render as interactive views, and code_examples returns idiomatic client code for Python, TypeScript, Java, C#, and Go. Your token is stored in the OS keychain.",
+  "author": {
+    "name": "Eric Hare",
+    "email": "ericrhare@gmail.com",
+    "url": "https://github.com/erichare"
+  },
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/erichare/astra-db-plugin"
+  },
+  "homepage": "https://github.com/erichare/astra-db-plugin",
+  "documentation": "https://github.com/erichare/astra-db-plugin#readme",
+  "support": "https://github.com/erichare/astra-db-plugin/issues",
+  "icon": "icon.png",
+  "license": "Apache-2.0",
+  "keywords": [
+    "astra",
+    "astra-db",
+    "datastax",
+    "vector-database",
+    "vector-search",
+    "database"
+  ],
+  "privacy_policies": [
+    "https://github.com/erichare/astra-db-plugin/blob/main/docs/privacy.md"
+  ],
+  "server": {
+    "type": "node",
+    "entry_point": "server/cli.js",
+    "mcp_config": {
+      "command": "node",
+      "args": [
+        "${__dirname}/server/cli.js",
+        "serve"
+      ],
+      "env": {
+        "ASTRA_MCP_CONFIG_TOKEN": "${user_config.token}",
+        "ASTRA_MCP_CONFIG_ENDPOINT": "${user_config.endpoint}",
+        "ASTRA_MCP_CONFIG_KEYSPACE": "${user_config.keyspace}",
+        "ASTRA_MCP_CONFIG_READ_ONLY": "${user_config.read_only}",
+        "ASTRA_MCP_CLIENT": "claude-desktop-mcpb"
+      }
+    }
+  },
+  "tools": [
+    {
+      "name": "connection_status",
+      "description": "Check which credentials and database are in use, with a live connectivity check."
+    },
+    {
+      "name": "list_databases",
+      "description": "List the Astra databases the token can access."
+    },
+    {
+      "name": "database_overview",
+      "description": "Map keyspaces, collections, and tables (interactive view)."
+    },
+    {
+      "name": "describe_collection",
+      "description": "Show a collection's vector, vectorize, lexical, rerank, and indexing configuration."
+    },
+    {
+      "name": "describe_table",
+      "description": "Show a table's columns, primary key, indexes, and vector columns."
+    },
+    {
+      "name": "find",
+      "description": "Read documents or rows with filters, sorting, and paging (interactive explorer)."
+    },
+    {
+      "name": "vector_search",
+      "description": "Similarity search by text, vector, or document; optional hybrid reranking."
+    },
+    {
+      "name": "count",
+      "description": "Count documents matching a filter."
+    },
+    {
+      "name": "distinct_values",
+      "description": "Distinct values of a field."
+    },
+    {
+      "name": "list_vectorize_providers",
+      "description": "Embedding and reranking providers available to the database."
+    },
+    {
+      "name": "code_examples",
+      "description": "Canonical Data API client code in five languages."
+    },
+    {
+      "name": "insert",
+      "description": "Insert documents or rows."
+    },
+    {
+      "name": "update",
+      "description": "Update documents or rows (bulk updates need confirmation)."
+    },
+    {
+      "name": "delete",
+      "description": "Delete documents or rows (bulk deletes need confirmation)."
+    },
+    {
+      "name": "create_collection",
+      "description": "Create a vector, vectorize, or hybrid-ready collection."
+    },
+    {
+      "name": "create_table",
+      "description": "Create a typed table with a primary key."
+    },
+    {
+      "name": "create_index",
+      "description": "Create a regular, vector, or text index on a table column."
+    },
+    {
+      "name": "drop",
+      "description": "Drop a collection, table, or index (always confirmed)."
+    }
+  ],
+  "prompts": [
+    {
+      "name": "overview",
+      "description": "Summarize what's in the database.",
+      "text": "Call database_overview and summarize the database."
+    },
+    {
+      "name": "setup",
+      "description": "Check the connection and fix it.",
+      "text": "Call connection_status and walk me through fixing the connection if needed."
+    }
+  ],
+  "user_config": {
+    "token": {
+      "type": "string",
+      "title": "Astra application token",
+      "description": "AstraCS:… token from the Astra console (Settings → Tokens). Stored in your OS keychain.",
+      "sensitive": true,
+      "required": true
+    },
+    "endpoint": {
+      "type": "string",
+      "title": "Data API endpoint",
+      "description": "Optional: https://…apps.astra.datastax.com. Leave empty if the token sees one database.",
+      "required": false
+    },
+    "keyspace": {
+      "type": "string",
+      "title": "Keyspace",
+      "description": "Optional default keyspace.",
+      "required": false
+    },
+    "read_only": {
+      "type": "boolean",
+      "title": "Read-only",
+      "description": "Hide write and schema tools.",
+      "default": false,
+      "required": false
+    }
+  },
+  "compatibility": {
+    "platforms": [
+      "darwin",
+      "win32",
+      "linux"
+    ],
+    "runtimes": {
+      "node": ">=20.0.0"
+    }
+  }
+}

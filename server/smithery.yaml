@@ -1,0 +1,39 @@
+# Smithery (https://smithery.ai) — local stdio install of @erichare/astra-mcp.
+# The hosted endpoint (https://astra-widgets-mcp.vercel.app/mcp) can also be
+# published URL-first with `smithery mcp publish`.
+startCommand:
+  type: stdio
+  configSchema:
+    type: object
+    properties:
+      token:
+        type: string
+        title: Astra application token
+        description: AstraCS:… token from the Astra console (Settings → Tokens).
+      endpoint:
+        type: string
+        title: Data API endpoint
+        description: Optional when the token sees one database.
+      keyspace:
+        type: string
+        title: Keyspace
+      readOnly:
+        type: boolean
+        title: Read-only
+        default: false
+    required: [token]
+  commandFunction: |-
+    (config) => ({
+      command: "npx",
+      args: ["-y", "@erichare/astra-mcp@2"],
+      env: {
+        ASTRA_DB_APPLICATION_TOKEN: config.token,
+        ...(config.endpoint ? { ASTRA_DB_API_ENDPOINT: config.endpoint } : {}),
+        ...(config.keyspace ? { ASTRA_DB_KEYSPACE: config.keyspace } : {}),
+        ...(config.readOnly ? { ASTRA_MCP_READ_ONLY: "1" } : {}),
+        ASTRA_MCP_CLIENT: "smithery"
+      }
+    })
+  exampleConfig:
+    token: AstraCS:your-token-here
+    endpoint: https://your-db-id-us-east-2.apps.astra.datastax.com

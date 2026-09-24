@@ -1,0 +1,66 @@
+{
+  "$schema": "https://static.modelcontextprotocol.io/schemas/2025-12-11/server.schema.json",
+  "name": "io.github.erichare/astra-mcp",
+  "title": "Astra DB",
+  "description": "Astra DB tools for agents: schema, find, vector search, guarded writes, and interactive views.",
+  "version": "1.2.1",
+  "websiteUrl": "https://github.com/erichare/astra-db-plugin",
+  "repository": {
+    "url": "https://github.com/erichare/astra-db-plugin",
+    "source": "github",
+    "subfolder": "server"
+  },
+  "icons": [
+    {
+      "src": "https://raw.githubusercontent.com/erichare/astra-db-plugin/main/assets/icon.png",
+      "mimeType": "image/png",
+      "sizes": [
+        "512x512"
+      ]
+    }
+  ],
+  "packages": [
+    {
+      "registryType": "npm",
+      "identifier": "@erichare/astra-mcp",
+      "version": "1.2.1",
+      "runtimeHint": "npx",
+      "transport": {
+        "type": "stdio"
+      },
+      "environmentVariables": [
+        {
+          "name": "ASTRA_DB_APPLICATION_TOKEN",
+          "description": "Astra application token (AstraCS:…). Optional when the project .env or ~/.astrarc provides one.",
+          "isSecret": true,
+          "isRequired": false,
+          "format": "string"
+        },
+        {
+          "name": "ASTRA_DB_API_ENDPOINT",
+          "description": "Data API endpoint of the default database. Optional when the token sees one database.",
+          "isRequired": false,
+          "format": "string"
+        },
+        {
+          "name": "ASTRA_DB_KEYSPACE",
+          "description": "Default keyspace (default_keyspace when unset).",
+          "isRequired": false,
+          "format": "string"
+        },
+        {
+          "name": "ASTRA_MCP_READ_ONLY",
+          "description": "Set to 1 to hide write and schema tools.",
+          "isRequired": false,
+          "format": "boolean"
+        }
+      ]
+    }
+  ],
+  "remotes": [
+    {
+      "type": "streamable-http",
+      "url": "https://astra-widgets-mcp.vercel.app/mcp"
+    }
+  ]
+}
