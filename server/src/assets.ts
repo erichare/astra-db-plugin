@@ -26,7 +26,14 @@ let cached: Assets | null | undefined;
 export function loadAssets(): Assets | null {
   if (cached !== undefined) return cached;
   const here = dirname(fileURLToPath(import.meta.url));
-  const candidates = [process.env.ASTRA_MCP_ASSETS, join(here, "assets.json"), join(here, "generated", "assets.json"), join(here, "..", "generated", "assets.json")]
+  const candidates = [
+    process.env.ASTRA_MCP_ASSETS,
+    join(here, "assets.json"),
+    join(here, "generated", "assets.json"),
+    join(here, "..", "generated", "assets.json"),
+    // Serverless (Vercel) functions run from the project root with included files.
+    join(process.cwd(), "src", "generated", "assets.json"),
+  ]
     .filter((p): p is string => Boolean(p));
   for (const path of candidates) {
     if (!existsSync(path)) continue;

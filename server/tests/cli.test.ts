@@ -156,7 +156,7 @@ describe("login", () => {
     const envText = readFileSync(join(cwd, ".env"), "utf8");
     expect(envText).toContain(`ASTRA_DB_APPLICATION_TOKEN=${TOKEN}`);
     expect(envText).toContain("ASTRA_DB_API_ENDPOINT=https://11111111-1111-1111-1111-111111111111-us-east-2.apps.astra.datastax.com");
-    expect(statSync(join(cwd, ".env")).mode & 0o777).toBe(0o600);
+    if (process.platform !== "win32") expect(statSync(join(cwd, ".env")).mode & 0o777).toBe(0o600);
     expect(readFileSync(join(cwd, ".gitignore"), "utf8")).toContain(".env");
     expect(io.lines.join("\n")).not.toContain(TOKEN);
   });
