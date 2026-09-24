@@ -31,7 +31,8 @@
       "suspicious": {
         "noExplicitAny": "error",
         "noAssignInExpressions": "off",
-        "noControlCharactersInRegex": "off"
+        "noControlCharactersInRegex": "off",
+        "noTemplateCurlyInString": "off"
       },
       "correctness": {
         "noUnusedVariables": "error",
@@ -45,19 +46,5 @@
         "organizeImports": "off"
       }
     }
-  },
-  "overrides": [
-    {
-      "includes": [
-        "tests/**"
-      ],
-      "linter": {
-        "rules": {
-          "suspicious": {
-            "noTemplateCurlyInString": "off"
-          }
-        }
-      }
-    }
-  ]
+  }
 }

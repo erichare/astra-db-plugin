@@ -1,113 +1,34 @@
-#!/usr/bin/env bash
-# One-command installer for the Astra DB plugin across agent harnesses.
+#!/usr/bin/env sh
+# Astra DB for AI agents — one-line installer.
 #
-#   curl -fsSL https://raw.githubusercontent.com/erichare/astra-db-plugin/main/install.sh | bash -s -- <target>
+#   curl -fsSL https://raw.githubusercontent.com/erichare/astra-db-plugin/main/install.sh | sh
+#   curl -fsSL …/install.sh | sh -s -- --agents claude-code,cursor --yes
 #
-# Works both from a cloned checkout and via curl | bash (it fetches the repo
-# itself when run standalone).
-set -euo pipefail
+# Runs `npx @erichare/astra-mcp init` (detects your agents, installs the
+# plugin/MCP config, then connects a database). Needs Node.js 20+.
+set -eu
 
-REPO_SLUG="erichare/astra-db-plugin"
-REPO_URL="https://github.com/erichare/astra-db-plugin.git"
-MARKETPLACE="astra-db-marketplace"
-PLUGIN="astra-db"
-SKILL="astra-toolkit"
+PACKAGE="@erichare/astra-mcp@2"
 
-usage() {
-  cat <<'USAGE'
-Astra DB plugin installer.
+say() { printf '%s\n' "$*"; }
 
-Usage: install.sh <target> [options]
+if ! command -v node >/dev/null 2>&1; then
+  say "astra-db: Node.js 20+ is required (https://nodejs.org), then re-run:"
+  say "  npx -y $PACKAGE init"
+  exit 1
+fi
 
-Targets:
-  claude              Register the marketplace and install the plugin via the claude CLI
-  codex-plugin        Register the marketplace and install the native plugin via the codex CLI
-  codex               Copy the skill only into ~/.codex/skills/astra-toolkit (set CODEX_HOME to override)
-  skills-dir <path>   Copy the skill into <path>/astra-toolkit (any Agent Skills harness)
-USAGE
-}
+major=$(node -p 'process.versions.node.split(".")[0]' 2>/dev/null || echo 0)
+if [ "$major" -lt 20 ]; then
+  say "astra-db: Node.js $major found; 20 or newer is required (https://nodejs.org)."
+  exit 1
+fi
 
-log() { printf '[astra-db] %s\n' "$1"; }
-fail() { printf '[astra-db] ERROR: %s\n' "$1" >&2; exit 1; }
-
-CLEANUP_DIR=""
-cleanup() { if [ -n "$CLEANUP_DIR" ]; then rm -rf "$CLEANUP_DIR"; fi; }
-trap cleanup EXIT
-
-# Echo a directory that contains skills/astra-toolkit: the surrounding
-# checkout when run from one, otherwise a fresh shallow clone.
-resolve_source() {
-  local script_path="${BASH_SOURCE[0]:-}"
-  if [ -n "$script_path" ] && [ -f "$script_path" ]; then
-    local script_dir
-    script_dir="$(cd "$(dirname "$script_path")" && pwd)"
-    if [ -d "$script_dir/skills/$SKILL" ]; then
-      printf '%s' "$script_dir"
-      return
-    fi
-  fi
-  command -v git >/dev/null 2>&1 || fail "git is required to fetch the plugin"
-  CLEANUP_DIR="$(mktemp -d)"
-  log "fetching $REPO_SLUG ..." >&2
-  git clone --quiet --depth 1 "$REPO_URL" "$CLEANUP_DIR/repo" \
-    || fail "could not clone $REPO_URL"
-  printf '%s' "$CLEANUP_DIR/repo"
-}
-
-copy_skill_into() {
-  local dest_parent="$1"
-  local source
-  source="$(resolve_source)"
-  mkdir -p "$dest_parent"
-  rm -rf "${dest_parent:?}/$SKILL"
-  cp -R "$source/skills/$SKILL" "$dest_parent/$SKILL"
-  log "installed skill to $dest_parent/$SKILL"
-}
-
-install_claude() {
-  command -v claude >/dev/null 2>&1 \
-    || fail "claude CLI not found — install Claude Code first: https://claude.com/claude-code"
-  if claude plugin marketplace add "$REPO_SLUG"; then
-    log "marketplace registered"
-  else
-    log "marketplace add did not succeed (already registered?) — continuing"
-  fi
-  claude plugin install "$PLUGIN@$MARKETPLACE"
-  log "done — restart Claude Code sessions to pick up the plugin"
-}
-
-install_codex_plugin() {
-  command -v codex >/dev/null 2>&1 \
-    || fail "codex CLI not found — install Codex first, or use 'codex' for a skill-only install"
-  if codex plugin marketplace add "$REPO_SLUG"; then
-    log "marketplace registered"
-  else
-    log "marketplace add did not succeed (already registered?) — continuing"
-  fi
-  codex plugin add "$PLUGIN@$MARKETPLACE"
-  log "done — Codex loads the astra-db plugin (astra-* skills, hooks, MCP) on its next session"
-}
-
-install_codex() {
-  copy_skill_into "${CODEX_HOME:-$HOME/.codex}/skills"
-  log "done — Codex discovers the skill on its next session"
-}
-
-main() {
-  case "${1:-}" in
-    claude) install_claude ;;
-    codex-plugin) install_codex_plugin ;;
-    codex) install_codex ;;
-    skills-dir)
-      [ -n "${2:-}" ] || { usage >&2; fail "skills-dir requires a path"; }
-      copy_skill_into "$2"
-      ;;
-    -h|--help) usage ;;
-    *)
-      usage >&2
-      fail "unknown target: '${1:-}'"
-      ;;
-  esac
-}
-
-main "$@"
+# Prompts need a terminal even when this script arrives through a pipe.
+if [ -t 0 ]; then
+  exec npx -y "$PACKAGE" init "$@"
+elif [ -r /dev/tty ]; then
+  exec npx -y "$PACKAGE" init "$@" </dev/tty
+else
+  exec npx -y "$PACKAGE" init --yes "$@"
+fi

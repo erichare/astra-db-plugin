@@ -3,9 +3,7 @@
  * skills/astra-toolkit (examples.json, generated at build time), so hosts
  * without skills (claude.ai, ChatGPT, Cursor…) still get canonical client code.
  */
-import { existsSync, readFileSync } from "node:fs";
-import { dirname, join } from "node:path";
-import { fileURLToPath } from "node:url";
+import { loadAssets } from "../assets.js";
 import type { ExamplesResultT } from "../server/schemas.js";
 
 export interface ExampleEntry {
@@ -129,25 +127,13 @@ export function rank(entries: ExampleEntry[], language: string, query: string, l
 
 let cached: ExampleEntry[] | null | undefined;
 
-/** Load the bundled catalog (dist/examples.json, or src/generated/examples.json in development). */
+/** The bundled example catalog with contents (from dist/assets.json). */
 export function loadCatalog(): ExampleEntry[] | null {
   if (cached !== undefined) return cached;
-  const here = dirname(fileURLToPath(import.meta.url));
-  const candidates = [
-    process.env.ASTRA_MCP_EXAMPLES,
-    join(here, "examples.json"),
-    join(here, "..", "generated", "examples.json"),
-  ].filter((p): p is string => Boolean(p));
-  for (const path of candidates) {
-    if (!existsSync(path)) continue;
-    try {
-      cached = JSON.parse(readFileSync(path, "utf8")) as ExampleEntry[];
-      return cached;
-    } catch {
-      // fall through to the next candidate
-    }
-  }
-  cached = null;
+  const assets = loadAssets();
+  cached = assets
+    ? assets.catalog.map((entry) => ({ ...entry, content: assets.files[entry.file] ?? "" })).filter((e) => e.content)
+    : null;
   return cached;
 }
 

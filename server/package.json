@@ -1,7 +1,7 @@
 {
   "name": "@erichare/astra-mcp",
   "version": "1.2.1",
-  "description": "Astra DB for AI agents: an MCP server with data tools, guarded writes, vector search, interactive MCP Apps views, and bundled Data API code examples — plus a one-command installer for Claude Code, Codex, Cursor, VS Code, and more.",
+  "description": "Astra DB for AI agents: an MCP server with data tools, guarded writes, vector search, interactive MCP Apps views, and bundled Data API code examples \u2014 plus a one-command installer for Claude Code, Codex, Cursor, VS Code, and more.",
   "type": "module",
   "license": "Apache-2.0",
   "engines": {
@@ -25,7 +25,7 @@
   },
   "files": [
     "dist/cli.js",
-    "dist/examples.json",
+    "dist/assets.json",
     "THIRD_PARTY_NOTICES.md",
     "README.md",
     "LICENSE"
