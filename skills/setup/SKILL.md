@@ -26,7 +26,7 @@ It prompts for an application token with hidden input, lists their databases, le
 - **No database yet?** They can create one in the console, or with the Astra CLI (`astra db create <name> --region <region>`; see [../astra-toolkit/astra-cli/README.md](../astra-toolkit/astra-cli/README.md)).
 - **They already use the Astra CLI?** An `astra setup` profile in `~/.astrarc` is picked up automatically. A token that sees exactly one database needs no endpoint.
 
-Never ask for the token in chat, and never write a token into a file yourself.
+Never ask for the token in chat, and never write a token into a file yourself. If the user pastes a token anyway, don't use, repeat, or store it: it is now in the conversation history, so suggest they rotate it in the Astra console and give the new one to `login` instead.
 
 ## 3. Verify
 

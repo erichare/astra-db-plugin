@@ -1,0 +1,1661 @@
+{
+  "tools": [
+    {
+      "name": "connection_status",
+      "title": "Astra DB connection status",
+      "icons": [
+        {
+          "src": "data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHZpZXdCb3g9IjAgMCA2NCA2NCI+PGRlZnM+PGxpbmVhckdyYWRpZW50IGlkPSJnIiB4MT0iMCIgeTE9IjAiIHgyPSIxIiB5Mj0iMSI+PHN0b3Agb2Zmc2V0PSIwIiBzdG9wLWNvbG9yPSIjOEI1Q0Y2Ii8+PHN0b3Agb2Zmc2V0PSIxIiBzdG9wLWNvbG9yPSIjNUIyMUI2Ii8+PC9saW5lYXJHcmFkaWVudD48L2RlZnM+PHJlY3Qgd2lkdGg9IjY0IiBoZWlnaHQ9IjY0IiByeD0iMTQiIGZpbGw9InVybCgjZykiLz48ZyBmaWxsPSJub25lIiBzdHJva2U9IiNmZmYiIHN0cm9rZS13aWR0aD0iMy4yIiBzdHJva2UtbGluZWNhcD0icm91bmQiPjxlbGxpcHNlIGN4PSIyNyIgY3k9IjE5IiByeD0iMTMiIHJ5PSI1Ii8+PHBhdGggZD0iTTE0IDE5djIyYzAgMi44IDUuOCA1IDEzIDVzMTMtMi4yIDEzLTVWMTkiLz48cGF0aCBkPSJNMTQgMzBjMCAyLjggNS44IDUgMTMgNXMxMy0yLjIgMTMtNSIvPjwvZz48cGF0aCBkPSJNNDcgMzkgNTIgMjZNNDcgMzlsLTQgMTEiIHN0cm9rZT0iI2ZmZiIgc3Ryb2tlLXdpZHRoPSIxLjYiIG9wYWNpdHk9Ii43NSIvPjxnIGZpbGw9IiNmZmYiPjxjaXJjbGUgY3g9IjQ3IiBjeT0iMzkiIHI9IjMuMiIvPjxjaXJjbGUgY3g9IjUyIiBjeT0iMjYiIHI9IjIuMiIvPjxjaXJjbGUgY3g9IjQzIiBjeT0iNTAiIHI9IjIuMiIvPjwvZz48L3N2Zz4=",
+          "mimeType": "image/svg+xml",
+          "sizes": [
+            "any"
+          ]
+        }
+      ],
+      "description": "Check whether Astra DB credentials are configured and working: where the token, endpoint, and keyspace come from (env, .env, plugin settings, Astra CLI), which database is targeted, and a live connectivity check. Call it first when another tool reports not_configured or an auth error.",
+      "inputSchema": {
+        "type": "object",
+        "properties": {
+          "check": {
+            "default": true,
+            "description": "Make a live request to verify the connection (default true).",
+            "type": "boolean"
+          }
+        },
+        "$schema": "https://json-schema.org/draft/2020-12/schema"
+      },
+      "outputSchema": {
+        "type": "object",
+        "properties": {
+          "view": {
+            "type": "string",
+            "const": "status"
+          },
+          "configured": {
+            "type": "boolean"
+          },
+          "readOnly": {
+            "type": "boolean"
+          },
+          "environment": {
+            "type": "string"
+          },
+          "token": {
+            "anyOf": [
+              {
+                "type": "object",
+                "properties": {
+                  "source": {
+                    "type": "string"
+                  },
+                  "detail": {
+                    "type": "string"
+                  },
+                  "masked": {
+                    "type": "string"
+                  }
+                },
+                "required": [
+                  "source",
+                  "detail",
+                  "masked"
+                ],
+                "additionalProperties": false
+              },
+              {
+                "type": "null"
+              }
+            ]
+          },
+          "endpoint": {
+            "anyOf": [
+              {
+                "type": "object",
+                "properties": {
+                  "source": {
+                    "type": "string"
+                  },
+                  "detail": {
+                    "type": "string"
+                  },
+                  "host": {
+                    "type": "string"
+                  }
+                },
+                "required": [
+                  "source",
+                  "detail",
+                  "host"
+                ],
+                "additionalProperties": false
+              },
+              {
+                "type": "null"
+              }
+            ]
+          },
+          "keyspace": {
+            "anyOf": [
+              {
+                "type": "object",
+                "properties": {
+                  "source": {
+                    "type": "string"
+                  },
+                  "detail": {
+                    "type": "string"
+                  },
+                  "value": {
+                    "type": "string"
+                  }
+                },
+                "required": [
+                  "source",
+                  "detail",
+                  "value"
+                ],
+                "additionalProperties": false
+              },
+              {
+                "type": "null"
+              }
+            ]
+          },
+          "database": {
+            "anyOf": [
+              {
+                "type": "object",
+                "properties": {
+                  "id": {
+                    "type": "string"
+                  },
+                  "name": {
+                    "type": "string"
+                  },
+                  "region": {
+                    "type": "string"
+                  }
+                },
+                "additionalProperties": false
+              },
+              {
+                "type": "null"
+              }
+            ]
+          },
+          "checks": {
+            "type": "object",
+            "properties": {
+              "dataApi": {
+                "type": "object",
+                "properties": {
+                  "ok": {
+                    "type": "boolean"
+                  },
+                  "message": {
+                    "type": "string"
+                  },
+                  "collections": {
+                    "type": "number"
+                  },
+                  "tables": {
+                    "type": "number"
+                  }
+                },
+                "required": [
+                  "ok"
+                ],
+                "additionalProperties": false
+              }
+            },
+            "additionalProperties": false
+          },
+          "hints": {
+            "type": "array",
+            "items": {
+              "type": "string"
+            }
+          },
+          "consulted": {
+            "type": "array",
+            "items": {
+              "type": "string"
+            }
+          }
+        },
+        "required": [
+          "view",
+          "configured",
+          "readOnly",
+          "environment",
+          "token",
+          "endpoint",
+          "keyspace",
+          "database",
+          "checks",
+          "hints",
+          "consulted"
+        ],
+        "$schema": "https://json-schema.org/draft/2020-12/schema",
+        "additionalProperties": false
+      },
+      "annotations": {
+        "title": "Astra DB connection status",
+        "readOnlyHint": true,
+        "destructiveHint": false,
+        "idempotentHint": true,
+        "openWorldHint": true
+      },
+      "_meta": {}
+    },
+    {
+      "name": "list_databases",
+      "title": "List Astra databases",
+      "icons": [
+        {
+          "src": "data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHZpZXdCb3g9IjAgMCA2NCA2NCI+PGRlZnM+PGxpbmVhckdyYWRpZW50IGlkPSJnIiB4MT0iMCIgeTE9IjAiIHgyPSIxIiB5Mj0iMSI+PHN0b3Agb2Zmc2V0PSIwIiBzdG9wLWNvbG9yPSIjOEI1Q0Y2Ii8+PHN0b3Agb2Zmc2V0PSIxIiBzdG9wLWNvbG9yPSIjNUIyMUI2Ii8+PC9saW5lYXJHcmFkaWVudD48L2RlZnM+PHJlY3Qgd2lkdGg9IjY0IiBoZWlnaHQ9IjY0IiByeD0iMTQiIGZpbGw9InVybCgjZykiLz48ZyBmaWxsPSJub25lIiBzdHJva2U9IiNmZmYiIHN0cm9rZS13aWR0aD0iMy4yIiBzdHJva2UtbGluZWNhcD0icm91bmQiPjxlbGxpcHNlIGN4PSIyNyIgY3k9IjE5IiByeD0iMTMiIHJ5PSI1Ii8+PHBhdGggZD0iTTE0IDE5djIyYzAgMi44IDUuOCA1IDEzIDVzMTMtMi4yIDEzLTVWMTkiLz48cGF0aCBkPSJNMTQgMzBjMCAyLjggNS44IDUgMTMgNXMxMy0yLjIgMTMtNSIvPjwvZz48cGF0aCBkPSJNNDcgMzkgNTIgMjZNNDcgMzlsLTQgMTEiIHN0cm9rZT0iI2ZmZiIgc3Ryb2tlLXdpZHRoPSIxLjYiIG9wYWNpdHk9Ii43NSIvPjxnIGZpbGw9IiNmZmYiPjxjaXJjbGUgY3g9IjQ3IiBjeT0iMzkiIHI9IjMuMiIvPjxjaXJjbGUgY3g9IjUyIiBjeT0iMjYiIHI9IjIuMiIvPjxjaXJjbGUgY3g9IjQzIiBjeT0iNTAiIHI9IjIuMiIvPjwvZz48L3N2Zz4=",
+          "mimeType": "image/svg+xml",
+          "sizes": [
+            "any"
+          ]
+        }
+      ],
+      "description": "List the Astra databases this token can access (DevOps API): name, id, status, regions with Data API endpoints, and keyspaces. Use it to choose the `database` argument of other tools.",
+      "inputSchema": {
+        "type": "object",
+        "properties": {
+          "include": {
+            "default": "active",
+            "description": "active (default) or all non-terminated databases.",
+            "type": "string",
+            "enum": [
+              "active",
+              "all"
+            ]
+          }
+        },
+        "$schema": "https://json-schema.org/draft/2020-12/schema"
+      },
+      "outputSchema": {
+        "type": "object",
+        "properties": {
+          "view": {
+            "type": "string",
+            "const": "databases"
+          },
+          "databases": {
+            "type": "array",
+            "items": {
+              "type": "object",
+              "properties": {
+                "id": {
+                  "type": "string"
+                },
+                "name": {
+                  "type": "string"
+                },
+                "status": {
+                  "type": "string"
+                },
+                "cloudProvider": {
+                  "type": [
+                    "string",
+                    "null"
+                  ]
+                },
+                "regions": {
+                  "type": "array",
+                  "items": {
+                    "type": "object",
+                    "properties": {
+                      "name": {
+                        "type": "string"
+                      },
+                      "apiEndpoint": {
+                        "type": "string"
+                      }
+                    },
+                    "required": [
+                      "name",
+                      "apiEndpoint"
+                    ],
+                    "additionalProperties": false
+                  }
+                },
+                "keyspaces": {
+                  "type": "array",
+                  "items": {
+                    "type": "string"
+                  }
+                },
+                "current": {
+                  "type": "boolean"
+                }
+              },
+              "required": [
+                "id",
+                "name",
+                "status",
+                "cloudProvider",
+                "regions",
+                "keyspaces",
+                "current"
+              ],
+              "additionalProperties": false
+            }
+          }
+        },
+        "required": [
+          "view",
+          "databases"
+        ],
+        "$schema": "https://json-schema.org/draft/2020-12/schema",
+        "additionalProperties": false
+      },
+      "annotations": {
+        "title": "List Astra databases",
+        "readOnlyHint": true,
+        "destructiveHint": false,
+        "idempotentHint": true,
+        "openWorldHint": true
+      },
+      "_meta": {}
+    },
+    {
+      "name": "database_overview",
+      "title": "Astra DB overview",
+      "icons": [
+        {
+          "src": "data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHZpZXdCb3g9IjAgMCA2NCA2NCI+PGRlZnM+PGxpbmVhckdyYWRpZW50IGlkPSJnIiB4MT0iMCIgeTE9IjAiIHgyPSIxIiB5Mj0iMSI+PHN0b3Agb2Zmc2V0PSIwIiBzdG9wLWNvbG9yPSIjOEI1Q0Y2Ii8+PHN0b3Agb2Zmc2V0PSIxIiBzdG9wLWNvbG9yPSIjNUIyMUI2Ii8+PC9saW5lYXJHcmFkaWVudD48L2RlZnM+PHJlY3Qgd2lkdGg9IjY0IiBoZWlnaHQ9IjY0IiByeD0iMTQiIGZpbGw9InVybCgjZykiLz48ZyBmaWxsPSJub25lIiBzdHJva2U9IiNmZmYiIHN0cm9rZS13aWR0aD0iMy4yIiBzdHJva2UtbGluZWNhcD0icm91bmQiPjxlbGxpcHNlIGN4PSIyNyIgY3k9IjE5IiByeD0iMTMiIHJ5PSI1Ii8+PHBhdGggZD0iTTE0IDE5djIyYzAgMi44IDUuOCA1IDEzIDVzMTMtMi4yIDEzLTVWMTkiLz48cGF0aCBkPSJNMTQgMzBjMCAyLjggNS44IDUgMTMgNXMxMy0yLjIgMTMtNSIvPjwvZz48cGF0aCBkPSJNNDcgMzkgNTIgMjZNNDcgMzlsLTQgMTEiIHN0cm9rZT0iI2ZmZiIgc3Ryb2tlLXdpZHRoPSIxLjYiIG9wYWNpdHk9Ii43NSIvPjxnIGZpbGw9IiNmZmYiPjxjaXJjbGUgY3g9IjQ3IiBjeT0iMzkiIHI9IjMuMiIvPjxjaXJjbGUgY3g9IjUyIiBjeT0iMjYiIHI9IjIuMiIvPjxjaXJjbGUgY3g9IjQzIiBjeT0iNTAiIHI9IjIuMiIvPjwvZz48L3N2Zz4=",
+          "mimeType": "image/svg+xml",
+          "sizes": [
+            "any"
+          ]
+        }
+      ],
+      "description": "Map a database: keyspaces → collections (vector dimension/metric, vectorize model, lexical/rerank, estimated counts) and tables (column and vector-column counts). Start here to see what exists. Renders an interactive overview.",
+      "inputSchema": {
+        "type": "object",
+        "properties": {
+          "database": {
+            "description": "Database to use: name, id, or Data API endpoint URL. Omit for the configured default.",
+            "type": "string",
+            "minLength": 1
+          },
+          "keyspaces": {
+            "description": "Only these keyspaces (default: all).",
+            "maxItems": 50,
+            "type": "array",
+            "items": {
+              "type": "string",
+              "minLength": 1
+            }
+          },
+          "maxPerKeyspace": {
+            "default": 50,
+            "description": "Max collections/tables listed per keyspace.",
+            "type": "integer",
+            "minimum": 1,
+            "maximum": 200
+          },
+          "includeCounts": {
+            "default": true,
+            "description": "Estimated document counts per collection (one request each).",
+            "type": "boolean"
+          },
+          "emit": {
+            "default": "structured",
+            "description": "html_file also writes a self-contained HTML page and returns a link to it — only for terminal-only hosts, when the user asks for a visual.",
+            "type": "string",
+            "enum": [
+              "structured",
+              "html_file"
+            ]
+          }
+        },
+        "$schema": "https://json-schema.org/draft/2020-12/schema"
+      },
+      "outputSchema": {
+        "type": "object",
+        "properties": {
+          "view": {
+            "type": "string",
+            "const": "overview"
+          },
+          "endpointHost": {
+            "type": "string"
+          },
+          "database": {
+            "type": "object",
+            "properties": {
+              "id": {
+                "type": "string"
+              },
+              "name": {
+                "type": "string"
+              },
+              "region": {
+                "type": "string"
+              }
+            },
+            "additionalProperties": false
+          },
+          "keyspaces": {
+            "type": "array",
+            "items": {
+              "type": "object",
+              "properties": {
+                "name": {
+                  "type": "string"
+                },
+                "isDefault": {
+                  "type": "boolean"
+                },
+                "error": {
+                  "type": "string"
+                },
+                "collections": {
+                  "type": "array",
+                  "items": {
+                    "type": "object",
+                    "properties": {
+                      "name": {
+                        "type": "string"
+                      },
+                      "vector": {
+                        "anyOf": [
+                          {
+                            "type": "object",
+                            "properties": {
+                              "dimension": {
+                                "type": [
+                                  "number",
+                                  "null"
+                                ]
+                              },
+                              "metric": {
+                                "type": [
+                                  "string",
+                                  "null"
+                                ]
+                              },
+                              "provider": {
+                                "type": [
+                                  "string",
+                                  "null"
+                                ]
+                              },
+                              "model": {
+                                "type": [
+                                  "string",
+                                  "null"
+                                ]
+                              }
+                            },
+                            "required": [
+                              "dimension",
+                              "metric",
+                              "provider",
+                              "model"
+                            ],
+                            "additionalProperties": false
+                          },
+                          {
+                            "type": "null"
+                          }
+                        ]
+                      },
+                      "lexical": {
+                        "type": "boolean"
+                      },
+                      "rerank": {
+                        "type": "boolean"
+                      },
+                      "estimatedCount": {
+                        "type": [
+                          "number",
+                          "null"
+                        ]
+                      }
+                    },
+                    "required": [
+                      "name",
+                      "vector",
+                      "lexical",
+                      "rerank",
+                      "estimatedCount"
+                    ],
+                    "additionalProperties": false
+                  }
+                },
+                "tables": {
+                  "type": "array",
+                  "items": {
+                    "type": "object",
+                    "properties": {
+                      "name": {
+                        "type": "string"
+                      },
+                      "columns": {
+                        "type": "number"
+                      },
+                      "vectorColumns": {
+                        "type": "number"
+                      }
+                    },
+                    "required": [
+                      "name",
+                      "columns",
+                      "vectorColumns"
+                    ],
+                    "additionalProperties": false
+                  }
+                }
+              },
+              "required": [
+                "name",
+                "isDefault",
+                "collections",
+                "tables"
+              ],
+              "additionalProperties": false
+            }
+          },
+          "totals": {
+            "type": "object",
+            "properties": {
+              "keyspaces": {
+                "type": "number"
+              },
+              "collections": {
+                "type": "number"
+              },
+              "tables": {
+                "type": "number"
+              },
+              "documents": {
+                "type": [
+                  "number",
+                  "null"
+                ]
+              }
+            },
+            "required": [
+              "keyspaces",
+              "collections",
+              "tables",
+              "documents"
+            ],
+            "additionalProperties": false
+          },
+          "truncated": {
+            "type": "object",
+            "properties": {
+              "keyspaces": {
+                "type": "boolean"
+              },
+              "items": {
+                "type": "boolean"
+              }
+            },
+            "required": [
+              "keyspaces",
+              "items"
+            ],
+            "additionalProperties": false
+          }
+        },
+        "required": [
+          "view",
+          "endpointHost",
+          "database",
+          "keyspaces",
+          "totals",
+          "truncated"
+        ],
+        "$schema": "https://json-schema.org/draft/2020-12/schema",
+        "additionalProperties": false
+      },
+      "annotations": {
+        "title": "Astra DB overview",
+        "readOnlyHint": true,
+        "destructiveHint": false,
+        "idempotentHint": true,
+        "openWorldHint": true
+      },
+      "_meta": {
+        "ui": {
+          "resourceUri": "ui://astra-db/app.html"
+        },
+        "openai/outputTemplate": "ui://astra-db/app.html",
+        "ui/resourceUri": "ui://astra-db/app.html"
+      }
+    },
+    {
+      "name": "describe_collection",
+      "title": "Describe collection",
+      "icons": [
+        {
+          "src": "data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHZpZXdCb3g9IjAgMCA2NCA2NCI+PGRlZnM+PGxpbmVhckdyYWRpZW50IGlkPSJnIiB4MT0iMCIgeTE9IjAiIHgyPSIxIiB5Mj0iMSI+PHN0b3Agb2Zmc2V0PSIwIiBzdG9wLWNvbG9yPSIjOEI1Q0Y2Ii8+PHN0b3Agb2Zmc2V0PSIxIiBzdG9wLWNvbG9yPSIjNUIyMUI2Ii8+PC9saW5lYXJHcmFkaWVudD48L2RlZnM+PHJlY3Qgd2lkdGg9IjY0IiBoZWlnaHQ9IjY0IiByeD0iMTQiIGZpbGw9InVybCgjZykiLz48ZyBmaWxsPSJub25lIiBzdHJva2U9IiNmZmYiIHN0cm9rZS13aWR0aD0iMy4yIiBzdHJva2UtbGluZWNhcD0icm91bmQiPjxlbGxpcHNlIGN4PSIyNyIgY3k9IjE5IiByeD0iMTMiIHJ5PSI1Ii8+PHBhdGggZD0iTTE0IDE5djIyYzAgMi44IDUuOCA1IDEzIDVzMTMtMi4yIDEzLTVWMTkiLz48cGF0aCBkPSJNMTQgMzBjMCAyLjggNS44IDUgMTMgNXMxMy0yLjIgMTMtNSIvPjwvZz48cGF0aCBkPSJNNDcgMzkgNTIgMjZNNDcgMzlsLTQgMTEiIHN0cm9rZT0iI2ZmZiIgc3Ryb2tlLXdpZHRoPSIxLjYiIG9wYWNpdHk9Ii43NSIvPjxnIGZpbGw9IiNmZmYiPjxjaXJjbGUgY3g9IjQ3IiBjeT0iMzkiIHI9IjMuMiIvPjxjaXJjbGUgY3g9IjUyIiBjeT0iMjYiIHI9IjIuMiIvPjxjaXJjbGUgY3g9IjQzIiBjeT0iNTAiIHI9IjIuMiIvPjwvZz48L3N2Zz4=",
+          "mimeType": "image/svg+xml",
+          "sizes": [
+            "any"
+          ]
+        }
+      ],
+      "description": "Show one collection's configuration and shape: vector settings, vectorize and rerank services, lexical, indexing allow/deny, default id type, estimated count, and a sample document with field types. Use before writing queries or code against it.",
+      "inputSchema": {
+        "type": "object",
+        "properties": {
+          "database": {
+            "description": "Database to use: name, id, or Data API endpoint URL. Omit for the configured default.",
+            "type": "string",
+            "minLength": 1
+          },
+          "keyspace": {
+            "description": "Keyspace. Omit for the configured/default keyspace.",
+            "type": "string",
+            "minLength": 1
+          },
+          "collection": {
+            "type": "string",
+            "minLength": 1,
+            "description": "Collection name."
+          },
+          "includeSample": {
+            "default": true,
+            "description": "Include one sample document (vectors omitted).",
+            "type": "boolean"
+          },
+          "emit": {
+            "default": "structured",
+            "description": "html_file also writes a self-contained HTML page and returns a link to it — only for terminal-only hosts, when the user asks for a visual.",
+            "type": "string",
+            "enum": [
+              "structured",
+              "html_file"
+            ]
+          }
+        },
+        "required": [
+          "collection"
+        ],
+        "$schema": "https://json-schema.org/draft/2020-12/schema"
+      },
+      "outputSchema": {
+        "type": "object",
+        "properties": {
+          "view": {
+            "type": "string",
+            "const": "collection"
+          },
+          "keyspace": {
+            "type": "string"
+          },
+          "name": {
+            "type": "string"
+          },
+          "estimatedCount": {
+            "type": [
+              "number",
+              "null"
+            ]
+          },
+          "vector": {
+            "anyOf": [
+              {
+                "type": "object",
+                "properties": {
+                  "dimension": {
+                    "type": [
+                      "number",
+                      "null"
+                    ]
+                  },
+                  "metric": {
+                    "type": [
+                      "string",
+                      "null"
+                    ]
+                  },
+                  "provider": {
+                    "type": [
+                      "string",
+                      "null"
+                    ]
+                  },
+                  "model": {
+                    "type": [
+                      "string",
+                      "null"
+                    ]
+                  }
+                },
+                "required": [
+                  "dimension",
+                  "metric",
+                  "provider",
+                  "model"
+                ],
+                "additionalProperties": false
+              },
+              {
+                "type": "null"
+              }
+            ]
+          },
+          "lexical": {
+            "type": "object",
+            "properties": {
+              "enabled": {
+                "type": "boolean"
+              },
+              "analyzer": {}
+            },
+            "required": [
+              "enabled"
+            ],
+            "additionalProperties": false
+          },
+          "rerank": {
+            "type": "object",
+            "properties": {
+              "enabled": {
+                "type": "boolean"
+              },
+              "provider": {
+                "type": [
+                  "string",
+                  "null"
+                ]
+              },
+              "model": {
+                "type": [
+                  "string",
+                  "null"
+                ]
+              }
+            },
+            "required": [
+              "enabled",
+              "provider",
+              "model"
+            ],
+            "additionalProperties": false
+          },
+          "indexing": {
+            "type": "object",
+            "properties": {
+              "allow": {
+                "anyOf": [
+                  {
+                    "type": "array",
+                    "items": {
+                      "type": "string"
+                    }
+                  },
+                  {
+                    "type": "null"
+                  }
+                ]
+              },
+              "deny": {
+                "anyOf": [
+                  {
+                    "type": "array",
+                    "items": {
+                      "type": "string"
+                    }
+                  },
+                  {
+                    "type": "null"
+                  }
+                ]
+              }
+            },
+            "required": [
+              "allow",
+              "deny"
+            ],
+            "additionalProperties": false
+          },
+          "defaultIdType": {
+            "type": [
+              "string",
+              "null"
+            ]
+          },
+          "sampleDocument": {
+            "anyOf": [
+              {
+                "type": "object",
+                "propertyNames": {
+                  "type": "string"
+                },
+                "additionalProperties": {}
+              },
+              {
+                "type": "null"
+              }
+            ]
+          },
+          "fields": {
+            "type": "array",
+            "items": {
+              "type": "object",
+              "properties": {
+                "name": {
+                  "type": "string"
+                },
+                "type": {
+                  "type": "string"
+                },
+                "present": {
+                  "type": "number"
+                }
+              },
+              "required": [
+                "name",
+                "type",
+                "present"
+              ],
+              "additionalProperties": false
+            }
+          }
+        },
+        "required": [
+          "view",
+          "keyspace",
+          "name",
+          "estimatedCount",
+          "vector",
+          "lexical",
+          "rerank",
+          "indexing",
+          "defaultIdType",
+          "sampleDocument",
+          "fields"
+        ],
+        "$schema": "https://json-schema.org/draft/2020-12/schema",
+        "additionalProperties": false
+      },
+      "annotations": {
+        "title": "Describe collection",
+        "readOnlyHint": true,
+        "destructiveHint": false,
+        "idempotentHint": true,
+        "openWorldHint": true
+      },
+      "_meta": {
+        "ui": {
+          "resourceUri": "ui://astra-db/app.html"
+        },
+        "openai/outputTemplate": "ui://astra-db/app.html",
+        "ui/resourceUri": "ui://astra-db/app.html"
+      }
+    },
+    {
+      "name": "find",
+      "title": "Find documents or rows",
+      "icons": [
+        {
+          "src": "data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHZpZXdCb3g9IjAgMCA2NCA2NCI+PGRlZnM+PGxpbmVhckdyYWRpZW50IGlkPSJnIiB4MT0iMCIgeTE9IjAiIHgyPSIxIiB5Mj0iMSI+PHN0b3Agb2Zmc2V0PSIwIiBzdG9wLWNvbG9yPSIjOEI1Q0Y2Ii8+PHN0b3Agb2Zmc2V0PSIxIiBzdG9wLWNvbG9yPSIjNUIyMUI2Ii8+PC9saW5lYXJHcmFkaWVudD48L2RlZnM+PHJlY3Qgd2lkdGg9IjY0IiBoZWlnaHQ9IjY0IiByeD0iMTQiIGZpbGw9InVybCgjZykiLz48ZyBmaWxsPSJub25lIiBzdHJva2U9IiNmZmYiIHN0cm9rZS13aWR0aD0iMy4yIiBzdHJva2UtbGluZWNhcD0icm91bmQiPjxlbGxpcHNlIGN4PSIyNyIgY3k9IjE5IiByeD0iMTMiIHJ5PSI1Ii8+PHBhdGggZD0iTTE0IDE5djIyYzAgMi44IDUuOCA1IDEzIDVzMTMtMi4yIDEzLTVWMTkiLz48cGF0aCBkPSJNMTQgMzBjMCAyLjggNS44IDUgMTMgNXMxMy0yLjIgMTMtNSIvPjwvZz48cGF0aCBkPSJNNDcgMzkgNTIgMjZNNDcgMzlsLTQgMTEiIHN0cm9rZT0iI2ZmZiIgc3Ryb2tlLXdpZHRoPSIxLjYiIG9wYWNpdHk9Ii43NSIvPjxnIGZpbGw9IiNmZmYiPjxjaXJjbGUgY3g9IjQ3IiBjeT0iMzkiIHI9IjMuMiIvPjxjaXJjbGUgY3g9IjUyIiBjeT0iMjYiIHI9IjIuMiIvPjxjaXJjbGUgY3g9IjQzIiBjeT0iNTAiIHI9IjIuMiIvPjwvZz48L3N2Zz4=",
+          "mimeType": "image/svg+xml",
+          "sizes": [
+            "any"
+          ]
+        }
+      ],
+      "description": "Read documents (collections) or rows (tables) with an optional Data API filter, sort, and projection. Returns pages of 20 plus nextPageState for more. For similarity search use vector_search. Renders an interactive explorer.",
+      "inputSchema": {
+        "type": "object",
+        "properties": {
+          "database": {
+            "description": "Database to use: name, id, or Data API endpoint URL. Omit for the configured default.",
+            "type": "string",
+            "minLength": 1
+          },
+          "keyspace": {
+            "description": "Keyspace. Omit for the configured/default keyspace.",
+            "type": "string",
+            "minLength": 1
+          },
+          "name": {
+            "type": "string",
+            "minLength": 1,
+            "description": "Collection or table name."
+          },
+          "kind": {
+            "description": "Only needed when a collection and a table share the name; otherwise detected.",
+            "type": "string",
+            "enum": [
+              "collection",
+              "table"
+            ]
+          },
+          "filter": {
+            "type": "object",
+            "propertyNames": {
+              "type": "string"
+            },
+            "additionalProperties": {},
+            "description": "Data API filter, e.g. {\"status\": \"active\", \"year\": {\"$gte\": 2020}}. Typed ids as {\"$uuid\": \"…\"} / {\"$objectId\": \"…\"}."
+          },
+          "sort": {
+            "description": "Non-vector sort, e.g. {\"createdAt\": -1}. For similarity use vector_search.",
+            "type": "object",
+            "propertyNames": {
+              "type": "string"
+            },
+            "additionalProperties": {
+              "anyOf": [
+                {
+                  "type": "number",
+                  "const": 1
+                },
+                {
+                  "type": "number",
+                  "const": -1
+                }
+              ]
+            }
+          },
+          "projection": {
+            "description": "Fields to include (1) or exclude (0), e.g. {\"title\": 1, \"author\": 1}.",
+            "type": "object",
+            "propertyNames": {
+              "type": "string"
+            },
+            "additionalProperties": {
+              "anyOf": [
+                {
+                  "type": "number",
+                  "const": 0
+                },
+                {
+                  "type": "number",
+                  "const": 1
+                },
+                {
+                  "type": "boolean"
+                }
+              ]
+            }
+          },
+          "limit": {
+            "default": 20,
+            "description": "Documents to return (rounded up to whole pages of 20).",
+            "type": "integer",
+            "minimum": 1,
+            "maximum": 100
+          },
+          "pageState": {
+            "description": "nextPageState from a previous call, to continue paging.",
+            "type": "string"
+          },
+          "emit": {
+            "default": "structured",
+            "description": "html_file also writes a self-contained HTML page and returns a link to it — only for terminal-only hosts, when the user asks for a visual.",
+            "type": "string",
+            "enum": [
+              "structured",
+              "html_file"
+            ]
+          }
+        },
+        "required": [
+          "name"
+        ],
+        "$schema": "https://json-schema.org/draft/2020-12/schema"
+      },
+      "outputSchema": {
+        "type": "object",
+        "properties": {
+          "view": {
+            "type": "string",
+            "const": "explorer"
+          },
+          "keyspace": {
+            "type": "string"
+          },
+          "name": {
+            "type": "string"
+          },
+          "kind": {
+            "type": "string",
+            "enum": [
+              "collection",
+              "table"
+            ]
+          },
+          "filter": {
+            "anyOf": [
+              {
+                "type": "object",
+                "propertyNames": {
+                  "type": "string"
+                },
+                "additionalProperties": {}
+              },
+              {
+                "type": "null"
+              }
+            ]
+          },
+          "sort": {
+            "anyOf": [
+              {
+                "type": "object",
+                "propertyNames": {
+                  "type": "string"
+                },
+                "additionalProperties": {}
+              },
+              {
+                "type": "null"
+              }
+            ]
+          },
+          "documents": {
+            "type": "array",
+            "items": {
+              "type": "object",
+              "propertyNames": {
+                "type": "string"
+              },
+              "additionalProperties": {}
+            }
+          },
+          "displayFields": {
+            "type": "array",
+            "items": {
+              "type": "string"
+            }
+          },
+          "fields": {
+            "type": "array",
+            "items": {
+              "type": "object",
+              "properties": {
+                "name": {
+                  "type": "string"
+                },
+                "type": {
+                  "type": "string"
+                },
+                "present": {
+                  "type": "number"
+                }
+              },
+              "required": [
+                "name",
+                "type",
+                "present"
+              ],
+              "additionalProperties": false
+            }
+          },
+          "nextPageState": {
+            "type": [
+              "string",
+              "null"
+            ]
+          }
+        },
+        "required": [
+          "view",
+          "keyspace",
+          "name",
+          "kind",
+          "filter",
+          "sort",
+          "documents",
+          "displayFields",
+          "fields",
+          "nextPageState"
+        ],
+        "$schema": "https://json-schema.org/draft/2020-12/schema",
+        "additionalProperties": false
+      },
+      "annotations": {
+        "title": "Find documents or rows",
+        "readOnlyHint": true,
+        "destructiveHint": false,
+        "idempotentHint": true,
+        "openWorldHint": true
+      },
+      "_meta": {
+        "ui": {
+          "resourceUri": "ui://astra-db/app.html"
+        },
+        "openai/outputTemplate": "ui://astra-db/app.html",
+        "ui/resourceUri": "ui://astra-db/app.html"
+      }
+    },
+    {
+      "name": "vector_search",
+      "title": "Vector search",
+      "icons": [
+        {
+          "src": "data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHZpZXdCb3g9IjAgMCA2NCA2NCI+PGRlZnM+PGxpbmVhckdyYWRpZW50IGlkPSJnIiB4MT0iMCIgeTE9IjAiIHgyPSIxIiB5Mj0iMSI+PHN0b3Agb2Zmc2V0PSIwIiBzdG9wLWNvbG9yPSIjOEI1Q0Y2Ii8+PHN0b3Agb2Zmc2V0PSIxIiBzdG9wLWNvbG9yPSIjNUIyMUI2Ii8+PC9saW5lYXJHcmFkaWVudD48L2RlZnM+PHJlY3Qgd2lkdGg9IjY0IiBoZWlnaHQ9IjY0IiByeD0iMTQiIGZpbGw9InVybCgjZykiLz48ZyBmaWxsPSJub25lIiBzdHJva2U9IiNmZmYiIHN0cm9rZS13aWR0aD0iMy4yIiBzdHJva2UtbGluZWNhcD0icm91bmQiPjxlbGxpcHNlIGN4PSIyNyIgY3k9IjE5IiByeD0iMTMiIHJ5PSI1Ii8+PHBhdGggZD0iTTE0IDE5djIyYzAgMi44IDUuOCA1IDEzIDVzMTMtMi4yIDEzLTVWMTkiLz48cGF0aCBkPSJNMTQgMzBjMCAyLjggNS44IDUgMTMgNXMxMy0yLjIgMTMtNSIvPjwvZz48cGF0aCBkPSJNNDcgMzkgNTIgMjZNNDcgMzlsLTQgMTEiIHN0cm9rZT0iI2ZmZiIgc3Ryb2tlLXdpZHRoPSIxLjYiIG9wYWNpdHk9Ii43NSIvPjxnIGZpbGw9IiNmZmYiPjxjaXJjbGUgY3g9IjQ3IiBjeT0iMzkiIHI9IjMuMiIvPjxjaXJjbGUgY3g9IjUyIiBjeT0iMjYiIHI9IjIuMiIvPjxjaXJjbGUgY3g9IjQzIiBjeT0iNTAiIHI9IjIuMiIvPjwvZz48L3N2Zz4=",
+          "mimeType": "image/svg+xml",
+          "sizes": [
+            "any"
+          ]
+        }
+      ],
+      "description": "Similarity search by natural-language `query` (server-side vectorize), an explicit `vector`, or `documentId` (more like this). `hybrid` combines vector and lexical (BM25) results with reranking on collections that have both. A filter narrows candidates. Returns ranked hits with similarity scores; renders an interactive results view.",
+      "inputSchema": {
+        "type": "object",
+        "properties": {
+          "database": {
+            "description": "Database to use: name, id, or Data API endpoint URL. Omit for the configured default.",
+            "type": "string",
+            "minLength": 1
+          },
+          "keyspace": {
+            "description": "Keyspace. Omit for the configured/default keyspace.",
+            "type": "string",
+            "minLength": 1
+          },
+          "name": {
+            "type": "string",
+            "minLength": 1,
+            "description": "Collection or table name."
+          },
+          "kind": {
+            "description": "Only needed when a collection and a table share the name; otherwise detected.",
+            "type": "string",
+            "enum": [
+              "collection",
+              "table"
+            ]
+          },
+          "query": {
+            "description": "Natural-language text; embedded server-side (vectorize).",
+            "type": "string",
+            "minLength": 1
+          },
+          "vector": {
+            "description": "A query embedding (must match the dimension).",
+            "minItems": 2,
+            "type": "array",
+            "items": {
+              "type": "number"
+            }
+          },
+          "documentId": {
+            "description": "Find items similar to this existing document (collections).",
+            "anyOf": [
+              {
+                "type": "string",
+                "minLength": 1
+              },
+              {
+                "type": "object",
+                "propertyNames": {
+                  "type": "string"
+                },
+                "additionalProperties": {}
+              }
+            ]
+          },
+          "idType": {
+            "default": "auto",
+            "description": "How to interpret documentId (auto follows the collection's defaultId).",
+            "type": "string",
+            "enum": [
+              "auto",
+              "string",
+              "uuid",
+              "objectId"
+            ]
+          },
+          "vectorColumn": {
+            "description": "Tables only: which vector column to search (default: the only one).",
+            "type": "string"
+          },
+          "hybrid": {
+            "default": false,
+            "description": "Collections with lexical + rerank: combined vector + BM25 search, reranked.",
+            "type": "boolean"
+          },
+          "filter": {
+            "type": "object",
+            "propertyNames": {
+              "type": "string"
+            },
+            "additionalProperties": {},
+            "description": "Data API filter, e.g. {\"status\": \"active\", \"year\": {\"$gte\": 2020}}. Typed ids as {\"$uuid\": \"…\"} / {\"$objectId\": \"…\"}."
+          },
+          "projection": {
+            "description": "Fields to include (1) or exclude (0), e.g. {\"title\": 1, \"author\": 1}.",
+            "type": "object",
+            "propertyNames": {
+              "type": "string"
+            },
+            "additionalProperties": {
+              "anyOf": [
+                {
+                  "type": "number",
+                  "const": 0
+                },
+                {
+                  "type": "number",
+                  "const": 1
+                },
+                {
+                  "type": "boolean"
+                }
+              ]
+            }
+          },
+          "limit": {
+            "default": 10,
+            "description": "How many hits.",
+            "type": "integer",
+            "minimum": 1,
+            "maximum": 100
+          },
+          "emit": {
+            "default": "structured",
+            "description": "html_file also writes a self-contained HTML page and returns a link to it — only for terminal-only hosts, when the user asks for a visual.",
+            "type": "string",
+            "enum": [
+              "structured",
+              "html_file"
+            ]
+          }
+        },
+        "required": [
+          "name"
+        ],
+        "$schema": "https://json-schema.org/draft/2020-12/schema"
+      },
+      "outputSchema": {
+        "type": "object",
+        "properties": {
+          "view": {
+            "type": "string",
+            "const": "similarity"
+          },
+          "keyspace": {
+            "type": "string"
+          },
+          "name": {
+            "type": "string"
+          },
+          "kind": {
+            "type": "string",
+            "enum": [
+              "collection",
+              "table"
+            ]
+          },
+          "mode": {
+            "type": "string",
+            "enum": [
+              "vectorize",
+              "vector",
+              "document",
+              "hybrid"
+            ]
+          },
+          "query": {
+            "type": [
+              "string",
+              "null"
+            ]
+          },
+          "documentId": {
+            "type": [
+              "string",
+              "null"
+            ]
+          },
+          "limit": {
+            "type": "number"
+          },
+          "hits": {
+            "type": "array",
+            "items": {
+              "type": "object",
+              "properties": {
+                "rank": {
+                  "type": "number"
+                },
+                "id": {
+                  "type": "string"
+                },
+                "idValue": {},
+                "similarity": {
+                  "type": [
+                    "number",
+                    "null"
+                  ]
+                },
+                "scores": {
+                  "type": "object",
+                  "propertyNames": {
+                    "type": "string"
+                  },
+                  "additionalProperties": {
+                    "type": "number"
+                  }
+                },
+                "title": {
+                  "type": "string"
+                },
+                "fields": {
+                  "type": "object",
+                  "propertyNames": {
+                    "type": "string"
+                  },
+                  "additionalProperties": {
+                    "type": "string"
+                  }
+                },
+                "document": {
+                  "type": "object",
+                  "propertyNames": {
+                    "type": "string"
+                  },
+                  "additionalProperties": {}
+                }
+              },
+              "required": [
+                "rank",
+                "id",
+                "idValue",
+                "similarity",
+                "title",
+                "fields",
+                "document"
+              ],
+              "additionalProperties": false
+            }
+          },
+          "stats": {
+            "type": "object",
+            "properties": {
+              "max": {
+                "type": [
+                  "number",
+                  "null"
+                ]
+              },
+              "min": {
+                "type": [
+                  "number",
+                  "null"
+                ]
+              },
+              "mean": {
+                "type": [
+                  "number",
+                  "null"
+                ]
+              }
+            },
+            "required": [
+              "max",
+              "min",
+              "mean"
+            ],
+            "additionalProperties": false
+          },
+          "warnings": {
+            "type": "array",
+            "items": {
+              "type": "string"
+            }
+          }
+        },
+        "required": [
+          "view",
+          "keyspace",
+          "name",
+          "kind",
+          "mode",
+          "query",
+          "documentId",
+          "limit",
+          "hits",
+          "stats",
+          "warnings"
+        ],
+        "$schema": "https://json-schema.org/draft/2020-12/schema",
+        "additionalProperties": false
+      },
+      "annotations": {
+        "title": "Vector search",
+        "readOnlyHint": true,
+        "destructiveHint": false,
+        "idempotentHint": true,
+        "openWorldHint": true
+      },
+      "_meta": {
+        "ui": {
+          "resourceUri": "ui://astra-db/app.html"
+        },
+        "openai/outputTemplate": "ui://astra-db/app.html",
+        "ui/resourceUri": "ui://astra-db/app.html"
+      }
+    },
+    {
+      "name": "code_examples",
+      "title": "Data API code examples",
+      "icons": [
+        {
+          "src": "data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHZpZXdCb3g9IjAgMCA2NCA2NCI+PGRlZnM+PGxpbmVhckdyYWRpZW50IGlkPSJnIiB4MT0iMCIgeTE9IjAiIHgyPSIxIiB5Mj0iMSI+PHN0b3Agb2Zmc2V0PSIwIiBzdG9wLWNvbG9yPSIjOEI1Q0Y2Ii8+PHN0b3Agb2Zmc2V0PSIxIiBzdG9wLWNvbG9yPSIjNUIyMUI2Ii8+PC9saW5lYXJHcmFkaWVudD48L2RlZnM+PHJlY3Qgd2lkdGg9IjY0IiBoZWlnaHQ9IjY0IiByeD0iMTQiIGZpbGw9InVybCgjZykiLz48ZyBmaWxsPSJub25lIiBzdHJva2U9IiNmZmYiIHN0cm9rZS13aWR0aD0iMy4yIiBzdHJva2UtbGluZWNhcD0icm91bmQiPjxlbGxpcHNlIGN4PSIyNyIgY3k9IjE5IiByeD0iMTMiIHJ5PSI1Ii8+PHBhdGggZD0iTTE0IDE5djIyYzAgMi44IDUuOCA1IDEzIDVzMTMtMi4yIDEzLTVWMTkiLz48cGF0aCBkPSJNMTQgMzBjMCAyLjggNS44IDUgMTMgNXMxMy0yLjIgMTMtNSIvPjwvZz48cGF0aCBkPSJNNDcgMzkgNTIgMjZNNDcgMzlsLTQgMTEiIHN0cm9rZT0iI2ZmZiIgc3Ryb2tlLXdpZHRoPSIxLjYiIG9wYWNpdHk9Ii43NSIvPjxnIGZpbGw9IiNmZmYiPjxjaXJjbGUgY3g9IjQ3IiBjeT0iMzkiIHI9IjMuMiIvPjxjaXJjbGUgY3g9IjUyIiBjeT0iMjYiIHI9IjIuMiIvPjxjaXJjbGUgY3g9IjQzIiBjeT0iNTAiIHI9IjIuMiIvPjwvZz48L3N2Zz4=",
+          "mimeType": "image/svg+xml",
+          "sizes": [
+            "any"
+          ]
+        }
+      ],
+      "description": "Canonical Data API client code for Python (astrapy), TypeScript (@datastax/astra-db-ts), Java, C#, and Go from the bundled, documentation-derived example library. Use when writing application code; snippets read ASTRA_DB_APPLICATION_TOKEN / ASTRA_DB_API_ENDPOINT from the environment.",
+      "inputSchema": {
+        "type": "object",
+        "properties": {
+          "language": {
+            "type": "string",
+            "enum": [
+              "python",
+              "typescript",
+              "java",
+              "csharp",
+              "go"
+            ],
+            "description": "Client language."
+          },
+          "query": {
+            "type": "string",
+            "minLength": 1,
+            "description": "What the code should do, e.g. \"create a vector collection with vectorize\", \"find with filter and sort\"."
+          },
+          "limit": {
+            "default": 3,
+            "type": "integer",
+            "minimum": 1,
+            "maximum": 10
+          },
+          "mode": {
+            "default": "content",
+            "description": "content: include source; list: file names only.",
+            "type": "string",
+            "enum": [
+              "content",
+              "list"
+            ]
+          }
+        },
+        "required": [
+          "language",
+          "query"
+        ],
+        "$schema": "https://json-schema.org/draft/2020-12/schema"
+      },
+      "outputSchema": {
+        "type": "object",
+        "properties": {
+          "view": {
+            "type": "string",
+            "const": "examples"
+          },
+          "language": {
+            "type": "string"
+          },
+          "query": {
+            "type": "string"
+          },
+          "results": {
+            "type": "array",
+            "items": {
+              "type": "object",
+              "properties": {
+                "file": {
+                  "type": "string"
+                },
+                "operation": {
+                  "type": "string"
+                },
+                "score": {
+                  "type": "number"
+                },
+                "content": {
+                  "type": "string"
+                }
+              },
+              "required": [
+                "file",
+                "operation",
+                "score"
+              ],
+              "additionalProperties": false
+            }
+          },
+          "indexFile": {
+            "type": "string"
+          }
+        },
+        "required": [
+          "view",
+          "language",
+          "query",
+          "results",
+          "indexFile"
+        ],
+        "$schema": "https://json-schema.org/draft/2020-12/schema",
+        "additionalProperties": false
+      },
+      "annotations": {
+        "title": "Data API code examples",
+        "readOnlyHint": true,
+        "destructiveHint": false,
+        "idempotentHint": true,
+        "openWorldHint": false
+      },
+      "_meta": {}
+    },
+    {
+      "name": "drop",
+      "title": "Drop collection, table, or index",
+      "icons": [
+        {
+          "src": "data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHZpZXdCb3g9IjAgMCA2NCA2NCI+PGRlZnM+PGxpbmVhckdyYWRpZW50IGlkPSJnIiB4MT0iMCIgeTE9IjAiIHgyPSIxIiB5Mj0iMSI+PHN0b3Agb2Zmc2V0PSIwIiBzdG9wLWNvbG9yPSIjOEI1Q0Y2Ii8+PHN0b3Agb2Zmc2V0PSIxIiBzdG9wLWNvbG9yPSIjNUIyMUI2Ii8+PC9saW5lYXJHcmFkaWVudD48L2RlZnM+PHJlY3Qgd2lkdGg9IjY0IiBoZWlnaHQ9IjY0IiByeD0iMTQiIGZpbGw9InVybCgjZykiLz48ZyBmaWxsPSJub25lIiBzdHJva2U9IiNmZmYiIHN0cm9rZS13aWR0aD0iMy4yIiBzdHJva2UtbGluZWNhcD0icm91bmQiPjxlbGxpcHNlIGN4PSIyNyIgY3k9IjE5IiByeD0iMTMiIHJ5PSI1Ii8+PHBhdGggZD0iTTE0IDE5djIyYzAgMi44IDUuOCA1IDEzIDVzMTMtMi4yIDEzLTVWMTkiLz48cGF0aCBkPSJNMTQgMzBjMCAyLjggNS44IDUgMTMgNXMxMy0yLjIgMTMtNSIvPjwvZz48cGF0aCBkPSJNNDcgMzkgNTIgMjZNNDcgMzlsLTQgMTEiIHN0cm9rZT0iI2ZmZiIgc3Ryb2tlLXdpZHRoPSIxLjYiIG9wYWNpdHk9Ii43NSIvPjxnIGZpbGw9IiNmZmYiPjxjaXJjbGUgY3g9IjQ3IiBjeT0iMzkiIHI9IjMuMiIvPjxjaXJjbGUgY3g9IjUyIiBjeT0iMjYiIHI9IjIuMiIvPjxjaXJjbGUgY3g9IjQzIiBjeT0iNTAiIHI9IjIuMiIvPjwvZz48L3N2Zz4=",
+          "mimeType": "image/svg+xml",
+          "sizes": [
+            "any"
+          ]
+        }
+      ],
+      "description": "Permanently drop a collection, a table, or a table index, with all its data. Always requires the user's explicit confirmation.",
+      "inputSchema": {
+        "type": "object",
+        "properties": {
+          "database": {
+            "description": "Database to use: name, id, or Data API endpoint URL. Omit for the configured default.",
+            "type": "string",
+            "minLength": 1
+          },
+          "keyspace": {
+            "description": "Keyspace. Omit for the configured/default keyspace.",
+            "type": "string",
+            "minLength": 1
+          },
+          "kind": {
+            "type": "string",
+            "enum": [
+              "collection",
+              "table",
+              "index"
+            ],
+            "description": "What to drop."
+          },
+          "name": {
+            "type": "string",
+            "minLength": 1,
+            "description": "Name of the collection, table, or table index."
+          },
+          "confirm": {
+            "description": "Set ONLY after you described the impact and the user approved it in a later message: the exact target name. The original request is not approval; never guess or self-approve.",
+            "type": "string"
+          }
+        },
+        "required": [
+          "kind",
+          "name"
+        ],
+        "$schema": "https://json-schema.org/draft/2020-12/schema"
+      },
+      "outputSchema": {
+        "type": "object",
+        "properties": {
+          "view": {
+            "type": "string",
+            "const": "mutation"
+          },
+          "operation": {
+            "type": "string"
+          },
+          "status": {
+            "type": "string",
+            "enum": [
+              "ok",
+              "cancelled"
+            ]
+          },
+          "keyspace": {
+            "type": "string"
+          },
+          "name": {
+            "type": "string"
+          },
+          "kind": {
+            "type": "string"
+          },
+          "message": {
+            "type": "string"
+          },
+          "insertedCount": {
+            "type": "number"
+          },
+          "insertedIds": {
+            "type": "array",
+            "items": {}
+          },
+          "matchedCount": {
+            "type": "number"
+          },
+          "modifiedCount": {
+            "type": "number"
+          },
+          "upsertedId": {},
+          "deletedCount": {
+            "type": "number"
+          },
+          "failures": {
+            "type": "array",
+            "items": {
+              "type": "object",
+              "properties": {
+                "index": {
+                  "type": "number"
+                },
+                "message": {
+                  "type": "string"
+                }
+              },
+              "required": [
+                "message"
+              ],
+              "additionalProperties": false
+            }
+          }
+        },
+        "required": [
+          "view",
+          "operation",
+          "status",
+          "keyspace",
+          "name",
+          "kind",
+          "message"
+        ],
+        "$schema": "https://json-schema.org/draft/2020-12/schema",
+        "additionalProperties": false
+      },
+      "annotations": {
+        "title": "Drop collection, table, or index",
+        "readOnlyHint": false,
+        "destructiveHint": true,
+        "idempotentHint": true,
+        "openWorldHint": true
+      },
+      "_meta": {
+        "anthropic/requiresUserInteraction": true
+      }
+    }
+  ]
+}

@@ -86,7 +86,7 @@ export function requireConfirmation(
   }
 
   return fail(new AstraMcpError("confirmation_required", `${spec.impact} This needs the user's explicit confirmation.`, {
-    hint: `Describe the impact to the user and ask them to confirm. Only if they clearly approve, call again with confirm: "${spec.expected}".`,
+    hint: `Tell the user exactly what will be lost and ask them to confirm; the original request does not count. Only after they approve, call again with confirm: "${spec.expected}".`,
     details: { expected: spec.expected },
   }));
 }

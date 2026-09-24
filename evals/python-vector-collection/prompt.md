@@ -3,6 +3,7 @@ name: python-vector-collection
 tags: [python, collections, vector]
 runs: 2
 max_turns: 12
+allowed_tools: [Read, Glob, Grep, Skill, Write, mcp__plugin_astra-db_astra-db__code_examples]
 ---
 
 Write a standalone Python script `main.py` that uses the Astra DB Data API Python client (astrapy) to:

@@ -116,7 +116,7 @@ export const CodeExamplesInput = z.object({
 });
 
 const Confirm = z.string().optional().describe(
-  "Set ONLY after the user explicitly approved this destructive operation in the conversation: the exact target name. Never guess or self-approve.",
+  "Set ONLY after you described the impact and the user approved it in a later message: the exact target name. The original request is not approval; never guess or self-approve.",
 );
 
 export const InsertInput = z.object({

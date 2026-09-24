@@ -1,0 +1,3 @@
+Astra DB configured (token from /work/app/.env) → 2f0c6a3e-8d1b-4c55-9a7e-1b2c3d4e5f60-us-east-2.apps.astra.datastax.com. Connected: 4 collection(s), 0 table(s) in keyspace default_keyspace.
+
+{"view":"status","configured":true,"readOnly":false,"environment":"astra","token":{"source":"dotenv","detail":"/work/app/.env","masked":"AstraCS:…cdef"},"endpoint":{"source":"dotenv","detail":"/work/app/.env","host":"2f0c6a3e-8d1b-4c55-9a7e-1b2c3d4e5f60-us-east-2.apps.astra.datastax.com"},"keyspace":{"source":"dotenv","detail":"/work/app/.env","value":"default_keyspace"},"database":{"id":"2f0c6a3e-8d1b-4c55-9a7e-1b2c3d4e5f60","region":"us-east-2"},"checks":{"dataApi":{"ok":true,"collections":4,"tables":0}},"hints":[],"consulted":["/work/app/.env"]}
