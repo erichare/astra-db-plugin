@@ -61,7 +61,7 @@ jobs:
 
       - name: npm package contents
         run: |
-          npm pack --dry-run --json > "$RUNNER_TEMP/pack.json"
+          npm pack --dry-run --json --ignore-scripts > "$RUNNER_TEMP/pack.json"
           node -e '
             const [p] = require(process.argv[1]);
             const files = p.files.map((f) => f.path).sort();
