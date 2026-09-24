@@ -2,86 +2,27 @@ name: Release
 
 on:
   push:
-    branches: [main]
-    paths:
-      - "skills/**"
-      - "commands/**"
-      - "agents/**"
-      - "hooks/**"
-      - ".mcp.json"
-      - ".mcp.codex.json"
-      - ".claude-plugin/**"
-      - ".agents/**"
-      - "codex/**"
-      - ".bob/**"
-      - "server/**"
+    tags: ["v*"]
 
 permissions:
   contents: write
 
 jobs:
   release:
-    if: "!startsWith(github.event.head_commit.message, 'chore(release):')"
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
+
+      - uses: actions/setup-node@v4
         with:
-          fetch-depth: 0
+          node-version: "22"
 
-      - uses: actions/setup-python@v5
-        with:
-          python-version: "3.12"
-
-      - name: Decide whether to tag current version or bump
-        id: decide
-        run: |
-          version=$(python3 -c "import json; print(json.load(open('.claude-plugin/plugin.json'))['version'])")
-          if git rev-parse "v$version" >/dev/null 2>&1; then
-            echo "bump=true" >> "$GITHUB_OUTPUT"
-          else
-            echo "bump=false" >> "$GITHUB_OUTPUT"
-            echo "version=$version" >> "$GITHUB_OUTPUT"
-          fi
-
-      - name: Bump version (level from conventional commit)
-        id: bump
-        if: steps.decide.outputs.bump == 'true'
-        env:
-          HEAD_MSG: ${{ github.event.head_commit.message }}
-        run: |
-          level=$(python3 scripts/bump_level.py "$HEAD_MSG")
-          echo "bumping $level"
-          echo "version=$(python3 scripts/bump_version.py "$level")" >> "$GITHUB_OUTPUT"
-
-      - name: Commit release
-        if: steps.decide.outputs.bump == 'true'
-        run: |
-          git config user.name "github-actions[bot]"
-          git config user.email "github-actions[bot]@users.noreply.github.com"
-          git add .claude-plugin codex/.codex-plugin CHANGELOG.md
-          git commit -m "chore(release): v${{ steps.bump.outputs.version }}"
-          git push origin main
-
-      - name: Tag and push
-        id: tag
-        run: |
-          git config user.name "github-actions[bot]"
-          git config user.email "github-actions[bot]@users.noreply.github.com"
-          version="${{ steps.bump.outputs.version || steps.decide.outputs.version }}"
-          git tag "v$version"
-          git push origin "v$version"
-          echo "version=$version" >> "$GITHUB_OUTPUT"
+      - name: Tag matches every manifest
+        run: node scripts/check-versions.mjs --tag "$GITHUB_REF_NAME"
 
       - name: GitHub Release from the changelog section
         env:
           GH_TOKEN: ${{ github.token }}
         run: |
-          version="${{ steps.tag.outputs.version }}"
-          python3 - "$version" > /tmp/release-notes.md <<'PY'
-          import re, sys
-          version = sys.argv[1]
-          text = open("CHANGELOG.md").read()
-          m = re.search(rf"## {re.escape(version)} — [^\n]+\n(.*?)(?=\n## |\Z)", text, re.S)
-          print((m.group(1).strip() if m else "See CHANGELOG.md.") + "\n")
-          PY
-          gh release create "v$version" --title "v$version" --notes-file /tmp/release-notes.md --latest
+          node scripts/release-notes.mjs "$GITHUB_REF_NAME" > "$RUNNER_TEMP/notes.md"
+          gh release create "$GITHUB_REF_NAME" --title "$GITHUB_REF_NAME" --notes-file "$RUNNER_TEMP/notes.md" --latest

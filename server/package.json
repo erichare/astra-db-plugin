@@ -1,6 +1,6 @@
 {
   "name": "astra-widgets-mcp",
-  "version": "0.1.0",
+  "version": "1.2.1",
   "private": true,
   "description": "Astra DB widgets MCP server: collection card, similarity view, explorer, database overview (MCP Apps UI + standalone HTML).",
   "type": "module",

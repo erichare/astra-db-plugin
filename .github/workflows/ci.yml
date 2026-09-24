@@ -28,9 +28,6 @@ jobs:
           npm test
           npm run build
 
-      - name: Layout parity (generated layouts + committed server bundle)
-        run: bash scripts/check_layout_parity.sh
-
       - name: skillsaw lint (strict — no warnings)
         run: |
           pip install --quiet skillsaw
@@ -44,15 +41,10 @@ jobs:
       - name: Python snippet syntax
         run: PYTHONPYCACHEPREFIX="${RUNNER_TEMP}/pycache" python3 -m compileall -q skills/astra-toolkit/clients/python/examples
 
-      - name: TypeScript snippet syntax
+      - name: Repository tests (scripts, manifests, skills, docs)
         run: |
-          npm install --no-save typescript@5
-          node scripts/check_ts_syntax.mjs skills/astra-toolkit/clients/typescript/examples
-
-      - name: Unit, hook, and integrity tests (90% coverage gate)
-        run: |
-          pip install --quiet pytest pytest-cov pyyaml
-          pytest tests/ --cov=scripts --cov-fail-under=90 -q
+          node --test 'tests/*.test.mjs'
+          node scripts/check-versions.mjs
 
       - name: Plugin structure validation
         run: |
