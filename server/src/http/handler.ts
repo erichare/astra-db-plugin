@@ -8,7 +8,7 @@
  *    only with `X-Astra-Allow-Writes: true`.
  */
 import { type AuthInfo, createMcpHandler } from "@modelcontextprotocol/server";
-import { AstraConnections } from "../astra/connection.js";
+import { AstraConnections, isAstraEndpoint } from "../astra/connection.js";
 import { type AstraGateway, createGateway } from "../astra/gateway.js";
 import { StaticCredentials } from "../credentials/resolver.js";
 import { createAstraServer } from "../server/factory.js";
@@ -97,6 +97,13 @@ export function createHttpHandler(deps: HttpDeps = {}) {
       auth = credentialsFromRequest(req);
     }
     if (!auth) return unauthorized(origin);
+    // The server calls this endpoint with the caller's token: only Astra's own hosts, never an arbitrary URL.
+    if (auth.creds.endpoint && !isAstraEndpoint(auth.creds.endpoint)) {
+      return json({
+        error: "invalid_request",
+        message: "The endpoint must be an Astra Data API endpoint (https://<database-id>-<region>.apps.astra.datastax.com).",
+      }, 400);
+    }
 
     const authInfo: AuthInfo = {
       token: bearer,

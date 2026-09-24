@@ -1,9 +1,12 @@
 /**
  * Client ID Metadata Documents: an https `client_id` is a URL that serves the
  * client's metadata. Fetched with SSRF guards: https only, no redirects, no
- * private/loopback addresses, 5 s timeout, 64 KB cap; cached for 5 minutes.
+ * private/loopback addresses (checked on the address actually connected to, so
+ * DNS rebinding can't slip past), 5 s timeout, 64 KB cap; cached for 5 minutes.
  */
+import { type LookupAddress, type LookupOptions, lookup as dnsLookup } from "node:dns";
 import { lookup } from "node:dns/promises";
+import { request } from "node:https";
 import { isIP } from "node:net";
 import type { ResolvedClient } from "./types.js";
 
@@ -30,24 +33,67 @@ export async function assertPublicHost(hostname: string): Promise<void> {
   if (!addresses.length || addresses.some(privateAddress)) throw new Error("client_id host resolves to a private address");
 }
 
+type Resolver = (hostname: string, options: { all: true }, callback: (err: NodeJS.ErrnoException | null, addresses: LookupAddress[]) => void) => void;
+type LookupCallback = (err: NodeJS.ErrnoException | null, address: string | LookupAddress[], family?: number) => void;
+
+/**
+ * A `lookup` for the socket itself: resolves, refuses private answers, and hands
+ * the validated addresses to the connection, so there is no second resolution
+ * an attacker's DNS could answer differently.
+ */
+export function publicLookup(resolve: Resolver = dnsLookup as unknown as Resolver) {
+  return (hostname: string, options: LookupOptions, callback: LookupCallback): void => {
+    resolve(hostname, { all: true }, (err, addresses) => {
+      if (err) return callback(err, []);
+      if (!addresses.length || addresses.some((a) => privateAddress(a.address))) {
+        return callback(Object.assign(new Error("client_id host resolves to a private address"), { code: "EPRIVATE" }), []);
+      }
+      if (options?.all) return callback(null, addresses);
+      callback(null, addresses[0].address, addresses[0].family);
+    });
+  };
+}
+
 export async function defaultFetchClientMetadata(url: string): Promise<unknown> {
   const parsed = new URL(url);
   if (parsed.protocol !== "https:") throw new Error("client_id must be an https URL");
   await assertPublicHost(parsed.hostname);
-  const response = await fetch(url, { redirect: "error", signal: AbortSignal.timeout(5000), headers: { accept: "application/json" } });
-  if (!response.ok) throw new Error(`client metadata fetch returned ${response.status}`);
-  const reader = response.body?.getReader();
-  if (!reader) throw new Error("empty client metadata");
-  const chunks: Uint8Array[] = [];
-  let size = 0;
-  for (;;) {
-    const { done, value } = await reader.read();
-    if (done) break;
-    size += value.length;
-    if (size > MAX_BYTES) throw new Error("client metadata too large");
-    chunks.push(value);
-  }
-  return JSON.parse(Buffer.concat(chunks).toString("utf8"));
+  return new Promise((resolvePromise, reject) => {
+    const req = request(parsed, {
+      method: "GET",
+      headers: { accept: "application/json" },
+      lookup: publicLookup() as never,
+      timeout: 5000,
+    }, (res) => {
+      const status = res.statusCode ?? 0;
+      if (status < 200 || status >= 300) {
+        res.resume();
+        reject(new Error(`client metadata fetch returned ${status}`));
+        return;
+      }
+      const chunks: Buffer[] = [];
+      let size = 0;
+      res.on("data", (chunk: Buffer) => {
+        size += chunk.length;
+        if (size > MAX_BYTES) {
+          req.destroy(new Error("client metadata too large"));
+          return;
+        }
+        chunks.push(chunk);
+      });
+      res.on("end", () => {
+        try {
+          resolvePromise(JSON.parse(Buffer.concat(chunks).toString("utf8")));
+        } catch {
+          reject(new Error("client metadata is not valid JSON"));
+        }
+      });
+      res.on("error", reject);
+    });
+    req.on("timeout", () => req.destroy(new Error("client metadata fetch timed out")));
+    req.on("error", reject);
+    req.end();
+  });
 }
 
 export async function resolveMetadataClient(

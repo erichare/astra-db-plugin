@@ -141,6 +141,22 @@ describe("IBM Bob bundle", () => {
     expect(json(layout.mcpFile).mcpServers).toEqual({ mine: { command: "z" } });
   });
 
+  it("uninstall keeps files the user added inside installed directories", () => {
+    const { cwd } = sandbox();
+    const layout = bobLayout(join(cwd, ".bob"), false);
+    installBob(loadAssets()!, layout);
+    const notes = join(layout.skillsDir, "astra-toolkit", "my-notes.md");
+    const hook = join(layout.hooksDir, "custom.mjs");
+    writeFileSync(notes, "mine");
+    writeFileSync(hook, "// mine");
+    uninstallBob(layout);
+    expect(readFileSync(notes, "utf8")).toBe("mine");
+    expect(readFileSync(hook, "utf8")).toBe("// mine");
+    expect(existsSync(join(layout.skillsDir, "astra-toolkit", "SKILL.md"))).toBe(false);
+    expect(existsSync(join(layout.skillsDir, "astra-widgets"))).toBe(false);
+    expect(existsSync(join(layout.hooksDir, "credential-guard.mjs"))).toBe(false);
+  });
+
   it("builds a release zip", () => {
     const files = unzipSync(bobZip(loadAssets()!));
     expect(Object.keys(files)).toEqual(expect.arrayContaining([".bob/skills/astra-toolkit/SKILL.md", ".bob/mcp.json", ".bob/custom_modes.yaml", ".bob/settings.json", ".bob/rules/astra-db.md"]));

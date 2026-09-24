@@ -244,8 +244,12 @@ export const DatabasesResult = z.object({
   })),
 });
 
+/** Every view names the database it came from, so drill-downs query the same one. */
+const ViewEndpoint = z.string().optional().describe("Data API endpoint of the database this came from; pass it as `database` in follow-up calls.");
+
 export const OverviewResult = z.object({
   view: z.literal("overview"),
+  endpoint: ViewEndpoint,
   endpointHost: z.string(),
   database: DatabaseRef,
   keyspaces: z.array(z.object({
@@ -267,6 +271,7 @@ export const OverviewResult = z.object({
 
 export const CollectionResult = z.object({
   view: z.literal("collection"),
+  endpoint: ViewEndpoint,
   keyspace: z.string(),
   name: z.string(),
   estimatedCount: z.number().nullable(),
@@ -281,6 +286,7 @@ export const CollectionResult = z.object({
 
 export const TableResult = z.object({
   view: z.literal("table"),
+  endpoint: ViewEndpoint,
   keyspace: z.string(),
   name: z.string(),
   columns: z.array(z.object({
@@ -297,6 +303,7 @@ export const TableResult = z.object({
 
 export const ExplorerResult = z.object({
   view: z.literal("explorer"),
+  endpoint: ViewEndpoint,
   keyspace: z.string(),
   name: z.string(),
   kind: z.enum(["collection", "table"]),
@@ -321,6 +328,7 @@ export const SimilarityHit = z.object({
 
 export const SimilarityResult = z.object({
   view: z.literal("similarity"),
+  endpoint: ViewEndpoint,
   keyspace: z.string(),
   name: z.string(),
   kind: z.enum(["collection", "table"]),

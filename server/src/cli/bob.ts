@@ -220,6 +220,20 @@ export function installBob(assets: Assets, layout: BobLayout): BobResult {
   return { written, merged: plan.merges, manifest };
 }
 
+/** Remove `dir` and its parents while they are empty, stopping at `stop`. */
+function pruneEmptyDirs(dir: string, stop: string): void {
+  let current = dir;
+  while (current.startsWith(stop) && current !== stop) {
+    try {
+      if (readdirSync(current).length > 0) return;
+      rmSync(current, { recursive: true });
+    } catch {
+      return;
+    }
+    current = dirname(current);
+  }
+}
+
 export function uninstallBob(layout: BobLayout): string[] {
   const manifestPath = join(layout.root, "astra-db.manifest.json");
   if (!existsSync(manifestPath)) return [];
@@ -232,9 +246,8 @@ export function uninstallBob(layout: BobLayout): string[] {
       removed.push(path);
     }
   }
-  for (const dir of [join(layout.skillsDir, "astra-toolkit"), join(layout.skillsDir, "astra-widgets"), layout.hooksDir]) {
-    rmSync(dir, { recursive: true, force: true });
-  }
+  // Only files the manifest lists are ours; a directory goes only once nothing else is left in it.
+  for (const path of removed) pruneEmptyDirs(dirname(path), layout.root);
   const modes = readText(layout.modesFile);
   if (modes !== undefined) writeFileSync(layout.modesFile, modes.replace(/^[ \t]*# astra-db:begin[^\n]*\n[\s\S]*?^[ \t]*# astra-db:end[^\n]*\n?/m, ""));
   if (readJsonc<Record<string, Record<string, unknown>>>(layout.mcpFile)?.mcpServers?.[SERVER_KEY]) editJsonc(layout.mcpFile, ["mcpServers", SERVER_KEY], undefined);

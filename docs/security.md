@@ -23,6 +23,8 @@ Confirmation happens in the server, not only in the prompt. If the client suppor
 - **Output.** Tokens appear masked (`AstraCS:…cdef`) in `connection_status`, `doctor`, and hook messages. Error messages from Astra are sanitized before they reach the model.
 - **No persistence in the server.** The local server keeps a token only in memory, for the connection cache.
 
+**Where tokens go.** The token is only ever sent to the configured endpoint, to endpoints the DevOps API returns for the user's own databases, or to Astra Data API hosts (`https://<database-id>-<region>.apps.astra.datastax.com`) named in a tool's `database` argument. Any other URL in that argument is refused, so a prompt can't redirect authenticated requests to a host it controls.
+
 ## The credential guard hook
 
 In Claude Code, Codex, and IBM Bob, a `PreToolUse` hook inspects only the *new* content an agent is about to write: `Write` and `Edit` bodies, notebook cells, the added lines of `apply_patch`, and shell commands that write files (`>`, `tee`, heredocs). It looks for a real-shaped `AstraCS:` token.
@@ -39,8 +41,8 @@ Deleting or replacing a leaked token is never blocked, because the text being re
 ## Hosted server
 
 - Writes are opt-in per connection: the *Allow writes* box on the OAuth consent page (scope `astra:write`), or `X-Astra-Allow-Writes: true` with raw bearer credentials. Without either, write tools aren't registered for that request.
-- OAuth follows the current MCP authorization spec: PKCE S256 only, `iss` on every redirect, audience-bound tokens, 1-hour access tokens, and rotating refresh tokens (30 days sliding, 90 days maximum). Client ID Metadata Documents are fetched with SSRF protections (https only, no redirects, private addresses refused, size and time limits).
-- Tokens are sealed with AES-256-GCM under a key derived from the deployment secret. The server keeps no database, so used refresh tokens can't be revoked individually: rotate the secret, or revoke the Astra token itself. Details in [hosted.md](hosted.md).
+- OAuth follows the current MCP authorization spec: PKCE S256 only, `iss` on every redirect, audience-bound tokens, 1-hour access tokens, and rotating refresh tokens (30 days sliding, 90 days maximum). Client ID Metadata Documents are fetched with SSRF protections (https only, no redirects, private addresses refused on the connected address, size and time limits). Request-supplied endpoints must be Astra's own hosts.
+- Tokens are sealed with AES-256-GCM under a key derived from the deployment secret. With an optional Redis store, refresh tokens are single-use and a replay revokes the chain; without one the server is stateless and a used refresh token stays valid until it expires (rotate the secret, or revoke the Astra token itself). Details in [hosted.md](hosted.md).
 
 ## Supply chain
 

@@ -56,6 +56,15 @@ describe("hosted MCP endpoint", () => {
     expect(credentialsFromRequest(new Request(`${ORIGIN}/mcp`))).toBeNull();
   });
 
+  it("refuses request endpoints outside Astra's domains", async () => {
+    const { fetchMcp } = handler();
+    const res = await fetchMcp(new Request(`${ORIGIN}/mcp`, {
+      method: "POST", body: "{}", headers: { authorization: `Bearer ${TOKEN}`, "x-astra-endpoint": "https://169.254.169.254" },
+    }));
+    expect(res.status).toBe(400);
+    expect(await res.text()).toContain("Astra Data API endpoint");
+  });
+
   for (const mode of ["legacy", "auto"] as const) {
     it(`serves read-only tools to raw bearer callers (${mode} era)`, async () => {
       const { fetchMcp } = handler();
@@ -200,6 +209,9 @@ describe("OAuth authorization server", () => {
     const bad = await authorize(reg.client_id, "https://c.example/cb", { token: "AstraCS:wrongwrongwrong" });
     expect(bad.res.status).toBe(400);
     expect(await bad.res.text()).toContain("Astra rejected the token.");
+    const offsite = await authorize(reg.client_id, "https://c.example/cb", { endpoint: "https://evil.example" });
+    expect(offsite.res.status).toBe(400);
+    expect(await offsite.res.text()).toContain("apps.astra.datastax.com");
     const deny = await authorize(reg.client_id, "https://c.example/cb", { action: "deny" });
     expect(new URL(deny.res.headers.get("location")!).searchParams.get("error")).toBe("access_denied");
   });

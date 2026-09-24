@@ -71,7 +71,9 @@ for (const theme of ["light", "dark"]) {
     await shoot(page, frame, `similarity-${theme}.png`);
     const log = await page.evaluate(() => window.__log);
     assert.deepEqual(log.calls.map((c) => c.name), ["describe_collection", "find", "vector_search"]);
-    assert.deepEqual(log.calls[2].arguments, { name: "articles", keyspace: "default_keyspace", kind: "collection", query: "black holes", hybrid: false });
+    const database = "https://22222222-2222-2222-2222-222222222222-eu-west-1.apps.astra.datastax.com";
+    assert.ok(log.calls.every((c) => c.arguments.database === database), "drill-downs stay on the view's database");
+    assert.deepEqual(log.calls[2].arguments, { name: "articles", keyspace: "default_keyspace", kind: "collection", query: "black holes", hybrid: false, database });
     assert.ok(log.context.length >= 3, "model context updated after drill-downs");
     assert.ok(log.sizes.length > 0 && log.sizes.at(-1).height > 100, "size-changed reported");
   });

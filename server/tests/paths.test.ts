@@ -115,3 +115,38 @@ describe("resources and prompts", () => {
     }
   });
 });
+
+describe("database URL arguments", () => {
+  const OTHER = "https://22222222-2222-2222-2222-222222222222-eu-west-1.apps.astra.datastax.com";
+
+  it("accepts Astra endpoints and the configured endpoint, and refuses any other host", async () => {
+    const { client } = await setup({ creds: { endpoint: { value: "https://hcd.internal.example:8181", source: "dotenv", detail: "/repo/.env" } } });
+    expect((await call(client, "find", { name: "articles", database: OTHER })).isError).toBe(false);
+    expect((await call(client, "find", { name: "articles", database: "https://hcd.internal.example:8181/" })).isError).toBe(false);
+    for (const database of [
+      "https://evil.example",
+      "http://22222222-2222-2222-2222-222222222222-eu-west-1.apps.astra.datastax.com",
+      "https://22222222-2222-2222-2222-222222222222-eu-west-1.apps.astra.datastax.com.evil.example",
+      "https://user:pass@22222222-2222-2222-2222-222222222222-eu-west-1.apps.astra.datastax.com",
+      "https://hcd.internal.example:9999",
+    ]) {
+      const r = await call(client, "find", { name: "articles", database });
+      expect(code(r), database).toBe("invalid_argument");
+    }
+  });
+});
+
+describe("view results name their database", () => {
+  it("carries the resolved endpoint, which drill-downs pass back as `database`", async () => {
+    const { client } = await setup();
+    const card = await call(client, "describe_collection", { collection: "articles" });
+    const endpoint = card.data.endpoint as string;
+    expect(endpoint).toMatch(/^https:\/\/11111111-.*\.apps\.astra\.datastax\.com$/);
+    for (const name of ["database_overview", "find", "vector_search"] as const) {
+      const args = name === "database_overview" ? { database: endpoint } : { name: "articles", database: endpoint, ...(name === "vector_search" ? { query: "x" } : {}) };
+      const r = await call(client, name, args);
+      expect(r.isError, `${name}: ${r.text}`).toBe(false);
+      expect(r.data.endpoint).toBe(endpoint);
+    }
+  });
+});

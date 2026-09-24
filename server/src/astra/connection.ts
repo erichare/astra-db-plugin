@@ -34,7 +34,8 @@ export type ResolvedKind =
   | { kind: "table"; descriptor: TableDescriptorLike };
 
 const UUID = /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i;
-const ASTRA_ENDPOINT = /^https:\/\/([0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12})-([a-z0-9-]+)\.apps\.astra(?:-dev|-test)?\.datastax\.com/i;
+const ASTRA_ENDPOINT = /^https:\/\/([0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12})-([a-z0-9-]+)\.apps\.astra(?:-dev|-test)?\.datastax\.com(?=[/:?#]|$)/i;
+const ASTRA_HOST = /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}-[a-z0-9-]+\.apps\.astra(?:-dev|-test)?\.datastax\.com$/i;
 const DB_LIST_TTL = 60_000;
 const SCHEMA_TTL = 30_000;
 
@@ -54,6 +55,35 @@ export function endpointHost(endpoint: string): string {
 
 function isUrl(value: string): boolean {
   return /^https?:\/\//i.test(value);
+}
+
+/** An https Data API endpoint on Astra's own domains (no credentials, no custom port). */
+export function isAstraEndpoint(url: string): boolean {
+  try {
+    const u = new URL(url);
+    return u.protocol === "https:" && !u.username && !u.password && !u.port && ASTRA_HOST.test(u.hostname);
+  } catch {
+    return false;
+  }
+}
+
+/**
+ * A URL given as a tool's `database` argument gets the user's token attached, so
+ * only Astra's own endpoints or the configured endpoint's origin are accepted —
+ * never an arbitrary host a prompt might supply.
+ */
+function trustedEndpoint(url: string, creds: ResolvedCredentials): string {
+  const trimmed = url.replace(/\/+$/, "");
+  if (isAstraEndpoint(trimmed)) return new URL(trimmed).origin;
+  const configured = creds.endpoint?.value.replace(/\/+$/, "");
+  try {
+    if (configured && new URL(trimmed).origin === new URL(configured).origin) return configured;
+  } catch {
+    // not a URL: fall through
+  }
+  throw new AstraMcpError("invalid_argument", "A `database` URL must be an Astra Data API endpoint (https://<database-id>-<region>.apps.astra.datastax.com) or the configured endpoint.", {
+    hint: "Pass the database's name or id instead; list_databases shows them.",
+  });
 }
 
 function activeEndpoint(info: DatabaseInfoLike): string | undefined {
@@ -106,7 +136,10 @@ export class AstraConnections {
     this.requireToken(creds);
     const wanted = database?.trim() || undefined;
 
-    if (wanted && isUrl(wanted)) return { endpoint: wanted.replace(/\/+$/, ""), database: parseEndpoint(wanted) };
+    if (wanted && isUrl(wanted)) {
+      const endpoint = trustedEndpoint(wanted, creds);
+      return { endpoint, database: parseEndpoint(endpoint) };
+    }
     if (!wanted && creds.endpoint) {
       return { endpoint: creds.endpoint.value.replace(/\/+$/, ""), database: parseEndpoint(creds.endpoint.value) };
     }

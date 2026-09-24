@@ -32,7 +32,8 @@ export interface ClientRegistration {
 
 export interface CodeToken { t: "code"; grant: Grant; redirect_uri: string; code_challenge: string; exp: number }
 export interface AccessToken { t: "access"; grant: Grant; exp: number }
-export interface RefreshToken { t: "refresh"; grant: Grant; exp: number; max: number }
+/** `fam` names the chain of rotations since consent; replaying any member revokes the chain (with a replay store). */
+export interface RefreshToken { t: "refresh"; grant: Grant; exp: number; max: number; fam?: string }
 
 /** Legacy v1.2.x token shapes (aw1), accepted as read-only grants. */
 export interface LegacyAccessToken { t: "access"; creds: AstraGrantCreds; exp: number }
@@ -53,6 +54,15 @@ export interface OAuthDeps {
   /** Fetch a Client ID Metadata Document (injectable for tests). */
   fetchClientMetadata?: (url: string) => Promise<unknown>;
   now?: () => number;
+  /** Makes refresh tokens single-use. Without it the server is fully stateless (see docs/hosted.md). */
+  replay?: ReplayStore;
+}
+
+/** A shared, expiring set (e.g. Redis): what enforces one use per refresh token. */
+export interface ReplayStore {
+  /** Record `key` for `ttlSeconds`; false when it was already recorded. */
+  claim(key: string, ttlSeconds: number): Promise<boolean>;
+  has(key: string): Promise<boolean>;
 }
 
 export function oauthError(error: string, description: string, status = 400): Response {

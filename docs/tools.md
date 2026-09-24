@@ -4,7 +4,7 @@ The `astra-db` MCP server (`npx -y @erichare/astra-mcp`) exposes 18 tools, 2 res
 
 ## Conventions
 
-- **Targeting.** Every data tool accepts `database` (a name, a database id, or a Data API endpoint URL) and `keyspace`. Leave both out to use the configured default. The token decides which databases are reachable; `list_databases` shows them.
+- **Targeting.** Every data tool accepts `database` (a name, a database id, or a Data API endpoint URL) and `keyspace`. Leave both out to use the configured default. The token decides which databases are reachable; `list_databases` shows them. An endpoint URL must be an Astra Data API host (`https://<database-id>-<region>.apps.astra.datastax.com`) or the configured endpoint, since the token is sent to it. View results carry the `endpoint` they came from, and the interactive views pass it back as `database` when you drill down.
 - **Collections and tables.** `find`, `vector_search`, `distinct_values`, `insert`, `update`, and `delete` work on both and detect which one `name` refers to. Pass `kind` only when a collection and a table share a name.
 - **Results.** Each tool returns a one-paragraph summary, the data as compact JSON (capped at about 12,000 characters), and the same data as `structuredContent` against a published `outputSchema`. Values round-trip: dates come back as `{"$date": …}`, UUIDs as `{"$uuid": …}`, and ObjectIds as `{"$objectId": …}`, so you can paste them straight into a filter. Vectors are summarized, not returned in full.
 - **Errors.** Failures return `isError: true` with `structuredContent.error = {code, message, hint, retryable}`. The codes are listed at the end of this page.

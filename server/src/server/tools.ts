@@ -73,7 +73,8 @@ export function registerTools(tc: ToolContext): string[] {
   };
 
   /** Visual results: optionally also write the standalone HTML page (stdio only). */
-  const visual = (view: string, data: Record<string, unknown>, summary: string, emit?: unknown): CallToolResult => {
+  const visual = (view: string, t: { endpoint: string }, result: Record<string, unknown>, summary: string, emit?: unknown): CallToolResult => {
+    const data = { ...result, endpoint: t.endpoint };
     if (emit !== "html_file") return ok(summary, data);
     const path = writeHtmlFile(view, data, tc.htmlDir);
     return ok(`${summary}\n\nInteractive view written to ${path} — open it in a browser.`, data, [
@@ -126,7 +127,7 @@ export function registerTools(tc: ToolContext): string[] {
     handler: async (args) => {
       const t = await target({ database: args.database });
       const data = await databaseOverview(t, args);
-      return visual("overview", data, T.overviewSummary(data), (args as { emit?: string }).emit);
+      return visual("overview", t, data, T.overviewSummary(data), (args as { emit?: string }).emit);
     },
   });
 
@@ -140,7 +141,7 @@ export function registerTools(tc: ToolContext): string[] {
     handler: async (args) => {
       const t = await target(args);
       const data = await describeCollection(connections, t, args);
-      return visual("collection", data, T.collectionSummary(data), (args as { emit?: string }).emit);
+      return visual("collection", t, data, T.collectionSummary(data), (args as { emit?: string }).emit);
     },
   });
 
@@ -154,7 +155,7 @@ export function registerTools(tc: ToolContext): string[] {
     handler: async (args) => {
       const t = await target(args);
       const data = await describeTable(connections, t, args);
-      return visual("table", data, T.tableSummary(data), (args as { emit?: string }).emit);
+      return visual("table", t, data, T.tableSummary(data), (args as { emit?: string }).emit);
     },
   });
 
@@ -170,7 +171,7 @@ export function registerTools(tc: ToolContext): string[] {
     handler: async (args) => {
       const t = await target(args);
       const data = await find(connections, t, args);
-      return visual("explorer", data, T.explorerSummary(data), (args as { emit?: string }).emit);
+      return visual("explorer", t, data, T.explorerSummary(data), (args as { emit?: string }).emit);
     },
   });
 
@@ -184,7 +185,7 @@ export function registerTools(tc: ToolContext): string[] {
     handler: async (args) => {
       const t = await target(args);
       const data = await vectorSearch(connections, t, args);
-      return visual("similarity", data, T.similaritySummary(data), (args as { emit?: string }).emit);
+      return visual("similarity", t, data, T.similaritySummary(data), (args as { emit?: string }).emit);
     },
   });
 

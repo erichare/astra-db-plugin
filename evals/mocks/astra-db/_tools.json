@@ -382,6 +382,10 @@
             "type": "string",
             "const": "overview"
           },
+          "endpoint": {
+            "description": "Data API endpoint of the database this came from; pass it as `database` in follow-up calls.",
+            "type": "string"
+          },
           "endpointHost": {
             "type": "string"
           },
@@ -648,6 +652,10 @@
           "view": {
             "type": "string",
             "const": "collection"
+          },
+          "endpoint": {
+            "description": "Data API endpoint of the database this came from; pass it as `database` in follow-up calls.",
+            "type": "string"
           },
           "keyspace": {
             "type": "string"
@@ -975,6 +983,10 @@
             "type": "string",
             "const": "explorer"
           },
+          "endpoint": {
+            "description": "Data API endpoint of the database this came from; pass it as `database` in follow-up calls.",
+            "type": "string"
+          },
           "keyspace": {
             "type": "string"
           },
@@ -1238,6 +1250,10 @@
           "view": {
             "type": "string",
             "const": "similarity"
+          },
+          "endpoint": {
+            "description": "Data API endpoint of the database this came from; pass it as `database` in follow-up calls.",
+            "type": "string"
           },
           "keyspace": {
             "type": "string"

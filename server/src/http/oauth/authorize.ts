@@ -1,4 +1,5 @@
 /** GET/POST /authorize: validate the client, show consent, seal the grant into a code. */
+import { isAstraEndpoint } from "../../astra/connection.js";
 import { html } from "../cors.js";
 import { nowSeconds, open, seal } from "../crypto.js";
 import { isMetadataClientId, resolveMetadataClient } from "./cimd.js";
@@ -85,7 +86,7 @@ export async function handleAuthorizePost(req: Request, deps: OAuthDeps): Promis
   if (endpointInput) {
     try {
       const u = new URL(endpointInput);
-      if (u.protocol !== "https:") return rerender("The endpoint must use https.");
+      if (!isAstraEndpoint(u.origin)) return rerender("Enter your database's Data API endpoint: https://<database-id>-<region>.apps.astra.datastax.com.");
       endpoint = u.origin;
     } catch {
       return rerender("Enter the full Data API endpoint URL, or leave it empty to pick your only database.");

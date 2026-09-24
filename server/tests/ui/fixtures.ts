@@ -1,7 +1,11 @@
 import type { CollectionResultT, ExplorerResultT, OverviewResultT, SimilarityResultT, TableResultT } from "../../src/server/schemas.js";
 
+/** A non-default database: drill-downs must keep querying it. */
+export const ENDPOINT = "https://22222222-2222-2222-2222-222222222222-eu-west-1.apps.astra.datastax.com";
+
 export const overview: OverviewResultT = {
   view: "overview",
+  endpoint: ENDPOINT,
   endpointHost: "1111-us-east-2.apps.astra.datastax.com",
   database: { id: "1111", name: "prod-db", region: "us-east-2" },
   keyspaces: [
@@ -20,7 +24,7 @@ export const overview: OverviewResultT = {
 };
 
 export const collection: CollectionResultT = {
-  view: "collection", keyspace: "default_keyspace", name: "articles", estimatedCount: 12400,
+  view: "collection", endpoint: ENDPOINT, keyspace: "default_keyspace", name: "articles", estimatedCount: 12400,
   vector: { dimension: 1024, metric: "cosine", provider: "nvidia", model: "nv-embedqa-e5-v5" },
   lexical: { enabled: true, analyzer: "standard" },
   rerank: { enabled: true, provider: "nvidia", model: "llama-3.2-nv-rerankqa-1b-v2" },
@@ -30,7 +34,7 @@ export const collection: CollectionResultT = {
 };
 
 export const table: TableResultT = {
-  view: "table", keyspace: "default_keyspace", name: "reviews",
+  view: "table", endpoint: ENDPOINT, keyspace: "default_keyspace", name: "reviews",
   columns: [
     { name: "product", type: "text", detail: null, primaryKey: "partition" },
     { name: "id", type: "uuid", detail: null, primaryKey: "clustering" },
@@ -45,7 +49,7 @@ export const table: TableResultT = {
 };
 
 export const explorer: ExplorerResultT = {
-  view: "explorer", keyspace: "default_keyspace", name: "articles", kind: "collection", filter: { year: { $gte: 2020 } }, sort: null,
+  view: "explorer", endpoint: ENDPOINT, keyspace: "default_keyspace", name: "articles", kind: "collection", filter: { year: { $gte: 2020 } }, sort: null,
   documents: Array.from({ length: 6 }, (_, i) => ({ _id: `doc-${i}`, title: ["Black holes, explained", "A history of the transistor", "Rust in production", "Coral reefs at night", "The Byzantine calendar", "Gradient descent, visually"][i], author: ["R. Moreno", "K. Adeyemi", "L. Chen", "M. Silva", "P. Novak", "A. Sato"][i], year: 2020 + i, genre: i % 2 ? "history" : "science" })),
   displayFields: ["title", "author", "year"],
   fields: [{ name: "title", type: "string", present: 6 }, { name: "author", type: "string", present: 6 }, { name: "year", type: "number", present: 6 }, { name: "genre", type: "string", present: 6 }],
@@ -53,7 +57,7 @@ export const explorer: ExplorerResultT = {
 };
 
 export const similarity: SimilarityResultT = {
-  view: "similarity", keyspace: "default_keyspace", name: "articles", kind: "collection", mode: "vectorize",
+  view: "similarity", endpoint: ENDPOINT, keyspace: "default_keyspace", name: "articles", kind: "collection", mode: "vectorize",
   query: "how do black holes evaporate", documentId: null, limit: 8,
   hits: Array.from({ length: 8 }, (_, i) => {
     const title = ["Hawking radiation, gently", "The quiet physics of black holes", "Event horizons and information", "Neutron stars at the limit", "Dark energy, measured", "Quantum fields for the curious", "Gravitational waves: a primer", "How stars die"][i];

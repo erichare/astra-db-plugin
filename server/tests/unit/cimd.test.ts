@@ -1,5 +1,6 @@
+import { request } from "node:https";
 import { describe, expect, it } from "vitest";
-import { assertPublicHost, defaultFetchClientMetadata, isMetadataClientId, resolveMetadataClient } from "../../src/http/oauth/cimd.js";
+import { assertPublicHost, defaultFetchClientMetadata, isMetadataClientId, publicLookup, resolveMetadataClient } from "../../src/http/oauth/cimd.js";
 import { createGateway } from "../../src/astra/gateway.js";
 
 describe("client ID metadata documents", () => {
@@ -23,6 +24,28 @@ describe("client ID metadata documents", () => {
   it("only fetches https URLs", async () => {
     await expect(defaultFetchClientMetadata("http://app.example/client.json")).rejects.toThrow(/https/);
     await expect(defaultFetchClientMetadata("https://127.0.0.1/client.json")).rejects.toThrow(/private/);
+  });
+
+  it("validates the addresses the socket will actually use", async () => {
+    const answer = (addresses: { address: string; family: number }[]) =>
+      publicLookup((_host, _opts, cb) => cb(null, addresses));
+    const run = (lookup: ReturnType<typeof publicLookup>, all: boolean) =>
+      new Promise<unknown>((resolve, reject) => lookup("h.example", { all }, (err, address) => (err ? reject(err) : resolve(address))));
+    await expect(run(answer([{ address: "93.184.216.34", family: 4 }]), false)).resolves.toBe("93.184.216.34");
+    await expect(run(answer([{ address: "93.184.216.34", family: 4 }]), true)).resolves.toEqual([{ address: "93.184.216.34", family: 4 }]);
+    await expect(run(answer([{ address: "93.184.216.34", family: 4 }, { address: "10.0.0.7", family: 4 }]), true)).rejects.toThrow(/private/);
+    await expect(run(answer([]), false)).rejects.toThrow(/private/);
+    await expect(run(publicLookup((_h, _o, cb) => cb(Object.assign(new Error("ENOTFOUND"), { code: "ENOTFOUND" }), [])), false)).rejects.toThrow(/ENOTFOUND/);
+  });
+
+  it("a rebinding answer at connect time stops the request before it connects", async () => {
+    const rebinding = publicLookup((_host, _opts, cb) => cb(null, [{ address: "127.0.0.1", family: 4 }]));
+    const error = await new Promise<Error>((resolve) => {
+      const req = request("https://rebind.example/client.json", { lookup: rebinding as never, timeout: 2000 });
+      req.on("error", resolve);
+      req.end();
+    });
+    expect(error.message).toMatch(/private/);
   });
 
   it("validates the document and caches it", async () => {

@@ -130,7 +130,9 @@ async function call(tool: string, args: Record<string, unknown>, options: CallOp
   root.setAttribute("aria-busy", "true");
   root.classList.add("loading");
   try {
-    const result = await bridge.callTool(tool, args);
+    // Follow-ups query the database the current view came from, not the configured default.
+    const endpoint = (history.at(-1) as { endpoint?: string } | undefined)?.endpoint;
+    const result = await bridge.callTool(tool, endpoint && args.database === undefined ? { ...args, database: endpoint } : args);
     if (result.isError) {
       const { message, hint } = errorFrom(result);
       banner(message, hint);
