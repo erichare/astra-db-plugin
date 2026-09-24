@@ -45,7 +45,7 @@ Use the common patterns in [architecture/README.md](architecture/README.md) rega
 Use the client object hierarchy (DataAPIClient → Database → Collection/Table → documents/rows) for all DDL and DML.
 
 - API is mostly uniform across languages; mind language-specific idioms and limitations.
-- Read `clients/<language>/README.md`, then pick snippets from `clients/<language>/INDEX.md` (a compact map of `examples/`) instead of listing the folder.
+- Read `clients/<language>/README.md`, then pick snippets from `clients/<language>/INDEX.md` (a compact map of `examples/`) instead of listing the directory.
 - All examples assume Astra DB; see per-language README for HCD connection code.
 - Adapt example comments to the app being built; don't copy them verbatim.
 

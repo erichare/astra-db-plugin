@@ -1,7 +1,9 @@
 {
+  "$schema": "https://json.schemastore.org/claude-code-plugin-manifest.json",
   "name": "astra-db",
+  "displayName": "Astra DB",
   "version": "1.2.1",
-  "description": "First-class Astra DB (DataStax / IBM) toolkit: data modeling for Collections and Tables, Astra CLI workflows, application architecture patterns, and 1,600+ doc-synced Data API code snippets for Python, TypeScript, Java, C#, and Go — plus live database tools via the Astra DB MCP server.",
+  "description": "Astra DB (DataStax / IBM) for coding agents: live database tools with interactive views, guarded writes and schema changes, vector and hybrid search, data-modeling and review skills, and 1,600+ idiomatic Data API snippets for Python, TypeScript, Java, C#, and Go.",
   "author": {
     "name": "Eric Hare",
     "email": "ericrhare@gmail.com",
@@ -16,10 +18,55 @@
     "datastax",
     "ibm",
     "cassandra",
+    "hcd",
     "vector-database",
+    "vector-search",
     "data-api",
-    "hcd"
+    "mcp",
+    "mcp-apps"
   ],
+  "userConfig": {
+    "token": {
+      "type": "string",
+      "title": "Astra application token",
+      "description": "Optional: an AstraCS: token, stored in your keychain. Leave empty to use the project's .env (npx -y @erichare/astra-mcp login) or your Astra CLI profile.",
+      "sensitive": true,
+      "required": false
+    },
+    "endpoint": {
+      "type": "string",
+      "title": "Data API endpoint",
+      "description": "Optional default database endpoint (https://…apps.astra.datastax.com). A project .env overrides it; tokens that see one database need none.",
+      "required": false
+    },
+    "keyspace": {
+      "type": "string",
+      "title": "Keyspace",
+      "description": "Optional default keyspace (default_keyspace when empty).",
+      "required": false
+    },
+    "read_only": {
+      "type": "boolean",
+      "title": "Read-only",
+      "description": "Hide write and schema tools (insert, update, delete, create, drop).",
+      "default": false
+    }
+  },
   "hooks": "./hooks/hooks.json",
-  "mcpServers": "./.mcp.json"
+  "mcpServers": {
+    "astra-db": {
+      "command": "npx",
+      "args": [
+        "-y",
+        "@erichare/astra-mcp@1.2.1"
+      ],
+      "env": {
+        "ASTRA_MCP_CONFIG_TOKEN": "${user_config.token}",
+        "ASTRA_MCP_CONFIG_ENDPOINT": "${user_config.endpoint}",
+        "ASTRA_MCP_CONFIG_KEYSPACE": "${user_config.keyspace}",
+        "ASTRA_MCP_CONFIG_READ_ONLY": "${user_config.read_only}",
+        "ASTRA_MCP_CLIENT": "claude-code"
+      }
+    }
+  }
 }

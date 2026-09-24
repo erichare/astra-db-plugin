@@ -5,22 +5,27 @@
     "email": "ericrhare@gmail.com"
   },
   "metadata": {
-    "description": "Marketplace for the Astra DB plugin — Astra DB / HCD Data API skills, commands, agents, and MCP tools.",
+    "description": "Astra DB for coding agents — skills, hooks, and the @erichare/astra-mcp server.",
     "version": "1.2.1"
   },
   "plugins": [
     {
       "name": "astra-db",
       "source": "./",
-      "description": "First-class Astra DB (DataStax / IBM) toolkit: data modeling, Astra CLI workflows, architecture patterns, and 1,600+ doc-synced Data API snippets for Python, TypeScript, Java, C#, and Go — plus live database tools via MCP.",
+      "description": "Astra DB (DataStax / IBM) for coding agents: live database tools with interactive views, guarded writes and schema changes, vector and hybrid search, data-modeling and review skills, and 1,600+ idiomatic Data API snippets for Python, TypeScript, Java, C#, and Go.",
       "category": "database",
       "keywords": [
         "astra",
         "astra-db",
         "datastax",
+        "ibm",
         "cassandra",
+        "hcd",
         "vector-database",
-        "data-api"
+        "vector-search",
+        "data-api",
+        "mcp",
+        "mcp-apps"
       ]
     }
   ]

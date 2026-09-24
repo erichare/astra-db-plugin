@@ -82,7 +82,7 @@ export function customModesBlock(personas: SkillDoc[], itemIndent: number): stri
       `  roleDefinition: ${yamlString(role.replace(/^#.*\n/, "").trim())}`,
       `  whenToUse: ${yamlString(p.description)}`,
       `  description: ${yamlString(p.description.split(". ")[0])}`,
-      `  customInstructions: |-\n${indentBlock(rest.join("\n\n").replace(/\.\.\/astra-toolkit\//g, ".bob/skills/astra-toolkit/"), 4)}`,
+      `  customInstructions: |-\n${indentBlock(bobLinks(rest.join("\n\n"), []), 4)}`,
       `  groups:\n${groups.map((g) => `    - ${g}`).join("\n")}`,
     );
   }
@@ -104,11 +104,21 @@ export function mergeCustomModes(existing: string | undefined, personas: SkillDo
   return `${head}\n${customModesBlock(personas, indent)}${after.startsWith("\n") ? after : `\n${after}`}`.replace(/\n*$/, "\n");
 }
 
-export function commandFile(skill: SkillDoc): string {
-  const body = skill.body
+/** Rewrite sibling-skill links and Claude slash commands for Bob's layout. */
+export function bobLinks(text: string, skills: SkillDoc[]): string {
+  let out = text
     .replace(/\.\.\/astra-toolkit\//g, ".bob/skills/astra-toolkit/")
     .replace(/\.\.\/astra-widgets\//g, ".bob/skills/astra-widgets/")
     .replace(/\/astra-db:([a-z-]+)/g, "/astra-$1");
+  for (const skill of skills) {
+    const target = skill.kind === "workflow" ? `.bob/commands/astra-${skill.name}.md` : skill.kind === "persona" ? ".bob/custom_modes.yaml" : null;
+    if (target) out = out.split(`../${skill.name}/SKILL.md`).join(target);
+  }
+  return out;
+}
+
+export function commandFile(skill: SkillDoc, skills: SkillDoc[] = []): string {
+  const body = bobLinks(skill.body, skills);
   return `---\ndescription: ${yamlString(skill.description)}\n${skill.fields["argument-hint"] ? `argument-hint: ${yamlString(skill.fields["argument-hint"])}\n` : ""}---\n${body}`;
 }
 
@@ -159,7 +169,7 @@ export function planBob(assets: Assets, layout: BobLayout): BobPlan {
     for (const [path, content] of Object.entries(skill.files)) files[join(layout.skillsDir, skill.name, path)] = content;
   }
   for (const skill of skills.filter((s) => s.kind === "workflow")) {
-    files[join(layout.commandsDir, `astra-${skill.name}.md`)] = commandFile(skill);
+    files[join(layout.commandsDir, `astra-${skill.name}.md`)] = commandFile(skill, skills);
   }
   files[join(layout.rulesDir, "astra-db.md")] = RULE;
   for (const [path, content] of Object.entries(filesUnder(assets, "hooks"))) {
