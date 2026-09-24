@@ -1,8 +1,8 @@
-import { handleOAuthRequest } from "../src/oauth/router.js";
-import { verifyAstraCredentials } from "../src/oauth/verify.js";
+import { secretsFromEnv } from "../src/http/crypto.js";
+import { handleOAuthRequest } from "../src/http/oauth/router.js";
+import { verifyAstraCredentials } from "../src/http/verify.js";
 
-const handler = (req: Request) =>
-  handleOAuthRequest(req, { secret: process.env.ASTRA_WIDGETS_AUTH_SECRET, verifyCredentials: verifyAstraCredentials });
+const handler = (req: Request) => handleOAuthRequest(req, { secrets: secretsFromEnv(), verify: verifyAstraCredentials });
 
 export const GET = handler;
 export const POST = handler;

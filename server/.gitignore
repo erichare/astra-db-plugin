@@ -1,4 +1,6 @@
 node_modules/
+dist/
 src/generated/
-.vercel/
+coverage/
+THIRD_PARTY_NOTICES.md
 .vercel
