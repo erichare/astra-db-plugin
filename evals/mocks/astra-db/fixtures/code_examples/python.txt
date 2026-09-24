@@ -1,0 +1,96 @@
+1 python example(s) for "create a vector collection":
+
+### skills/astra-toolkit/clients/python/examples/collections-create-collection-vector.py
+```python
+import os
+from astrapy import DataAPIClient
+from astrapy.constants import VectorMetric
+from astrapy.info import CollectionDefinition, CollectionVectorOptions
+
+# Get an existing database
+client = DataAPIClient()
+database = client.get_database(
+    os.environ["ASTRA_DB_API_ENDPOINT"], token=os.environ["ASTRA_DB_APPLICATION_TOKEN"]
+)
+
+# Create a collection
+collection_definition = CollectionDefinition(
+    vector=CollectionVectorOptions(
+        dimension=1024, metric=VectorMetric.COSINE, source_model="nv-qa-4"
+    ),
+)
+collection = database.create_collection(
+    "**COLLECTION_NAME**",
+    definition=collection_definition,
+)
+
+# ==============  BOUNDARY BETWEEN EXAMPLE SNIPPETS  ==============
+
+import os
+from astrapy import DataAPIClient
+from astrapy.constants import VectorMetric
+from astrapy.info import CollectionDefinition
+
+collection_definition = (
+    CollectionDefinition.builder()
+    .set_vector_dimension(1024)
+    .set_vector_metric(VectorMetric.COSINE)
+    .set_vector_source_model("nv-qa-4")
+    .build()
+)
+
+collection = database.create_collection(
+    "**COLLECTION_NAME**",
+    definition=collection_definition,
+)
+```
+
+1 python example(s) for "insert documents with vectorize":
+
+### skills/astra-toolkit/clients/python/examples/collections-insert-many-vectorize.py
+```python
+import os
+from astrapy import DataAPIClient
+
+# Get an existing collection
+client = DataAPIClient()
+database = client.get_database(
+    os.environ["ASTRA_DB_API_ENDPOINT"], token=os.environ["ASTRA_DB_APPLICATION_TOKEN"]
+)
+collection = database.get_collection("**COLLECTION_NAME**")
+
+# Insert documents into the collection
+result = collection.insert_many(
+    [
+        {
+            "name": "Jane Doe",
+            "age": 42,
+            "$vectorize": "Text to vectorize for this document",
+        },
+        {
+            "nickname": "Bobby",
+            "$vectorize": "Text to vectorize for this document",
+        },
+    ]
+)
+```
+
+1 python example(s) for "vector search sort limit":
+
+### skills/astra-toolkit/clients/python/examples/collections-find-many-sort-vector.py
+```python
+import os
+from astrapy import DataAPIClient
+
+# Find documents
+cursor = collection.find(
+    {}, sort={"$vectorize": "Text to vectorize"}, include_sort_vector=True
+)
+
+# Get the sort vector from the result
+vector = cursor.get_sort_vector()
+
+print(vector)
+```
+
+1 python example(s) for "find with filter projection sort limit":

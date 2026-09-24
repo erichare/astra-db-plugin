@@ -2,6 +2,7 @@ package main
 
 import (
 	"context"
+	"os"
 
 	"github.com/datastax/astra-db-go/v2/astra"
 	"github.com/datastax/astra-db-go/v2/astra/options"
@@ -16,8 +17,8 @@ func main() {
 
 	// Connect to a database
 	database := client.Database(
-		"**API_ENDPOINT**",
-		options.API().SetToken("**APPLICATION_TOKEN**"),
+		os.Getenv("ASTRA_DB_API_ENDPOINT"),
+		options.API().SetToken(os.Getenv("ASTRA_DB_APPLICATION_TOKEN")),
 	)
 
 	// Define the columns and primary key for the table

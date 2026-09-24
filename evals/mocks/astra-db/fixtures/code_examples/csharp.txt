@@ -1,0 +1,128 @@
+1 csharp example(s) for "create a vector collection":
+
+### skills/astra-toolkit/clients/csharp/examples/collections-create-collection-vector.cs
+```cs
+using DataStax.AstraDB.DataApi;
+using DataStax.AstraDB.DataApi.Collections;
+using DataStax.AstraDB.DataApi.Core;
+using DataStax.AstraDB.DataApi.SerDes;
+
+namespace Examples;
+
+// Define the type for the collection
+[CollectionName("**COLLECTION_NAME**")]
+[CollectionVector(SimilarityMetric.Cosine, 1024, SourceModel = "nv-qa-4")]
+public class User
+{
+  [DocumentId]
+  public Guid? Id { get; set; }
+
+  public string Name { get; set; } = null!;
+
+  public int? Age { get; set; }
+
+  [DocumentMapping(DocumentMappingField.Vector)]
+  public float[]? VectorEmbeddings { get; set; }
+}
+
+public class Program
+{
+  static async Task Main()
+  {
+    // Instantiate the client
+    var client = new DataAPIClient();
+
+    // Connect to a database
+    var database = client.GetDatabase(
+      System.Environment.GetEnvironmentVariable("ASTRA_DB_API_ENDPOINT"),
+      System.Environment.GetEnvironmentVariable("ASTRA_DB_APPLICATION_TOKEN")
+    );
+
+    // Create a collection
+    var collection = await database.CreateCollectionAsync<User>();
+  }
+}
+```
+
+1 csharp example(s) for "insert documents with vectorize":
+
+### skills/astra-toolkit/clients/csharp/examples/collections-insert-many-vectorize.cs
+```cs
+using DataStax.AstraDB.DataApi;
+using DataStax.AstraDB.DataApi.Collections;
+using DataStax.AstraDB.DataApi.Core;
+
+public class Program
+{
+  static async Task Main()
+  {
+    // Get an existing collection
+    var client = new DataAPIClient();
+    var database = client.GetDatabase(
+      System.Environment.GetEnvironmentVariable("ASTRA_DB_API_ENDPOINT"),
+      System.Environment.GetEnvironmentVariable("ASTRA_DB_APPLICATION_TOKEN")
+    );
+    var collection = database.GetCollection("**COLLECTION_NAME**");
+
+    // Insert documents to the collection
+    var document1 = new Document()
+    {
+      { "$vectorize", "Text to vectorize for this document" },
+      { "name", "Jane Doe" },
+      { "age", 42 },
+    };
+    var document2 = new Document()
+    {
+      { "$vectorize", "Text to vectorize for this document" },
+      { "nickname", "Bobby" },
+    };
+    var result = await collection.InsertManyAsync([document1, document2]);
+
+    foreach (var id in result.InsertedIds)
+    {
+      Console.WriteLine(id);
+    }
+  }
+}
+```
+
+1 csharp example(s) for "vector search sort limit":
+
+### skills/astra-toolkit/clients/csharp/examples/collections-find-many-sort-vector.cs
+```cs
+using System.Text.Json;
+using DataStax.AstraDB.DataApi;
+using DataStax.AstraDB.DataApi.Collections;
+using DataStax.AstraDB.DataApi.Core;
+using DataStax.AstraDB.DataApi.Core.Query;
+
+public class Program
+{
+  static void Main()
+  {
+    // Get an existing collection
+    var client = new DataAPIClient();
+    var database = client.GetDatabase(
+      System.Environment.GetEnvironmentVariable("ASTRA_DB_API_ENDPOINT"),
+      System.Environment.GetEnvironmentVariable("ASTRA_DB_APPLICATION_TOKEN")
+    );
+    var collection = database.GetCollection("**COLLECTION_NAME**");
+
+    // Find documents
+    var result = collection.Find(
+      new CollectionFindOptions<Document>()
+      {
+        Sort = Builders<Document>.CollectionSort.Vectorize(
+          "Text to vectorize"
+        ),
+        IncludeSortVector = true,
+      }
+    );
+
+    // Inspect the sort vector
+    Console.WriteLine(JsonSerializer.Serialize(result.GetSortVector()));
+  }
+}
+```
+
+1 csharp example(s) for "find with filter projection sort limit":

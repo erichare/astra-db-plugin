@@ -5,10 +5,10 @@ import com.datastax.astra.client.admin.AstraDBDatabaseAdmin;
 public class Example {
   public static void main(String[] args) {
     // Get an admin object
-    DataAPIClient client = new DataAPIClient("**APPLICATION_TOKEN**");
+    DataAPIClient client = new DataAPIClient(System.getenv("ASTRA_DB_APPLICATION_TOKEN"));
     AstraDBAdmin admin = client.getAdmin();
 
     // Get a database admin object
-    AstraDBDatabaseAdmin databaseAdmin = admin.getDatabaseAdmin("**API_ENDPOINT**");
+    AstraDBDatabaseAdmin databaseAdmin = admin.getDatabaseAdmin(System.getenv("ASTRA_DB_API_ENDPOINT"));
   }
 }

@@ -1,10 +1,11 @@
+import os
 from astrapy import DataAPIClient
 
-client = DataAPIClient("**APPLICATION_TOKEN**")
+client = DataAPIClient(os.environ["ASTRA_DB_APPLICATION_TOKEN"])
 
 admin = client.get_admin()
 
-database_admin = admin.get_database_admin("**API_ENDPOINT**")
+database_admin = admin.get_database_admin(os.environ["ASTRA_DB_API_ENDPOINT"])
 
 providers = database_admin.find_reranking_providers()
 

@@ -6,7 +6,7 @@ public class Example {
 
   public static void main(String[] args) {
     // Get a database
-    Database database = new DataAPIClient("**APPLICATION_TOKEN**").getDatabase("**API_ENDPOINT**");
+    Database database = new DataAPIClient(System.getenv("ASTRA_DB_APPLICATION_TOKEN")).getDatabase(System.getenv("ASTRA_DB_API_ENDPOINT"));
 
     // Add fields to a user-defined type
     database.alterType(

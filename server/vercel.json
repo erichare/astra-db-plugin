@@ -2,7 +2,8 @@
   "$schema": "https://openapi.vercel.sh/vercel.json",
   "functions": {
     "api/mcp.ts": {
-      "maxDuration": 60
+      "maxDuration": 60,
+      "includeFiles": "src/generated/**"
     },
     "api/oauth.ts": {
       "maxDuration": 30
@@ -39,6 +40,6 @@
     }
   ],
   "buildCommand": "node scripts/build.mjs --ui-only",
-  "installCommand": "npm install --no-fund --no-audit",
+  "installCommand": "npm ci --no-fund --no-audit",
   "framework": null
 }

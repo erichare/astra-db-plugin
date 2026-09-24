@@ -5,6 +5,7 @@ import (
 	"encoding/json"
 	"fmt"
 	"log"
+	"os"
 
 	"github.com/datastax/astra-db-go/v2/astra"
 	"github.com/datastax/astra-db-go/v2/astra/options"
@@ -14,7 +15,7 @@ func main() {
 	ctx := context.Background()
 
 	client := astra.NewClient(
-		options.API().SetToken("**APPLICATION_TOKEN**"),
+		options.API().SetToken(os.Getenv("ASTRA_DB_APPLICATION_TOKEN")),
 	)
 
 	admin, err := client.Admin()

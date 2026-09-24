@@ -15,8 +15,8 @@ public class Program
 
     // Connect to a database
     var database = client.GetDatabase(
-      "**API_ENDPOINT**",
-      "**APPLICATION_TOKEN**"
+      System.Environment.GetEnvironmentVariable("ASTRA_DB_API_ENDPOINT"),
+      System.Environment.GetEnvironmentVariable("ASTRA_DB_APPLICATION_TOKEN")
     );
 
     // Get an existing collection

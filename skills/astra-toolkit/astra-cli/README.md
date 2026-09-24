@@ -39,12 +39,11 @@ List regions: `astra db regions vector -q`. `create` can take several minutes; u
 ### Dotenv for applications
 
 ```
-astra dotenv write --db <DB> -k=ASTRA_DB_TOKEN=APPLICATION_TOKEN,ASTRA_DB_API_ENDPOINT=API_ENDPOINT -f <FILE>
+astra dotenv write --db <DB> -k=ASTRA_DB_TOKEN=ASTRA_DB_APPLICATION_TOKEN,ASTRA_DB_API_ENDPOINT=ASTRA_DB_API_ENDPOINT -f <FILE>
 ```
 
-App loads the file (e.g. `python-dotenv`); use `APPLICATION_TOKEN` and `API_ENDPOINT` env vars.
-Pay EXTRA ATTENTION to the env var names: do not try to load ASTRA_DB_TOKEN or ASTRA_DB_API_ENDPOINT which is wrong.
-
+App loads the file (e.g. `python-dotenv`) and reads `ASTRA_DB_APPLICATION_TOKEN` and `ASTRA_DB_API_ENDPOINT` — the names every example uses.
+Without the CLI, `npx -y @erichare/astra-mcp login` (run by the user in a terminal) writes the same `.env` interactively.
 
 ### Destructive operations — DO NOT perform, defer to the user
 

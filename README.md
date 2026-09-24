@@ -1,165 +1,142 @@
 <p align="center">
-  <img src="assets/banner.svg" alt="Astra DB Plugin — agent-native tooling for Astra DB and HCD" width="100%">
+  <img src="assets/banner.svg" alt="Astra DB for Agents — explore, query, and build on Astra DB from any agent" width="100%">
 </p>
 
 <p align="center">
   <a href="https://github.com/erichare/astra-db-plugin/actions/workflows/ci.yml"><img src="https://github.com/erichare/astra-db-plugin/actions/workflows/ci.yml/badge.svg" alt="CI"></a>
-  <a href="https://github.com/erichare/astra-db-plugin/tags"><img src="https://img.shields.io/github/v/tag/erichare/astra-db-plugin?label=release&color=brightgreen" alt="Release"></a>
+  <a href="https://www.npmjs.com/package/@erichare/astra-mcp"><img src="https://img.shields.io/npm/v/@erichare/astra-mcp?label=npm&color=7c3aed" alt="npm"></a>
+  <a href="https://github.com/erichare/astra-db-plugin/releases"><img src="https://img.shields.io/github/v/release/erichare/astra-db-plugin?label=release&color=brightgreen" alt="Release"></a>
   <a href="https://skillsaw.org/"><img src="https://img.shields.io/endpoint?url=https%3A%2F%2Fraw.githubusercontent.com%2Ferichare%2Fastra-db-plugin%2Fmain%2F.skillsaw-badge.json" alt="skillsaw grade"></a>
   <a href="LICENSE"><img src="https://img.shields.io/badge/license-Apache--2.0-blue" alt="License"></a>
 </p>
 
 <p align="center">
-  <b>5 client languages · ~1,660 doc-synced Data API snippets · 4 inline widgets · ~420 always-on tokens · skillsaw A+</b>
+  <b>18 MCP tools · interactive views · guarded writes · ~1,660 Data API examples in 5 languages</b><br>
+  Claude Code · Codex · Cursor · VS Code · Windsurf · Gemini CLI · Claude Desktop · IBM Bob · ChatGPT
 </p>
 
-> <img src="assets/logos/ibm.svg" alt="IBM" height="14"> **Built for IBM Bob.** Bob gets the complete bundle — the skill, three custom modes, `/astra-*` slash commands, the Astra DB MCP server, and a credential-hygiene rule — installed into a project with one command (or globally with `--global`). Claude Code and OpenAI Codex get the same capabilities in their native forms.
+Give your coding agent a live view of your Astra DB. It can map a database, read a collection's real schema before writing code against it, run vector and hybrid searches, page through documents, and change data, asking you first before anything destructive. When it writes application code, it starts from canonical Data API snippets for Python, TypeScript, Java, C#, and Go instead of guessing.
 
-One skill, one source of truth, three native packagings. The content is the `astra-toolkit` skill by Stefano Lottini (IBM / DataStax) — progressive-disclosure instructions for the Astra CLI, application architecture, data modeling for Collections and Tables, and roughly 340 documentation-derived Data API snippets for each of Python, TypeScript, Java, C#, and Go. It is self-sufficient (no web lookups) and synced automatically from [sl-at-ibm/astra-toolkit-skill](https://github.com/sl-at-ibm/astra-toolkit-skill).
-
-## Install
-
-Pick your agent — one command each.
-
-<p align="center">
-  <a href="#ibm-bob"><img src="assets/install-bob.svg" alt="Install for IBM Bob" width="32%"></a>
-  <a href="#claude-code"><img src="assets/install-claude.svg" alt="Install for Claude Code" width="32%"></a>
-  <a href="#openai-codex"><img src="assets/install-codex.svg" alt="Install for OpenAI Codex" width="32%"></a>
-</p>
-
-### <img src="assets/logos/bob.svg" alt="" height="22" align="absmiddle" hspace="6">IBM Bob
-
-From your project root:
+## Quickstart
 
 ```bash
-curl -fsSL https://raw.githubusercontent.com/erichare/astra-db-plugin/main/install.sh \
-  | bash -s -- bob
+npx -y @erichare/astra-mcp init
 ```
 
-Installs the full bundle into `.bob/` — the skill, `/astra-setup`, `/astra-doctor`, and `/astra-data-model-review` commands, the `astra-reviewer`, `astra-data-modeler`, and `astra-migration-helper` custom modes, the Astra DB MCP server, and a credential-hygiene rule — merging with any `.bob/` config the project already has. Add `--global` to install into `~/.bob/` for every project instead.
+`init` finds the agents on your machine and sets each one up. Claude Code and Codex get the full plugin (skills, hooks, and the MCP server) from their plugin marketplaces; the others get the MCP server in their config. Then it connects a database:
 
-### <img src="assets/logos/claude.svg" alt="" height="22" align="absmiddle" hspace="6">Claude Code
+1. Paste an application token at a hidden prompt. Create one in the [Astra console](https://astra.datastax.com) under **Settings → Tokens**.
+2. Pick a database and a keyspace.
+3. `ASTRA_DB_APPLICATION_TOKEN`, `ASTRA_DB_API_ENDPOINT`, and `ASTRA_DB_KEYSPACE` are written to `./.env` (mode 0600), and `login` offers to add `.env` to `.gitignore` if it isn't ignored yet.
 
-```bash
-claude plugin marketplace add erichare/astra-db-plugin
-claude plugin install astra-db@astra-db-marketplace
-```
+No restart needed: the server re-reads credentials on every call. Now ask your agent:
 
-The full plugin: skill, commands, agents, hooks, and MCP server.
+> What's in my Astra database?
+>
+> Find articles similar to "how do black holes evaporate".
+>
+> Write a TypeScript script that loads `products.json` into a new vectorize collection.
 
-### <img src="assets/logos/openai.svg" alt="" height="22" align="absmiddle" hspace="6">OpenAI Codex
+Needs Node.js 20+. Prefer a one-liner? `curl -fsSL https://raw.githubusercontent.com/erichare/astra-db-plugin/main/install.sh | sh` (PowerShell: `irm https://raw.githubusercontent.com/erichare/astra-db-plugin/main/install.ps1 | iex`) runs the same `init`.
 
-```bash
-codex plugin marketplace add erichare/astra-db-plugin
-codex plugin add astra-db@astra-db-marketplace
-```
+## See your data
 
-Native plugin (per the [OpenAI plugin spec](https://developers.openai.com/plugins/build/plugins)) with the skill, the `astra-setup` / `astra-doctor` / `astra-data-model-review` command skills, the `astra-reviewer` / `astra-data-modeler` / `astra-migration-helper` persona skills (Codex lists them as `astra-db:astra-*`; invoke with `$`), hooks, and the MCP server. It also appears under `/plugins` in Codex and in the ChatGPT app's Plugins tab.
-
-<details>
-<summary><b>More install options</b> — in-app commands, Cursor / Gemini CLI / any Agent Skills harness, npx, clone</summary>
-
-<br>
-
-- **Claude Code, inside a session:** `/plugin marketplace add erichare/astra-db-plugin` then `/plugin install astra-db@astra-db-marketplace`.
-- **Any Agent Skills harness** (Cursor, Gemini CLI, anything reading the [agentskills.io](https://agentskills.io) layout): `curl -fsSL https://raw.githubusercontent.com/erichare/astra-db-plugin/main/install.sh | bash -s -- skills-dir <your-skills-directory>`, or `npx skills add erichare/astra-db-plugin`.
-- **Codex, skill only** (no plugin system): `curl -fsSL .../install.sh | bash -s -- codex` copies the skill into `~/.codex/skills/astra-toolkit` (`CODEX_HOME` overrides the location).
-- **Bob, by cloning:** the repository ships the complete `.bob/` bundle, so cloning it into place works too; `install.sh bob --global` puts the same bundle under `~/.bob/`.
-- **From a checkout:** `./install.sh <claude|codex|bob|skills-dir PATH>` does the same without re-fetching.
-
-</details>
-
-## Widgets
-
-Ask about a collection and get a widget, not a wall of text. The bundled `astra-widgets` MCP server supplies the data; the `astra-widgets` skill renders it inline where the harness can (Claude Code desktop, Claude.ai/Desktop and ChatGPT via MCP Apps) and opens a self-contained page everywhere else.
+In hosts that render [MCP Apps](https://modelcontextprotocol.io/extensions/apps/overview), such as Claude and ChatGPT, the overview, schema, explorer, and search tools answer with an interactive view: drill from a database into a collection, its documents, and similar documents, with a Back history, your host's theme, and full keyboard support. Elsewhere, the agent gets the same data as text, and can write a standalone HTML page when you ask for a visual.
 
 <table>
   <tr>
-    <td width="50%"><img src="assets/widgets/similarity-light.png" alt="Similarity results widget: ranked hits with score bars and stats"></td>
-    <td width="50%"><img src="assets/widgets/card-dark.png" alt="Collection card widget: vector config, metric tiles, definition, sample document"></td>
+    <td width="50%"><img src="assets/widgets/similarity-light.png" alt="Vector search results: ranked hits with similarity bars and score statistics"></td>
+    <td width="50%"><img src="assets/widgets/card-dark.png" alt="Collection view: vector and vectorize settings, lexical and rerank, sample document"></td>
   </tr>
   <tr>
-    <td><img src="assets/widgets/overview-light.png" alt="Database overview widget: keyspaces, collections, vector config, counts"></td>
-    <td><img src="assets/widgets/explorer-dark.png" alt="Collection explorer widget: filterable documents table with field inventory"></td>
+    <td><img src="assets/widgets/overview-light.png" alt="Database overview: keyspaces, collections with vector settings and counts, tables"></td>
+    <td><img src="assets/widgets/explorer-dark.png" alt="Explorer: documents table with field inventory, filters, and paging"></td>
+  </tr>
+  <tr>
+    <td><img src="assets/widgets/table-light.png" alt="Table view: columns, primary key, indexes, vector columns"></td>
+    <td><img src="assets/widgets/constellation-dark.png" alt="Similarity map: hits placed by score around the query"></td>
   </tr>
 </table>
 
-| Command | Widget | Drill-downs |
+In Claude Code, the shortcuts are `/astra-db:overview`, `/astra-db:collection <name>`, `/astra-db:explore <name> [--filter '<json>']`, and `/astra-db:similar "<query>" <collection>`.
+
+## Tools
+
+| | Tools |
+| --- | --- |
+| **Connect** | `connection_status` shows where each credential comes from and runs a live check; `list_databases` |
+| **Explore** | `database_overview`, `describe_collection`, `describe_table`, `list_vectorize_providers` |
+| **Query** | `find` (filter, sort, projection, paging), `vector_search` (text via vectorize, a vector, or "more like this document"; hybrid with rerank), `count`, `distinct_values` |
+| **Build** | `code_examples` searches the bundled, documentation-derived client snippets, offline |
+| **Change** | `insert`, `update`, `delete`, `create_collection`, `create_table`, `create_index`, `drop` |
+
+Every data tool takes an optional `database` (name, id, or endpoint) and `keyspace`, so one server covers all your databases. The server also exposes `astra://databases` and per-collection schema resources, plus `overview`, `explore`, `similar`, and `setup` prompts. Arguments, outputs, and error codes: [docs/tools.md](docs/tools.md).
+
+## Safe by default
+
+- **Destructive changes need your say-so.** `drop`, and `update` or `delete` across many documents or with an empty filter, need confirmation. Clients that support elicitation ask you directly. Otherwise the agent has to show you what will be lost and wait for your approval; the request that started it doesn't count.
+- **Read-only when you want it.** `ASTRA_MCP_READ_ONLY=1`, `astra-mcp serve --read-only`, or the plugin's *Read-only* setting removes every write tool.
+- **Tokens stay out of the chat.** `login` reads the token with hidden input, and the tools send the agent to `login`, never to you for a token. If you paste one anyway, the agent is told not to use it and to suggest rotating it.
+- **A guard against leaks.** In Claude Code, Codex, and Bob, a hook stops `AstraCS:` tokens from being written anywhere except a git-ignored `.env`. Removing a leaked token is always allowed.
+- **Hosted writes are opt-in**, per connection: the *Allow writes* box on the OAuth consent page, or an explicit header.
+
+More in [docs/security.md](docs/security.md).
+
+## Works with
+
+`init` handles all of these; pick a subset with `--agents claude-code,cursor`, use project-level files with `--project`, and preview with `--dry-run`. `npx -y @erichare/astra-mcp uninstall` reverses it.
+
+| Agent | What you get | Manual setup |
 | --- | --- | --- |
-| `/astra-db:overview` | keyspaces → collections (vector dims · metric, vectorize model, lexical/rerank, ~count) and tables | open a collection card |
-| `/astra-db:collection <name>` | full metadata + sample document | explore documents, search |
-| `/astra-db:similar "<query>" --collection <name>` (`--doc <id>`, `--hybrid`, `--limit`) | ranked bars with `$similarity`, constellation map, score stats | similar-to-this-document |
-| `/astra-db:explore <name>` (`--filter '{…}'`, `--fields a,b`) | documents table, field inventory, paging | filter by value, next page, similar |
+| **Claude Code** | Plugin: skills, `/astra-db:*` shortcuts, hooks, MCP server, settings for token, endpoint, keyspace, and read-only | `claude plugin marketplace add erichare/astra-db-plugin`<br>`claude plugin install astra-db@astra-db-marketplace` |
+| **OpenAI Codex** | Plugin: skills (`$astra-db:*`), hooks, MCP server | `codex plugin marketplace add erichare/astra-db-plugin`<br>`codex plugin add astra-db@astra-db-marketplace` |
+| **Cursor** | MCP server in `~/.cursor/mcp.json` | [![Add to Cursor](https://img.shields.io/badge/Cursor-Add_astra--db-111827)](https://cursor.com/en/install-mcp?name=astra-db&config=eyJjb21tYW5kIjoibnB4IiwiYXJncyI6WyIteSIsIkBlcmljaGFyZS9hc3RyYS1tY3BAMiJdfQ%3D%3D) |
+| **VS Code** (Copilot) | MCP server in your user profile | [![Install in VS Code](https://img.shields.io/badge/VS_Code-Install_astra--db-0098FF?logo=visualstudiocode&logoColor=white)](https://insiders.vscode.dev/redirect/mcp/install?name=astra-db&config=%7B%22type%22%3A%22stdio%22%2C%22command%22%3A%22npx%22%2C%22args%22%3A%5B%22-y%22%2C%22%40erichare%2Fastra-mcp%402%22%5D%2C%22env%22%3A%7B%22ASTRA_MCP_PROJECT_DIR%22%3A%22%24%7BworkspaceFolder%7D%22%2C%22ASTRA_MCP_CLIENT%22%3A%22vscode%22%7D%7D) |
+| **Windsurf** | MCP server in `~/.codeium/windsurf/mcp_config.json` | `init --agents windsurf` |
+| **Gemini CLI** | MCP server in `~/.gemini/settings.json` | `init --agents gemini` |
+| **Claude Desktop** | MCP server in `claude_desktop_config.json` | Or open [`astra-db.mcpb`](https://github.com/erichare/astra-db-plugin/releases/latest/download/astra-db.mcpb) for a one-click install with a settings form |
+| **IBM Bob** | Skills, `/astra-*` commands, three custom modes, rules, hooks, MCP server in `~/.bob/` | [docs/bob.md](docs/bob.md) |
+| **ChatGPT, claude.ai** | Hosted server with OAuth | [docs/hosted.md](docs/hosted.md) |
+| **Any MCP client** | stdio server | `npx -y @erichare/astra-mcp` |
 
-The widgets are proactive too: the skill tells the agent to show the matching view whenever it inspects a collection or runs a vector search for you. Codex gets the same as `$astra-overview` / `$astra-collection` / `$astra-similar` / `$astra-explore`; Bob as `/astra-*` commands — both open the generated HTML page. The server needs `node` 20+ on your PATH and the same two environment variables as the rest of the plugin.
+Skills-only harnesses that read the [Agent Skills](https://agentskills.io) layout can take the `skills/` directory as is.
 
-<details>
-<summary><b>Hosted server</b> — ChatGPT, claude.ai, Claude Desktop</summary>
+## What the agent knows
 
-<br>
+| Skill | Purpose |
+| --- | --- |
+| `astra-toolkit` | The knowledge base: Collections vs Tables, data modeling, the Astra CLI, application architecture, and about 340 examples per language with per-language indexes. Written by Stefano Lottini (IBM / DataStax), vendored and extended here |
+| `astra-widgets` | When to show a view, and how to render one where MCP Apps aren't available |
+| `setup`, `doctor` | Connect a project, and diagnose one that isn't working, with the exact fix per failure |
+| `data-model-review` | Review the project's data model and Data API usage against the live schema |
+| `overview`, `collection`, `explore`, `similar` | Shortcuts you invoke; the agent doesn't trigger them on its own |
+| `reviewer`, `data-modeler`, `migration-helper` | Personas: a read-only code reviewer in a forked context, a schema designer, and a staged migration planner |
 
-The same server runs as a streamable-HTTP endpoint at **`https://astra-widgets-mcp.vercel.app/mcp`** (source: `server/api/mcp.ts` + `server/api/oauth.ts`, deployed on Vercel; self-host with `vercel --prod` from `server/` and set `ASTRA_WIDGETS_AUTH_SECRET`). Nothing is stored server-side: OAuth tokens are encrypted blobs that carry your own Astra credentials.
+## Configuration
 
-**ChatGPT** — Settings → Security and login → turn on Developer mode → Plugins (Connectors) → **+** → name it, paste the URL above, choose **OAuth**, create. A "Connect Astra DB" page asks once for your Database Administrator token and Data API endpoint, then the four widget tools appear with inline MCP Apps UI. (Copy the connection's `plugin_asdk_app_…` id from the browser URL if you want to reference it from `codex/.app.json`.) **claude.ai** custom connectors work the same way (OAuth).
+Each value (token, endpoint, keyspace) comes from the first place that has it:
 
-**Claude Desktop / any MCP client** — OAuth as above, or headers directly via `mcp-remote` in `claude_desktop_config.json`:
+1. The server's environment: `ASTRA_DB_APPLICATION_TOKEN`, `ASTRA_DB_API_ENDPOINT`, `ASTRA_DB_KEYSPACE`
+2. The project's `.env.local` or `.env`, searched upward to the git root
+3. The host's settings (the Claude Code plugin or the Claude Desktop bundle)
+4. Your profile, written by `login --global`
+5. The Astra CLI's `~/.astrarc` (token only)
 
-```json
-{
-  "mcpServers": {
-    "astra-widgets": {
-      "command": "npx",
-      "args": ["-y", "mcp-remote", "https://astra-widgets-mcp.vercel.app/mcp",
-               "--header", "Authorization: Bearer ${ASTRA_DB_APPLICATION_TOKEN}",
-               "--header", "X-Astra-Endpoint: ${ASTRA_DB_API_ENDPOINT}"],
-      "env": { "ASTRA_DB_APPLICATION_TOKEN": "<your token>", "ASTRA_DB_API_ENDPOINT": "<your endpoint>" }
-    }
-  }
-}
+With a token but no endpoint, the server picks your only active database, or the one named by `ASTRA_DB_NAME`. `npx -y @erichare/astra-mcp doctor` shows what it found and where. Full reference: [docs/configuration.md](docs/configuration.md).
+
+## Documentation
+
+[Tools](docs/tools.md) · [Configuration](docs/configuration.md) · [Security](docs/security.md) · [Hosted server](docs/hosted.md) · [IBM Bob](docs/bob.md) · [Troubleshooting](docs/troubleshooting.md) · [Privacy](docs/privacy.md) · [Publishing](docs/publishing.md) · [Changelog](CHANGELOG.md)
+
+## Contributing
+
+```bash
+cd server && npm ci && npm test      # server, CLI, hosted, and UI view tests
+node --test tests/*.test.mjs         # hooks, manifests, skills, scripts
 ```
 
-Raw bearer requests (`Authorization: Bearer <ASTRA_DB_APPLICATION_TOKEN>` + `X-Astra-Endpoint` header or `?endpoint=`) keep working for scripts and curl.
-
-</details>
-
-## What you get
-
-| Component | Details | IBM Bob | Claude Code | Codex / ChatGPT | Other Agent Skills harnesses |
-| --- | --- | :-: | :-: | :-: | :-: |
-| **Skill** `astra-toolkit` | `SKILL.md` entry point, per-topic instruction files, `clients/<language>/examples/` snippet library — loaded on demand | ✓ | ✓ | ✓ | ✓ |
-| **Commands** | setup (CLI, token, `.env`), doctor (diagnostics), data-model-review | ✓ `/astra-*` | ✓ `/astra-db:*` | ✓ `$astra-*` skills | — |
-| **Agents** | reviewer (Data API usage review), data-modeler (schema design), migration-helper (staged migration plans) | ✓ custom modes | ✓ subagents | ✓ `$astra-*` persona skills | — |
-| **MCP server** | [`@datastax/astra-db-mcp`](https://github.com/datastax/astra-db-mcp) for live database operations | ✓ | ✓ | ✓ | — |
-| **Widgets** | `astra-widgets` MCP server + skill: overview, collection card, similarity view, explorer | ✓ HTML page | ✓ inline | ✓ inline (ChatGPT) · HTML page (Codex CLI) | — |
-| **Hooks** | Credential guard (blocks hardcoded `AstraCS:` tokens); daily upstream-freshness notice | ≈ rule¹ | ✓ | ✓ | — |
-
-¹ Bob has no hook system; the bundle ships a `.bob/rules/astra-db.md` rule that enforces the same credential hygiene as guidance.
-
-**Live database tools.** The MCP server activates when `ASTRA_DB_APPLICATION_TOKEN` and `ASTRA_DB_API_ENDPOINT` are set in your environment; `/astra-db:setup` installs the Astra CLI and generates a `.env` with both. The skill itself needs no credentials.
-
-<details>
-<summary><b>Maintainers</b> — sync pipeline, CI gates, releases, evals</summary>
-
-<br>
-
-Content flow: `sl-at-ibm/astra-toolkit-skill` → `scripts/sync_upstream.py` → `skills/astra-toolkit/` (canonical) → `scripts/build_layouts.py` → `.bob/` bundle and `codex/` plugin root (generated from the skill plus `commands/` and `agents/` via `scripts/convert.py`, committed, parity-checked).
-
-- **Sync**: `.github/workflows/sync.yml` runs weekly and opens a PR when upstream changed (`sync-manifest.json` records the upstream SHA). Manual refresh: `python3 scripts/sync_upstream.py && python3 scripts/build_layouts.py`.
-- **Content is verbatim** with one deliberate exception: `DESCRIPTION_OVERRIDES` in `scripts/sync_upstream.py` patches the skill's frontmatter description with routing trigger phrasing (proposed upstream; the override is deleted once adopted).
-- **CI** (`.github/workflows/ci.yml`): skillsaw `--strict` plus an A+ grade gate, layout parity, Python/TypeScript snippet syntax checks, the pytest suite (sync/build/release scripts, both hooks, the installer, and skill-content integrity — 90% coverage gate on `scripts/`), and `claude plugin validate`. Run locally with `pytest tests/`.
-- **Evals** (`evals/`): three `claude plugin eval` cases (Python vector collection, TypeScript filtered find, Collections-vs-Tables reasoning) with `file_exists`, `tool_used: Skill`, and LLM rubric graders. `plugin eval` is early-access; run `claude plugin eval . --no-publish` once enabled for the account.
-- **Releases** (`.github/workflows/release.yml`): merges touching plugin content auto-bump the patch version across the Claude and Codex manifests, tag, and update the changelog. Use `scripts/bump_version.py minor|major` manually for larger changes.
-- **Manifests / roots**: repo root is the Claude Code plugin (`.claude-plugin/` plugin + marketplace, `.mcp.json`, `hooks/`, `commands/`, `agents/`); `codex/` is the self-contained Codex plugin root (`codex/.codex-plugin/plugin.json`, generated `skills/`, `hooks/` copy, `.mcp.json`) published via `.agents/plugins/marketplace.json`; `.bob/` is the generated IBM Bob bundle.
-
-</details>
+See [CONTRIBUTING.md](CONTRIBUTING.md) for the layout and checks, and [AGENTS.md](AGENTS.md) if you're a coding agent working on this repository.
 
 ## License and provenance
 
-<p align="center">
-  <picture>
-    <source media="(prefers-color-scheme: dark)" srcset="assets/logos/datastax-wordmark-dark.svg">
-    <img src="assets/logos/datastax-wordmark.svg" alt="DataStax" height="26">
-  </picture>
-</p>
-
-Packaging (scripts, commands, agents, hooks, workflows, assets) is [Apache-2.0](LICENSE). Bundled skill content originates from [sl-at-ibm/astra-toolkit-skill](https://github.com/sl-at-ibm/astra-toolkit-skill) and derives from the [DataStax documentation](https://docs.datastax.com); see [NOTICE](NOTICE). Maintained in coordination with the upstream author. This is a community project, not an official DataStax, IBM, Anthropic, or OpenAI product; platform names and logos identify compatibility only and are trademarks of their respective owners (see [NOTICE](NOTICE)).
+The plugin, server, installer, hooks, and assets are [Apache-2.0](LICENSE). The `astra-toolkit` skill content is vendored from [sl-at-ibm/astra-toolkit-skill](https://github.com/sl-at-ibm/astra-toolkit-skill) and derives from the [DataStax documentation](https://docs.datastax.com); the changes made here are listed in [NOTICE](NOTICE). This is a community project, not an official DataStax, IBM, Anthropic, or OpenAI product. Product names and logos identify compatibility only and are trademarks of their owners.

@@ -1,5 +1,8 @@
 ---
 type: llm
+focus:
+  source: file
+  path: main.py
 ---
 
 Score 1 only if main.py satisfies ALL of the following; otherwise score 0:

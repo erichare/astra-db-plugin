@@ -1,0 +1,82 @@
+{
+  "name": "astra-db",
+  "version": "2.0.0",
+  "description": "Astra DB (DataStax / IBM) for coding agents: live database tools with interactive views, guarded writes and schema changes, vector and hybrid search, data-modeling and review skills, and 1,600+ idiomatic Data API snippets for Python, TypeScript, Java, C#, and Go.",
+  "author": {
+    "name": "Eric Hare",
+    "email": "ericrhare@gmail.com",
+    "url": "https://github.com/erichare"
+  },
+  "homepage": "https://github.com/erichare/astra-db-plugin",
+  "repository": "https://github.com/erichare/astra-db-plugin",
+  "license": "Apache-2.0",
+  "keywords": [
+    "astra",
+    "astra-db",
+    "datastax",
+    "ibm",
+    "cassandra",
+    "hcd",
+    "vector-database",
+    "vector-search",
+    "data-api",
+    "mcp",
+    "mcp-apps"
+  ],
+  "skills": "./skills/",
+  "mcpServers": {
+    "astra-db": {
+      "command": "npx",
+      "args": [
+        "-y",
+        "@erichare/astra-mcp@2.0.0"
+      ],
+      "env": {
+        "ASTRA_MCP_CLIENT": "codex"
+      },
+      "env_vars": [
+        "ASTRA_DB_APPLICATION_TOKEN",
+        "ASTRA_DB_TOKEN",
+        "APPLICATION_TOKEN",
+        "ASTRA_DB_API_ENDPOINT",
+        "API_ENDPOINT",
+        "ASTRA_DB_KEYSPACE",
+        "ASTRA_DB_NAME",
+        "ASTRA_DB_ID",
+        "ASTRA_DB_ENVIRONMENT",
+        "ASTRARC",
+        "ASTRA_PROFILE",
+        "ASTRA_MCP_READ_ONLY",
+        "ASTRA_MCP_CREDENTIALS_FILE",
+        "XDG_CONFIG_HOME",
+        "APPDATA",
+        "PATH",
+        "HOME",
+        "USERPROFILE"
+      ]
+    }
+  },
+  "interface": {
+    "displayName": "Astra DB",
+    "shortDescription": "Inspect, query, and vector-search Astra DB from Codex — with idiomatic client code in five languages.",
+    "longDescription": "Astra DB (DataStax / IBM) and HCD for Codex. The astra-db MCP server gives live tools — database overview, collection and table schemas, find, vector and hybrid search, counts, guarded inserts/updates/deletes, and schema changes that ask before anything destructive — plus canonical Data API snippets. Skills cover setup ($astra-db:setup — connect with `npx -y @erichare/astra-mcp login`, no token in chat), diagnosis ($astra-db:doctor), code review, data modeling, and migrations. Credentials come from your project's .env, environment, or Astra CLI profile.",
+    "developerName": "Eric Hare",
+    "category": "Developer Tools",
+    "capabilities": [
+      "Interactive",
+      "Read",
+      "Write"
+    ],
+    "websiteURL": "https://github.com/erichare/astra-db-plugin",
+    "privacyPolicyURL": "https://github.com/erichare/astra-db-plugin/blob/main/docs/privacy.md",
+    "brandColor": "#7C3AED",
+    "logo": "./assets/icon.png",
+    "composerIcon": "./assets/icon.png",
+    "defaultPrompt": [
+      "Connect this project to my Astra DB database",
+      "Show me what's in my Astra DB database",
+      "Create a vector collection for these documents and write Python code to search it",
+      "Review this project's Astra DB data model"
+    ]
+  }
+}

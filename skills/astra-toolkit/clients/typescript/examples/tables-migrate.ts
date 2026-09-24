@@ -1,8 +1,8 @@
 import { DataAPIClient, TableInsertManyError } from "@datastax/astra-db-ts";
 
 const client = new DataAPIClient();
-const database = client.db("**API_ENDPOINT**", {
-  token: "**APPLICATION_TOKEN**",
+const database = client.db(process.env.ASTRA_DB_API_ENDPOINT!, {
+  token: process.env.ASTRA_DB_APPLICATION_TOKEN!,
 });
 
 const table = database.table("**TABLE_NAME**");

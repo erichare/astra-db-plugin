@@ -3,6 +3,7 @@ name: typescript-find-filter
 tags: [typescript, collections, queries]
 runs: 2
 max_turns: 12
+allowed_tools: [Read, Glob, Grep, Skill, Write, mcp__plugin_astra-db_astra-db__code_examples]
 ---
 
 Write a TypeScript module `query.ts` that uses the Astra DB Data API TypeScript client (@datastax/astra-db-ts) to:

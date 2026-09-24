@@ -35,8 +35,8 @@ public class Program
     // Get an existing table
     var client = new DataAPIClient();
     var database = client.GetDatabase(
-      "API_ENDPOINT",
-      "APPLICATION_TOKEN"
+      System.Environment.GetEnvironmentVariable("ASTRA_DB_API_ENDPOINT"),
+      System.Environment.GetEnvironmentVariable("ASTRA_DB_APPLICATION_TOKEN")
     );
     var table = database.GetTable<ExampleRowBeforeAlter>("TABLE_NAME");
 

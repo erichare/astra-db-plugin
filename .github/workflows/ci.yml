@@ -4,16 +4,25 @@ on:
   push:
     branches: [main]
   pull_request:
+  workflow_call:
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+concurrency:
+  group: ci-${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: ${{ github.event_name == 'pull_request' }}
 
 jobs:
-  quality:
+  server:
+    name: Server (lint, types, tests, build, UI)
     runs-on: ubuntu-latest
+    defaults:
+      run:
+        working-directory: server
     steps:
       - uses: actions/checkout@v4
-
-      - uses: actions/setup-python@v5
-        with:
-          python-version: "3.12"
 
       - uses: actions/setup-node@v4
         with:
@@ -21,40 +30,154 @@ jobs:
           cache: npm
           cache-dependency-path: server/package-lock.json
 
-      - name: Widget server — install, test, build
+      - run: npm ci --no-fund --no-audit
+
+      - name: Lint (Biome)
+        run: npm run check
+
+      - name: Build (app shell, bundled assets, dist/cli.js)
+        run: npm run build
+
+      - name: Typecheck
+        run: npm run typecheck
+
+      - name: Unit, protocol, HTTP/OAuth, CLI, and UI view tests (coverage gate)
+        run: npx vitest run --coverage
+
+      - name: stdio end-to-end (both protocol eras, real bundle)
+        run: npm run test:e2e
+
+      - name: App shell in the official MCP Apps host bridge (Chromium)
+        run: |
+          npx playwright install --with-deps chromium
+          npm run test:ui -- --screenshots "$RUNNER_TEMP/shots"
+
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: ui-screenshots
+          path: ${{ runner.temp }}/shots
+          if-no-files-found: ignore
+
+      - name: npm package contents
+        run: |
+          npm pack --dry-run --json --ignore-scripts > "$RUNNER_TEMP/pack.json"
+          node -e '
+            const [p] = require(process.argv[1]);
+            const files = p.files.map((f) => f.path).sort();
+            const want = ["LICENSE", "THIRD_PARTY_NOTICES.md", "dist/assets.json", "dist/cli.js", "package.json"];
+            for (const f of want) if (!files.includes(f)) throw new Error(`missing ${f} in package: ${files}`);
+            if (p.unpackedSize > 8 * 1024 * 1024) throw new Error(`package too large: ${p.unpackedSize}`);
+            console.log(`${files.length} files, ${(p.size / 1024).toFixed(0)} KB packed`);
+          ' "$RUNNER_TEMP/pack.json"
+
+      - name: Claude Desktop bundle (.mcpb validate + pack)
+        run: npm run pack:mcpb
+
+  cross-platform:
+    name: Hooks, CLI, scripts (${{ matrix.os }}, Node ${{ matrix.node }})
+    runs-on: ${{ matrix.os }}
+    defaults:
+      run:
+        shell: bash
+    strategy:
+      fail-fast: false
+      matrix:
+        os: [ubuntu-latest, macos-latest, windows-latest]
+        node: ["20", "22"]
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: ${{ matrix.node }}
+
+      - name: Repository tests (hooks, manifests, skills, scripts)
+        run: node --test tests/*.test.mjs
+
+      - name: CLI and credential tests
+        if: matrix.node == '22'
         working-directory: server
         run: |
           npm ci --no-fund --no-audit
-          npm test
-          npm run build
+          npm run build:ui
+          npx vitest run tests/cli.test.ts tests/unit
 
-      - name: Layout parity (generated layouts + committed server bundle)
-        run: bash scripts/check_layout_parity.sh
+  plugin:
+    name: Plugin manifests, skills, examples
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
 
-      - name: skillsaw lint (strict — no warnings)
+      - uses: actions/setup-node@v4
+        with:
+          node-version: "22"
+          cache: npm
+          cache-dependency-path: server/package-lock.json
+
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+
+      - uses: actions/setup-go@v5
+        with:
+          go-version: stable
+          cache: false
+
+      - uses: actions/setup-java@v4
+        with:
+          distribution: temurin
+          java-version: "21"
+
+      - name: Versions agree everywhere
+        run: node scripts/check-versions.mjs
+
+      - name: Claude Code plugin validation (strict)
+        run: |
+          npm install -g @anthropic-ai/claude-code
+          claude plugin validate . --strict
+          claude plugin validate .claude-plugin/plugin.json --strict
+          claude plugin validate skills --strict
+
+      - name: skillsaw lint (strict) and A+ grade gate
         run: |
           pip install --quiet skillsaw
           skillsaw lint . --strict
+          skillsaw badge . -o "$RUNNER_TEMP/badge.json"
+          python3 -c "import json,sys; g=json.load(open(sys.argv[1]))['message']; assert g == 'A+', f'grade {g} is below A+'" "$RUNNER_TEMP/badge.json"
 
-      - name: skillsaw grade gate (A+)
+      - name: Example snippets (env credentials, indexes, Python/TypeScript/Go/Java syntax)
         run: |
-          skillsaw badge . -o /tmp/badge.json
-          python3 -c "import json; grade = json.load(open('/tmp/badge.json'))['message']; assert grade == 'A+', f'grade {grade} is below A+'"
+          (cd server && npm ci --no-fund --no-audit)
+          node scripts/codemod-examples.mjs --check
+          node scripts/build-examples-index.mjs --check
+          node scripts/check-examples.mjs --strict
 
-      - name: Python snippet syntax
-        run: PYTHONPYCACHEPREFIX="${RUNNER_TEMP}/pycache" python3 -m compileall -q skills/astra-toolkit/clients/python/examples
+  evals:
+    name: Plugin evals (claude plugin eval)
+    needs: plugin
+    if: github.event_name == 'workflow_dispatch' || (github.event_name == 'push' && github.ref == 'refs/heads/main')
+    runs-on: ubuntu-latest
+    env:
+      ANTHROPIC_API_KEY: ${{ secrets.ANTHROPIC_API_KEY }}
+    steps:
+      - uses: actions/checkout@v4
+        if: env.ANTHROPIC_API_KEY != ''
 
-      - name: TypeScript snippet syntax
-        run: |
-          npm install --no-save typescript@5
-          node scripts/check_ts_syntax.mjs skills/astra-toolkit/clients/typescript/examples
+      - uses: actions/setup-node@v4
+        if: env.ANTHROPIC_API_KEY != ''
+        with:
+          node-version: "22"
 
-      - name: Unit, hook, and integrity tests (90% coverage gate)
-        run: |
-          pip install --quiet pytest pytest-cov pyyaml
-          pytest tests/ --cov=scripts --cov-fail-under=90 -q
-
-      - name: Plugin structure validation
+      - name: Run evals against the no-plugin baseline
+        if: env.ANTHROPIC_API_KEY != ''
         run: |
           npm install -g @anthropic-ai/claude-code
-          claude plugin validate .
+          claude plugin eval . --trust-plugin --allow-tools Write Edit Bash --no-publish --json "$RUNNER_TEMP/evals.json" --threshold 0.8 --max-cost-usd 10
+
+      - uses: actions/upload-artifact@v4
+        if: env.ANTHROPIC_API_KEY != '' && always()
+        with:
+          name: eval-results
+          path: ${{ runner.temp }}/evals.json
+          if-no-files-found: ignore

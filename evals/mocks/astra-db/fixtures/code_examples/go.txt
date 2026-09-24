@@ -1,0 +1,110 @@
+1 go example(s) for "create a vector collection":
+
+### skills/astra-toolkit/clients/go/examples/collections-create-collection-vector.go
+```go
+package main
+
+import (
+	"context"
+	"log"
+	"os"
+
+	"github.com/datastax/astra-db-go/v2/astra"
+	"github.com/datastax/astra-db-go/v2/astra/options"
+)
+
+func main() {
+	ctx := context.Background()
+
+	// Get an existing database
+	client := astra.NewClient()
+
+	database := client.Database(
+		os.Getenv("ASTRA_DB_API_ENDPOINT"),
+		options.API().SetToken(os.Getenv("ASTRA_DB_APPLICATION_TOKEN")),
+	)
+
+	// Create a collection
+	_, err := database.CreateCollection(
+		ctx,
+		"**COLLECTION_NAME**",
+		options.CreateCollection().
+			UpdateVector(options.Vector().
+				SetDimension(1024).
+				SetMetric(string(options.MetricCosine)).
+				SetSourceModel("nv-qa-4")),
+	)
+	if err != nil {
+		log.Fatal(err)
+	}
+}
+```
+
+1 go example(s) for "insert documents with vectorize":
+
+### skills/astra-toolkit/clients/go/examples/collections-insert-many-vectorize.go
+```go
+package main
+
+func main() {
+	ctx := context.Background()
+	// Get an existing collection
+	client := astra.NewClient()
+
+	collection := database.Collection("**COLLECTION_NAME**")
+
+	// Insert documents into the collection
+	_, err := collection.InsertMany(
+		ctx,
+		[]map[string]any{
+			{
+				"name":       "Jane Doe",
+				"age":        42,
+				"$vectorize": "Text to vectorize for this document",
+			},
+			{
+				"nickname":   "Bobby",
+				"$vectorize": "Text to vectorize for this document",
+			},
+		},
+	)
+	if err != nil {
+		log.Fatal(err)
+	}
+}
+```
+
+1 go example(s) for "vector search sort limit":
+
+### skills/astra-toolkit/clients/go/examples/collections-find-many-sort-vector.go
+```go
+package main
+
+import (
+	"context"
+	"fmt"
+	"os"
+
+	"github.com/datastax/astra-db-go/v2/astra"
+	"github.com/datastax/astra-db-go/v2/astra/filter"
+	"github.com/datastax/astra-db-go/v2/astra/options"
+	"github.com/datastax/astra-db-go/v2/astra/sort"
+)
+
+	// Get an existing collection
+	client := astra.NewClient()
+
+	// Find documents
+	cursor := collection.Find(
+		filter.F{},
+		options.CollectionFind().
+			SetSort(sort.Vectorize("Text to vectorize")).SetIncludeSortVector(true),
+	)
+
+	// Get the sort vector from the result
+	vector := cursor.GetSortVector(ctx)
+	fmt.Println(vector)
+}
+```
+
+1 go example(s) for "find with filter projection sort limit":

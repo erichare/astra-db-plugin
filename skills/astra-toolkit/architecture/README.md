@@ -24,7 +24,7 @@ Spawn one `DataAPIClient`, one `Database`, and the needed Collection/Table objec
 
 A `DataAPIClient` needs an API Endpoint and a Token.
 
-Easiest setup: generate a dotenv via the CLI (see `astra-cli/README.md`) and load it in the app. **Do this by default when prototyping an application.**
+Read them from `ASTRA_DB_API_ENDPOINT` and `ASTRA_DB_APPLICATION_TOKEN`. Easiest setup: generate a dotenv (`npx -y @erichare/astra-mcp login`, or the CLI — see `astra-cli/README.md`) and load it in the app. **Do this by default when prototyping an application.**
 
 ## Async API
 

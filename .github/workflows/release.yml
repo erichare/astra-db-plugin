@@ -1,87 +1,138 @@
 name: Release
 
+# Publishes @erichare/astra-mcp to npm (trusted publishing + provenance), the MCP
+# Registry (GitHub OIDC), and a GitHub Release with the Claude Desktop .mcpb and
+# the IBM Bob bundle.
+#
+# - Push a tag vX.Y.Z (matching every manifest), or
+# - run it manually on any branch: it releases the version in the manifests at
+#   that commit — publish from a branch first, then merge, so marketplace
+#   installs never point at an unpublished server.
 on:
   push:
-    branches: [main]
-    paths:
-      - "skills/**"
-      - "commands/**"
-      - "agents/**"
-      - "hooks/**"
-      - ".mcp.json"
-      - ".mcp.codex.json"
-      - ".claude-plugin/**"
-      - ".agents/**"
-      - "codex/**"
-      - ".bob/**"
-      - "server/**"
+    tags: ["v*"]
+  workflow_dispatch:
+    inputs:
+      prerelease:
+        description: "Mark the GitHub Release as a pre-release"
+        type: boolean
+        default: false
+      npm_tag:
+        description: "npm dist-tag"
+        type: string
+        default: latest
 
 permissions:
-  contents: write
+  contents: read
+
+concurrency:
+  group: release
+  cancel-in-progress: false
 
 jobs:
-  release:
-    if: "!startsWith(github.event.head_commit.message, 'chore(release):')"
+  verify:
+    uses: ./.github/workflows/ci.yml
+
+  version:
     runs-on: ubuntu-latest
+    outputs:
+      version: ${{ steps.v.outputs.version }}
     steps:
       - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
         with:
-          fetch-depth: 0
-
-      - uses: actions/setup-python@v5
-        with:
-          python-version: "3.12"
-
-      - name: Decide whether to tag current version or bump
-        id: decide
+          node-version: "22"
+      - id: v
         run: |
-          version=$(python3 -c "import json; print(json.load(open('.claude-plugin/plugin.json'))['version'])")
-          if git rev-parse "v$version" >/dev/null 2>&1; then
-            echo "bump=true" >> "$GITHUB_OUTPUT"
-          else
-            echo "bump=false" >> "$GITHUB_OUTPUT"
-            echo "version=$version" >> "$GITHUB_OUTPUT"
-          fi
-
-      - name: Bump version (level from conventional commit)
-        id: bump
-        if: steps.decide.outputs.bump == 'true'
-        env:
-          HEAD_MSG: ${{ github.event.head_commit.message }}
-        run: |
-          level=$(python3 scripts/bump_level.py "$HEAD_MSG")
-          echo "bumping $level"
-          echo "version=$(python3 scripts/bump_version.py "$level")" >> "$GITHUB_OUTPUT"
-
-      - name: Commit release
-        if: steps.decide.outputs.bump == 'true'
-        run: |
-          git config user.name "github-actions[bot]"
-          git config user.email "github-actions[bot]@users.noreply.github.com"
-          git add .claude-plugin codex/.codex-plugin CHANGELOG.md
-          git commit -m "chore(release): v${{ steps.bump.outputs.version }}"
-          git push origin main
-
-      - name: Tag and push
-        id: tag
-        run: |
-          git config user.name "github-actions[bot]"
-          git config user.email "github-actions[bot]@users.noreply.github.com"
-          version="${{ steps.bump.outputs.version || steps.decide.outputs.version }}"
-          git tag "v$version"
-          git push origin "v$version"
+          version=$(node -p 'require("./server/package.json").version')
+          if [ "${GITHUB_REF_TYPE}" = "tag" ]; then node scripts/check-versions.mjs --tag "$GITHUB_REF_NAME"; else node scripts/check-versions.mjs; fi
           echo "version=$version" >> "$GITHUB_OUTPUT"
 
-      - name: GitHub Release from the changelog section
+  npm:
+    needs: [verify, version]
+    runs-on: ubuntu-latest
+    environment: npm
+    permissions:
+      contents: read
+      id-token: write
+    defaults:
+      run:
+        working-directory: server
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: "22"
+          registry-url: https://registry.npmjs.org
+      - name: Use an npm with trusted publishing
+        run: npm install -g npm@latest
+      - run: npm ci --no-fund --no-audit
+      - run: npm run build
+      - name: Publish (skip if this version already exists)
+        env:
+          NODE_AUTH_TOKEN: ${{ secrets.NPM_TOKEN }}
+          VERSION: ${{ needs.version.outputs.version }}
+          NPM_TAG: ${{ inputs.npm_tag || 'latest' }}
+        run: |
+          # Pre-release versions (2.1.0-rc.1) never take over "latest".
+          case "$VERSION" in *-*) [ "$NPM_TAG" = latest ] && NPM_TAG=next ;; esac
+          if npm view "@erichare/astra-mcp@${VERSION}" version >/dev/null 2>&1; then
+            echo "@erichare/astra-mcp@${VERSION} is already published"
+          else
+            npm publish --provenance --access public --tag "$NPM_TAG"
+          fi
+      - name: Smoke-test the published package
+        working-directory: ${{ runner.temp }}
+        env:
+          VERSION: ${{ needs.version.outputs.version }}
+        run: |
+          for i in 1 2 3 4 5 6; do npx -y "@erichare/astra-mcp@${VERSION}" --version && exit 0; sleep 10; done
+          exit 1
+
+  registry:
+    needs: [npm, version]
+    runs-on: ubuntu-latest
+    permissions:
+      contents: read
+      id-token: write
+    steps:
+      - uses: actions/checkout@v4
+      - name: Publish server.json to the MCP Registry
+        working-directory: server
+        run: |
+          curl -fsSL "https://github.com/modelcontextprotocol/registry/releases/latest/download/mcp-publisher_linux_amd64.tar.gz" | tar xz mcp-publisher
+          ./mcp-publisher login github-oidc
+          ./mcp-publisher publish || echo "::warning::MCP Registry publish failed (version may already exist)"
+
+  github-release:
+    needs: [npm, version]
+    runs-on: ubuntu-latest
+    permissions:
+      contents: write
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: "22"
+          cache: npm
+          cache-dependency-path: server/package-lock.json
+      - name: Build release assets
+        working-directory: server
+        run: |
+          npm ci --no-fund --no-audit
+          npm run build
+          npm run pack:mcpb
+          node dist/cli.js bob-bundle --out "dist/astra-db-bob.zip"
+      - name: Create the GitHub Release
         env:
           GH_TOKEN: ${{ github.token }}
+          VERSION: ${{ needs.version.outputs.version }}
+          PRERELEASE: ${{ inputs.prerelease && '--prerelease' || '' }}
         run: |
-          version="${{ steps.tag.outputs.version }}"
-          python3 - "$version" > /tmp/release-notes.md <<'PY'
-          import re, sys
-          version = sys.argv[1]
-          text = open("CHANGELOG.md").read()
-          m = re.search(rf"## {re.escape(version)} — [^\n]+\n(.*?)(?=\n## |\Z)", text, re.S)
-          print((m.group(1).strip() if m else "See CHANGELOG.md.") + "\n")
-          PY
-          gh release create "v$version" --title "v$version" --notes-file /tmp/release-notes.md --latest
+          node scripts/release-notes.mjs "$VERSION" > "$RUNNER_TEMP/notes.md"
+          if gh release view "v${VERSION}" >/dev/null 2>&1; then
+            gh release upload "v${VERSION}" server/dist/astra-db-${VERSION}.mcpb server/dist/astra-db.mcpb server/dist/astra-db-bob.zip --clobber
+          else
+            gh release create "v${VERSION}" --target "$GITHUB_SHA" --title "v${VERSION}" --notes-file "$RUNNER_TEMP/notes.md" $PRERELEASE \
+              server/dist/astra-db-${VERSION}.mcpb server/dist/astra-db.mcpb server/dist/astra-db-bob.zip
+          fi

@@ -1,0 +1,6 @@
+# LF everywhere, Windows checkouts included: skills, hooks, and scripts parse
+# frontmatter and shebangs that CRLF line endings would break.
+* text=auto eol=lf
+*.png binary
+*.mcpb binary
+*.zip binary

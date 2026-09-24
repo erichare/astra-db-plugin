@@ -19,8 +19,8 @@ public class Example {
     // Connect to a database
     Database database =
         client.getDatabase(
-            "**API_ENDPOINT**",
-            new DatabaseOptions("**APPLICATION_TOKEN**", new DataAPIClientOptions()));
+            System.getenv("ASTRA_DB_API_ENDPOINT"),
+            new DatabaseOptions(System.getenv("ASTRA_DB_APPLICATION_TOKEN"), new DataAPIClientOptions()));
 
     // Get an existing collection
     Collection<Document> collection = database.getCollection("**COLLECTION_NAME**");

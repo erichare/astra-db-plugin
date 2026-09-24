@@ -1,10 +1,10 @@
 import { DataAPIClient } from "@datastax/astra-db-ts";
 
-const client = new DataAPIClient("**APPLICATION_TOKEN**");
+const client = new DataAPIClient(process.env.ASTRA_DB_APPLICATION_TOKEN!);
 
 const admin = client.admin();
 
-const databaseAdmin = admin.dbAdmin("**API_ENDPOINT**");
+const databaseAdmin = admin.dbAdmin(process.env.ASTRA_DB_API_ENDPOINT!);
 
 (async function () {
   const providers = await databaseAdmin.findEmbeddingProviders();

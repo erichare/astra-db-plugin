@@ -1,0 +1,85 @@
+1 java example(s) for "create a vector collection":
+
+### skills/astra-toolkit/clients/java/examples/collections-create-collection-vector.java
+```java
+import com.datastax.astra.client.DataAPIClient;
+import com.datastax.astra.client.collections.Collection;
+import com.datastax.astra.client.collections.definition.CollectionDefinition;
+import com.datastax.astra.client.collections.definition.documents.Document;
+import com.datastax.astra.client.core.vector.SimilarityMetric;
+import com.datastax.astra.client.databases.Database;
+
+public class Example {
+
+  public static void main(String[] args) {
+    // Get a database
+    Database database = new DataAPIClient(System.getenv("ASTRA_DB_APPLICATION_TOKEN")).getDatabase(System.getenv("ASTRA_DB_API_ENDPOINT"));
+
+    // Create a collection
+    CollectionDefinition collectionDefinition =
+        new CollectionDefinition().vectorDimension(1024).vectorSimilarity(SimilarityMetric.COSINE);
+
+    Collection<Document> collection =
+        database.createCollection("**COLLECTION_NAME**", collectionDefinition);
+  }
+}
+```
+
+1 java example(s) for "insert documents with vectorize":
+
+### skills/astra-toolkit/clients/java/examples/collections-insert-many-vectorize.java
+```java
+import com.datastax.astra.client.DataAPIClient;
+import com.datastax.astra.client.collections.Collection;
+import com.datastax.astra.client.collections.commands.results.CollectionInsertManyResult;
+import com.datastax.astra.client.collections.definition.documents.Document;
+import java.util.List;
+
+  public static void main(String[] args) {
+    // Get an existing collection
+    Collection<Document> collection =
+        new DataAPIClient(System.getenv("ASTRA_DB_APPLICATION_TOKEN"))
+            .getDatabase(System.getenv("ASTRA_DB_API_ENDPOINT"))
+            .getCollection("**COLLECTION_NAME**");
+
+    // Insert documents into the collection
+    Document document1 =
+        new Document()
+            .append("name", "Jane Doe")
+            .append("age", 42)
+            .append("$vectorize", "Text to vectorize for this document");
+    Document document2 =
+        new Document()
+            .append("nickname", "Bobby")
+            .append("$vectorize", "Text to vectorize for this document");
+    CollectionInsertManyResult result = collection.insertMany(List.of(document1, document2));
+    System.out.println("IDs inserted: " + result.getInsertedIds());
+  }
+}
+```
+
+1 java example(s) for "vector search sort limit":
+
+### skills/astra-toolkit/clients/java/examples/collections-find-many-sort-vector.java
+```java
+import com.datastax.astra.client.DataAPIClient;
+import com.datastax.astra.client.collections.Collection;
+import com.datastax.astra.client.collections.commands.cursor.CollectionFindCursor;
+import com.datastax.astra.client.collections.commands.options.CollectionFindOptions;
+import com.datastax.astra.client.collections.definition.documents.Document;
+import com.datastax.astra.client.core.query.Sort;
+
+    // Find documents
+    CollectionFindOptions options =
+        new CollectionFindOptions()
+            .sort(Sort.vectorize("Text to vectorize"))
+            .includeSortVector(true);
+    CollectionFindCursor<Document, Document> cursor = collection.find(options);
+
+    // Get the sort vector from the result
+    System.out.println(cursor.getSortVector());
+  }
+}
+```
+
+1 java example(s) for "find with filter projection sort limit":

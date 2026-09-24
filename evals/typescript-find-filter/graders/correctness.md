@@ -1,5 +1,8 @@
 ---
 type: llm
+focus:
+  source: file
+  path: query.ts
 ---
 
 Score 1 only if query.ts satisfies ALL of the following; otherwise score 0:
