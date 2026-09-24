@@ -13,8 +13,8 @@ The bump script updates every manifest, the exact server pins in the Claude Code
 
 Then run **Release** (`.github/workflows/release.yml`) in one of two ways:
 
-- **From a branch, before merging** (Actions → Release → *Run workflow*). It publishes whatever version the manifests at that commit carry. This is the safe order: npm has the server before the marketplaces point at it. `prerelease` and `npm_tag` are optional inputs.
-- **From a tag:** `git tag v2.1.0 && git push origin v2.1.0`. The tag must match the manifests.
+- **From a branch, before merging** (Actions → Release → *Run workflow*). It publishes whatever version the manifests at that commit carry. This is the safe order: npm has the server before the marketplaces point at it. `prerelease` and `npm_tag` are optional inputs. GitHub only offers *Run workflow* for workflows that already exist on `main`, so this works from the release after 2.0.0 onwards.
+- **From a tag:** `git tag v2.1.0 && git push origin v2.1.0`. The tag must match the manifests. A tag build uses the workflow file from the tagged commit, so this also works on a branch that isn't merged yet (that's how 2.0.0 ships). Merge that branch with a merge commit so the tagged commit ends up on `main`.
 
 The workflow:
 
@@ -30,10 +30,11 @@ Merge after it succeeds. Claude Code and Codex users get the new version through
 
 **npm trusted publishing.** npm can only trust a package that already exists, so the very first publish uses a token:
 
-1. Create a GitHub environment named `npm` (*Settings → Environments*). Required reviewers are a good idea.
-2. Add a granular npm access token with publish rights for `@erichare/astra-mcp` as the environment secret `NPM_TOKEN`, then run the release.
-3. On npmjs.com, open the package's settings, add a trusted publisher (GitHub Actions, repository `erichare/astra-db-plugin`, workflow `release.yml`, environment `npm`), and disallow token publishing.
-4. Delete the `NPM_TOKEN` secret. From then on, the job authenticates with OIDC and signs provenance automatically.
+1. Create a GitHub environment named `npm` (*Settings → Environments*). Required reviewers are a good idea. If you restrict its deployment branches and tags, allow tags matching `v*`.
+2. On npmjs.com, create a granular access token (*Access Tokens → Generate New Token → Granular*): read and write on the `@erichare` scope, a 1-day expiry, and *Bypass two-factor authentication* if your account requires 2FA for writes. Store it as the environment secret `NPM_TOKEN`, either in the GitHub UI or with `gh secret set NPM_TOKEN --env npm --repo erichare/astra-db-plugin`, which prompts for it. Never paste it into a chat or a file.
+3. Run the release (for 2.0.0: push the tag). The token publishes, and provenance is still signed because the job has `id-token: write`.
+4. On npmjs.com, open the package's *Settings → Trusted publishing*, add GitHub Actions with user `erichare`, repository `astra-db-plugin`, workflow `release.yml`, and environment `npm`. Then set publishing access to require 2FA and disallow tokens.
+5. Delete the npm token and the `NPM_TOKEN` secret. From then on, the job authenticates with OIDC.
 
 **MCP Registry.** Nothing to set up: `mcp-publisher login github-oidc` proves ownership of the `io.github.erichare/*` namespace from the workflow's OIDC token. The registry checks that `server.json`'s `name` matches `mcpName` in `server/package.json`.
 
