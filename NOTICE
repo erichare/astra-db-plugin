@@ -31,10 +31,8 @@ product.
 
 The plugin's own icon (assets/icon.svg) is original artwork.
 
-Logos under assets/logos/ are trademarks of their respective owners and are
-used solely to identify compatible products: DataStax mark and wordmark
-(DataStax, Inc., an IBM company), IBM logo (International Business Machines
-Corporation), IBM Bob mark (IBM, from bob.ibm.com), Claude mark (Anthropic),
-OpenAI symbol (OpenAI). Mark files were obtained from the Simple Icons
-collection (CC0), Wikimedia Commons, and bob.ibm.com; no endorsement is
-implied.
+The README banner (assets/banner.svg) embeds the IBM Bob mark (IBM, from
+bob.ibm.com), the Claude mark (Anthropic), and the OpenAI symbol (OpenAI),
+obtained from the Simple Icons collection (CC0) and bob.ibm.com. They are
+trademarks of their respective owners, used solely to identify compatible
+products; no endorsement is implied.
