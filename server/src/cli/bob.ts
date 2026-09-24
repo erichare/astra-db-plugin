@@ -32,7 +32,8 @@ export interface SkillDoc {
 }
 
 /** Parse SKILL.md frontmatter (flat keys plus a one-level `metadata:` map). */
-export function parseSkill(text: string): { fields: Record<string, string>; metadata: Record<string, string>; body: string } {
+export function parseSkill(raw: string): { fields: Record<string, string>; metadata: Record<string, string>; body: string } {
+  const text = raw.replace(/\r\n/g, "\n");
   const match = text.match(/^---\n([\s\S]*?)\n---\n?([\s\S]*)$/);
   if (!match) return { fields: {}, metadata: {}, body: text };
   const fields: Record<string, string> = {};

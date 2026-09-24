@@ -106,6 +106,9 @@ describe("IBM Bob bundle", () => {
   it("parses skill frontmatter with a metadata map", () => {
     const parsed = parseSkill("---\nname: x\ndescription: \"d\"\nmetadata:\n  kind: persona\n  bob-groups: read mcp\n---\nBody");
     expect(parsed).toEqual({ fields: { name: "x", description: "d" }, metadata: { kind: "persona", "bob-groups": "read mcp" }, body: "Body" });
+    // A Windows checkout or editor may hand us CRLF.
+    const crlf = parseSkill("---\r\nname: x\r\ndescription: \"d\"\r\nmetadata:\r\n  kind: persona\r\n---\r\nBody");
+    expect(crlf).toEqual({ fields: { name: "x", description: "d" }, metadata: { kind: "persona" }, body: "Body" });
   });
 
   it("merges custom modes between markers, keeping user modes and indentation", () => {

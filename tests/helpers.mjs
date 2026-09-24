@@ -18,7 +18,8 @@ export function exists(path) {
 }
 
 /** Top-level `key: value` pairs of a SKILL.md-style frontmatter block (nested maps become raw text). */
-export function frontmatter(text) {
+export function frontmatter(raw) {
+  const text = raw.replace(/\r\n/g, "\n");
   if (!text.startsWith("---\n")) return null;
   const end = text.indexOf("\n---", 4);
   if (end < 0) return null;
