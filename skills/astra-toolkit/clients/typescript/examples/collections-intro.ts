@@ -4,8 +4,8 @@ import { DataAPIClient } from "@datastax/astra-db-ts";
 const client = new DataAPIClient();
 
 // Connect to a database
-const database = client.db("**API_ENDPOINT**", {
-  token: "**APPLICATION_TOKEN**",
+const database = client.db(process.env.ASTRA_DB_API_ENDPOINT!, {
+  token: process.env.ASTRA_DB_APPLICATION_TOKEN!,
 });
 
 // Get an existing collection

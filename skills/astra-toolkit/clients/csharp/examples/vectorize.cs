@@ -121,10 +121,10 @@ public class Program
 
     // Connect to a database
     var database = client.GetDatabase(
-      "API_ENDPOINT",
+      System.Environment.GetEnvironmentVariable("ASTRA_DB_API_ENDPOINT"),
       new GetDatabaseOptions()
       {
-        Token = "APPLICATION_TOKEN"
+        Token = System.Environment.GetEnvironmentVariable("ASTRA_DB_APPLICATION_TOKEN")
       }
     );
 

@@ -12,7 +12,7 @@ public class Example {
 
   public static void main(String[] args) {
 
-    Database database = new DataAPIClient("**APPLICATION_TOKEN**").getDatabase("**API_ENDPOINT**");
+    Database database = new DataAPIClient(System.getenv("ASTRA_DB_APPLICATION_TOKEN")).getDatabase(System.getenv("ASTRA_DB_API_ENDPOINT"));
 
     Collection<Document> oldCollection = database.getCollection("**OLD_COLLECTION_NAME**");
     Collection<Document> newCollection = database.getCollection("**NEW_COLLECTION_NAME**");

@@ -15,8 +15,8 @@ public class Example {
 
     // Get an existing collection
     Collection<Document> collection =
-        new DataAPIClient("**APPLICATION_TOKEN**")
-            .getDatabase("**API_ENDPOINT**")
+        new DataAPIClient(System.getenv("ASTRA_DB_APPLICATION_TOKEN"))
+            .getDatabase(System.getenv("ASTRA_DB_API_ENDPOINT"))
             .getCollection("**COLLECTION_NAME**");
 
     // Find documents
@@ -59,8 +59,8 @@ public class Example {
 
     // Get an existing collection
     Collection<Document> collection =
-        new DataAPIClient("**APPLICATION_TOKEN**")
-            .getDatabase("**API_ENDPOINT**")
+        new DataAPIClient(System.getenv("ASTRA_DB_APPLICATION_TOKEN"))
+            .getDatabase(System.getenv("ASTRA_DB_API_ENDPOINT"))
             .getCollection("**COLLECTION_NAME**");
 
     // Find documents

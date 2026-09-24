@@ -1,8 +1,8 @@
 import { DataAPIClient, LexicalDoc, VectorizeDoc } from "@datastax/astra-db-ts";
 
 // Get a database
-const client = new DataAPIClient("**APPLICATION_TOKEN**");
-const database = client.db("**API_ENDPOINT**");
+const client = new DataAPIClient(process.env.ASTRA_DB_APPLICATION_TOKEN!);
+const database = client.db(process.env.ASTRA_DB_API_ENDPOINT!);
 
 // Define the type for the collection
 interface User extends VectorizeDoc, LexicalDoc {
@@ -62,8 +62,8 @@ interface User extends VectorizeDoc, LexicalDoc {
 import { DataAPIClient } from "@datastax/astra-db-ts";
 
 // Get a database
-const client = new DataAPIClient("**APPLICATION_TOKEN**");
-const database = client.db("**API_ENDPOINT**");
+const client = new DataAPIClient(process.env.ASTRA_DB_APPLICATION_TOKEN!);
+const database = client.db(process.env.ASTRA_DB_API_ENDPOINT!);
 
 (async function () {
   const collection = await database.createCollection("**COLLECTION_NAME**", {

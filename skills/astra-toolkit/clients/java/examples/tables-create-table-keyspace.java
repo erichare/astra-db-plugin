@@ -9,8 +9,8 @@ public class Example {
   public static void main(String[] args) {
     // Get an existing database
     Database database =
-        new DataAPIClient("**APPLICATION_TOKEN**")
-            .getDatabase("**API_ENDPOINT**", "**KEYSPACE_NAME**");
+        new DataAPIClient(System.getenv("ASTRA_DB_APPLICATION_TOKEN"))
+            .getDatabase(System.getenv("ASTRA_DB_API_ENDPOINT"), "**KEYSPACE_NAME**");
 
     TableDefinition tableDefinition =
         new TableDefinition()

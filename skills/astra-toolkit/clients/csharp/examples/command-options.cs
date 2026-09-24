@@ -13,7 +13,7 @@ public class Program
     // Specifies the token and timeouts
     var clientOptions = new CommandOptions()
     {
-      Token = "**APPLICATION_TOKEN**",
+      Token = System.Environment.GetEnvironmentVariable("ASTRA_DB_APPLICATION_TOKEN"),
       TimeoutOptions = new TimeoutOptions()
       {
         ConnectionTimeout = TimeSpan.FromMilliseconds(3000),
@@ -26,11 +26,11 @@ public class Program
     // and specifies the keyspace
     var databaseOptions = new GetDatabaseOptions()
     {
-      Token = "**APPLICATION_TOKEN**",
+      Token = System.Environment.GetEnvironmentVariable("ASTRA_DB_APPLICATION_TOKEN"),
       Keyspace = "**KEYSPACE_NAME**",
     };
     var database = client.GetDatabase(
-      "**API_ENDPOINT**",
+      System.Environment.GetEnvironmentVariable("ASTRA_DB_API_ENDPOINT"),
       databaseOptions
     );
 

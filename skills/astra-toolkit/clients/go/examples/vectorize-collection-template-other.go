@@ -32,7 +32,7 @@ func main() {
 						SetProvider("{embedding-provider-name-api}").
 						SetModelName("MODEL_NAME").
 						SetAuthentication(map[string]any{
-							"providerKey": "API_KEY_NAME"
+							"providerKey": "API_KEY_NAME",
 						}),
 				)),
 	)

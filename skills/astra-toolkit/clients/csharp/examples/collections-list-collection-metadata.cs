@@ -11,8 +11,8 @@ public class Program
     // Get a database
     var client = new DataAPIClient();
     var database = client.GetDatabase(
-      "**API_ENDPOINT**",
-      "**APPLICATION_TOKEN**"
+      System.Environment.GetEnvironmentVariable("ASTRA_DB_API_ENDPOINT"),
+      System.Environment.GetEnvironmentVariable("ASTRA_DB_APPLICATION_TOKEN")
     );
 
     // List collections

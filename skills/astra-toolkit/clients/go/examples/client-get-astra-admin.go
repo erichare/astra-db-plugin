@@ -2,6 +2,7 @@ package main
 
 import (
 	"log"
+	"os"
 
 	"github.com/datastax/astra-db-go/v2/astra"
 	"github.com/datastax/astra-db-go/v2/astra/options"
@@ -9,7 +10,7 @@ import (
 
 func main() {
 	client := astra.NewClient(
-		options.API().SetToken("**APPLICATION_TOKEN**"),
+		options.API().SetToken(os.Getenv("ASTRA_DB_APPLICATION_TOKEN")),
 	)
 
 	_, err := client.Admin(options.API())

@@ -10,8 +10,8 @@ public class Example {
     // Get an existing table
     TableOptions options = new TableOptions().keyspace("**KEYSPACE_NAME**");
     Table<Row> table =
-        new DataAPIClient("**APPLICATION_TOKEN**")
-            .getDatabase("**API_ENDPOINT**")
+        new DataAPIClient(System.getenv("ASTRA_DB_APPLICATION_TOKEN"))
+            .getDatabase(System.getenv("ASTRA_DB_API_ENDPOINT"))
             .getTable("**TABLE_NAME**", options);
   }
 }

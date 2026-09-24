@@ -1,9 +1,10 @@
+import os
 from astrapy import DataAPIClient
 
 # Get an existing database
 client = DataAPIClient()
 database = client.get_database(
-    "**API_ENDPOINT**", token="**APPLICATION_TOKEN**"
+    os.environ["ASTRA_DB_API_ENDPOINT"], token=os.environ["ASTRA_DB_APPLICATION_TOKEN"]
 )
 
 # Define the columns and primary key for the table
@@ -43,6 +44,7 @@ table = database.create_table(
 
 # ==============  BOUNDARY BETWEEN EXAMPLE SNIPPETS  ==============
 
+import os
 from astrapy import DataAPIClient
 from astrapy.info import (
     ColumnType,
@@ -59,7 +61,7 @@ from astrapy.info import (
 # Get an existing database
 client = DataAPIClient()
 database = client.get_database(
-    "**API_ENDPOINT**", token="**APPLICATION_TOKEN**"
+    os.environ["ASTRA_DB_API_ENDPOINT"], token=os.environ["ASTRA_DB_APPLICATION_TOKEN"]
 )
 
 table_definition = CreateTableDefinition(
@@ -95,6 +97,7 @@ table = database.create_table(
 
 # ==============  BOUNDARY BETWEEN EXAMPLE SNIPPETS  ==============
 
+import os
 from astrapy import DataAPIClient
 from astrapy.info import (
     ColumnType,
@@ -105,7 +108,7 @@ from astrapy.info import (
 # Get an existing database
 client = DataAPIClient()
 database = client.get_database(
-    "**API_ENDPOINT**", token="**APPLICATION_TOKEN**"
+    os.environ["ASTRA_DB_API_ENDPOINT"], token=os.environ["ASTRA_DB_APPLICATION_TOKEN"]
 )
 
 table_definition = (

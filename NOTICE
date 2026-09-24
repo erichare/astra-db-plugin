@@ -1,19 +1,35 @@
 Astra DB Plugin
 Copyright 2026 Eric Hare
 
-This distribution bundles agent-skill content synchronized from
-https://github.com/sl-at-ibm/astra-toolkit-skill (Stefano Lottini, IBM /
-DataStax), which itself derives its instruction files and code examples from
-the DataStax documentation (https://docs.datastax.com). The exact upstream
-commit for the bundled content is recorded in sync-manifest.json.
+This distribution bundles agent-skill content (skills/astra-toolkit/) vendored
+from https://github.com/sl-at-ibm/astra-toolkit-skill (Stefano Lottini, IBM /
+DataStax) at commit aebf0d6e2a297bf7c2a049f238acf82832303b8f (2026-08-21),
+which itself derives its instruction files and code examples from the DataStax
+documentation (https://docs.datastax.com). The same examples ship inside the
+@erichare/astra-mcp npm package and the .mcpb bundle for the code_examples tool.
+
+Modifications made in this repository since vendoring:
+- examples read credentials from ASTRA_DB_APPLICATION_TOKEN /
+  ASTRA_DB_API_ENDPOINT environment variables instead of placeholders
+  (scripts/codemod-examples.mjs), with the matching imports added;
+- one Go example gained a missing composite-literal comma;
+- per-language INDEX.md files (scripts/build-examples-index.mjs);
+- SKILL.md description and Credentials / Live database tools sections,
+  consistent env var names in astra-cli/ and architecture/ READMEs.
 
 The upstream repository does not yet declare an explicit license; this
 redistribution is maintained in coordination with the upstream author, and
 this NOTICE will be updated when upstream licensing is formalized.
 
+The compiled MCP server (server/dist, published to npm) bundles third-party
+open-source packages; their license notices are collected in
+server/THIRD_PARTY_NOTICES.md at build time.
+
 Astra DB and DataStax are trademarks of DataStax, Inc. (an IBM company).
 This is a community-maintained plugin and is not an official DataStax or IBM
 product.
+
+The plugin's own icon (assets/icon.svg) is original artwork.
 
 Logos under assets/logos/ are trademarks of their respective owners and are
 used solely to identify compatible products: DataStax mark and wordmark

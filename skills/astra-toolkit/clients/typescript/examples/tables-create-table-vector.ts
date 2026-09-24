@@ -7,8 +7,8 @@ import {
 
 // Get an existing database
 const client = new DataAPIClient();
-const database = client.db("**API_ENDPOINT**", {
-  token: "**APPLICATION_TOKEN**",
+const database = client.db(process.env.ASTRA_DB_API_ENDPOINT!, {
+  token: process.env.ASTRA_DB_APPLICATION_TOKEN!,
 });
 
 const tableDefinition = Table.schema({
@@ -42,8 +42,8 @@ import { DataAPIClient, DataAPIVector, Table } from "@datastax/astra-db-ts";
 
 // Get an existing database
 const client = new DataAPIClient();
-const database = client.db("**API_ENDPOINT**", {
-  token: "**APPLICATION_TOKEN**",
+const database = client.db(process.env.ASTRA_DB_API_ENDPOINT!, {
+  token: process.env.ASTRA_DB_APPLICATION_TOKEN!,
 });
 
 const tableDefinition = Table.schema({
@@ -81,8 +81,8 @@ import { DataAPIClient, SomeRow, Table } from "@datastax/astra-db-ts";
 
 // Get an existing database
 const client = new DataAPIClient();
-const database = client.db("**API_ENDPOINT**", {
-  token: "**APPLICATION_TOKEN**",
+const database = client.db(process.env.ASTRA_DB_API_ENDPOINT!, {
+  token: process.env.ASTRA_DB_APPLICATION_TOKEN!,
 });
 
 const tableDefinition = Table.schema({

@@ -8,8 +8,8 @@ public class Example {
   public static void main(String[] args) {
     // Get and existing table
     Table<Row> table =
-        new DataAPIClient("**APPLICATION_TOKEN**")
-            .getDatabase("**API_ENDPOINT**")
+        new DataAPIClient(System.getenv("ASTRA_DB_APPLICATION_TOKEN"))
+            .getDatabase(System.getenv("ASTRA_DB_API_ENDPOINT"))
             .getTable("**TABLE_NAME**");
 
     // Insert binary values

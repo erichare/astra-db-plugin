@@ -13,8 +13,8 @@ public class Program
     // Get an existing collection
     var client = new DataAPIClient();
     var database = client.GetDatabase(
-      "**API_ENDPOINT**",
-      "**APPLICATION_TOKEN**"
+      System.Environment.GetEnvironmentVariable("ASTRA_DB_API_ENDPOINT"),
+      System.Environment.GetEnvironmentVariable("ASTRA_DB_APPLICATION_TOKEN")
     );
     var collection = database.GetCollection("**COLLECTION_NAME**");
 
@@ -67,8 +67,8 @@ public class Program
     // Get an existing collection
     var client = new DataAPIClient();
     var database = client.GetDatabase(
-      "**API_ENDPOINT**",
-      "**APPLICATION_TOKEN**"
+      System.Environment.GetEnvironmentVariable("ASTRA_DB_API_ENDPOINT"),
+      System.Environment.GetEnvironmentVariable("ASTRA_DB_APPLICATION_TOKEN")
     );
     var collection = database.GetCollection("**COLLECTION_NAME**");
 
