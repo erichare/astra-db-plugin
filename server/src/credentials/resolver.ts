@@ -13,7 +13,7 @@
  */
 import { existsSync, readFileSync, statSync } from "node:fs";
 import { homedir } from "node:os";
-import { dirname, join, resolve } from "node:path";
+import { dirname, join, posix, resolve, win32 } from "node:path";
 import { astrarcCandidates, profileFrom } from "./astrarc.js";
 import { parseDotenv } from "./dotenv.js";
 import { clean, parseBool } from "./sanitize.js";
@@ -74,9 +74,11 @@ export interface ResolverOptions {
 
 export function userCredentialsPath(env: NodeJS.ProcessEnv, home: string, platform: NodeJS.Platform): string {
   if (clean(env.ASTRA_MCP_CREDENTIALS_FILE)) return env.ASTRA_MCP_CREDENTIALS_FILE as string;
-  if (platform === "win32" && env.APPDATA) return join(env.APPDATA, "astra-mcp", "credentials.json");
-  const base = clean(env.XDG_CONFIG_HOME) ?? join(home, ".config");
-  return join(base, "astra-mcp", "credentials.json");
+  // Join for the target platform, not the host (the two differ in tests and when paths are displayed).
+  const path = platform === "win32" ? win32 : posix;
+  if (platform === "win32" && env.APPDATA) return path.join(env.APPDATA, "astra-mcp", "credentials.json");
+  const base = clean(env.XDG_CONFIG_HOME) ?? path.join(home, ".config");
+  return path.join(base, "astra-mcp", "credentials.json");
 }
 
 /** Directories to search for dotenv files: the project dir upward to its git root (never past $HOME). */

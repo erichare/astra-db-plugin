@@ -139,7 +139,8 @@ describe("CredentialResolver", () => {
   it("locates the user credentials file per platform", () => {
     expect(userCredentialsPath({}, "/h", "linux")).toBe("/h/.config/astra-mcp/credentials.json");
     expect(userCredentialsPath({ XDG_CONFIG_HOME: "/x" }, "/h", "linux")).toBe("/x/astra-mcp/credentials.json");
-    expect(userCredentialsPath({ APPDATA: "C:\\Users\\a\\AppData\\Roaming" }, "C:\\Users\\a", "win32")).toContain("astra-mcp");
+    expect(userCredentialsPath({ APPDATA: "C:\\Users\\a\\AppData\\Roaming" }, "C:\\Users\\a", "win32")).toBe("C:\\Users\\a\\AppData\\Roaming\\astra-mcp\\credentials.json");
+    expect(userCredentialsPath({}, "C:\\Users\\a", "win32")).toBe("C:\\Users\\a\\.config\\astra-mcp\\credentials.json");
     expect(userCredentialsPath({ ASTRA_MCP_CREDENTIALS_FILE: "/custom.json" }, "/h", "linux")).toBe("/custom.json");
   });
 
