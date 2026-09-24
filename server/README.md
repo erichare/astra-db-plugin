@@ -36,7 +36,7 @@ The 18 tools:
 
 Destructive operations need the user's confirmation, through elicitation or an explicit `confirm` argument after the user approves. Credentials come from the environment, then the project's `.env`, host settings, `login --global`, and the Astra CLI's `~/.astrarc`.
 
-The package bundles everything into one file with no runtime dependencies, and it's published with npm provenance.
+The package bundles everything into one file with no runtime dependencies. Releases after 2.0.0 are published from GitHub Actions with npm provenance.
 
 Documentation, the Claude Code and Codex plugin, and the hosted OAuth endpoint for ChatGPT and claude.ai: **[github.com/erichare/astra-db-plugin](https://github.com/erichare/astra-db-plugin)**.
 

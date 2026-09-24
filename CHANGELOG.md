@@ -20,7 +20,7 @@
 - **Hosted server:** the full tool set, writes opt-in per connection, and modernized OAuth (Client ID Metadata Documents with DNS-rebinding-safe fetching, `iss`, audience-bound tokens, rotating refresh tokens, key rotation). With an optional Redis store (Vercel KV / Upstash), refresh tokens are single-use and a replay revokes the chain. Endpoints are restricted to Astra's Data API hosts.
 - **Skills everywhere.** Commands and agents became skills: `setup`, `doctor`, `data-model-review`, the `overview` / `collection` / `explore` / `similar` shortcuts, and the `reviewer`, `data-modeler`, and `migration-helper` personas. The examples read `ASTRA_DB_*` from the environment and have per-language indexes.
 - **Hooks rewritten in Node.** The credential guard inspects only new content and allows a git-ignored `.env`, and a session hook adds one line of connection context.
-- **Distribution:** npm with provenance, the MCP Registry, a Claude Desktop `.mcpb`, an IBM Bob zip, Smithery, and Docker. Every piece is released from one workflow.
+- **Distribution:** npm (trusted publishing with provenance from the next release on), the MCP Registry, a Claude Desktop `.mcpb`, an IBM Bob zip, Smithery, and Docker. Every piece is released from one workflow.
 - **Evals:** MCP-mocked `claude plugin eval` cases for vector search, filtered find, destructive confirmation, pasted tokens, and Go code.
 
 ### Fixes

@@ -46,6 +46,6 @@ Deleting or replacing a leaked token is never blocked, because the text being re
 
 ## Supply chain
 
-- `@erichare/astra-mcp` ships as a single bundled file with no runtime dependencies, published from GitHub Actions with npm trusted publishing and provenance. `npm audit signatures` verifies it.
+- `@erichare/astra-mcp` ships as a single bundled file with no runtime dependencies. Releases after 2.0.0 are published from GitHub Actions with npm trusted publishing and provenance, which `npm audit signatures` verifies. 2.0.0, the package's first version, was published by the maintainer with 2FA, because npm only enables trusted publishing once a package exists.
 - The Claude Code and Codex plugins pin the exact server version they were released with.
 - The Claude Desktop bundle (`.mcpb`) and the IBM Bob zip are built in the same release workflow and attached to the GitHub Release.

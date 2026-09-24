@@ -28,13 +28,21 @@ Merge after it succeeds. Claude Code and Codex users get the new version through
 
 ## One-time setup
 
-**npm trusted publishing.** npm can only trust a package that already exists, so the very first publish uses a token:
+**npm trusted publishing.** npm can only trust a package that already exists, and since July 2026 it refuses a new package's first publish from a 2FA-bypass token (`EOTP`). So the very first version is published by a maintainer, with 2FA:
 
-1. Create a GitHub environment named `npm` (*Settings → Environments*). Required reviewers are a good idea. If you restrict its deployment branches and tags, allow tags matching `v*`.
-2. On npmjs.com, create a granular access token (*Access Tokens → Generate New Token → Granular*): read and write on the `@erichare` scope, a 1-day expiry, and *Bypass two-factor authentication* if your account requires 2FA for writes. Store it as the environment secret `NPM_TOKEN`, either in the GitHub UI or with `gh secret set NPM_TOKEN --env npm --repo erichare/astra-db-plugin`, which prompts for it. Never paste it into a chat or a file.
-3. Run the release (for 2.0.0: push the tag). The token publishes, and provenance is still signed because the job has `id-token: write`.
+1. Push the release tag. CI runs; the npm step fails with `EOTP`, and the jobs after it are skipped.
+2. From a checkout of that tag, as the `erichare` npm user:
+   ```bash
+   git fetch origin --tags && git checkout v2.0.0
+   cd server && npm ci
+   npm publish --provenance=false   # builds via prepack; asks for your 2FA
+   ```
+   `--provenance=false` is needed because provenance can only be signed in CI. Later releases have it.
+3. Re-run the failed jobs of the Release run. The npm step sees the version exists and skips, then the MCP Registry and GitHub Release jobs run.
 4. On npmjs.com, open the package's *Settings → Trusted publishing*, add GitHub Actions with user `erichare`, repository `astra-db-plugin`, workflow `release.yml`, and environment `npm`. Then set publishing access to require 2FA and disallow tokens.
-5. Delete the npm token and the `NPM_TOKEN` secret. From then on, the job authenticates with OIDC.
+5. Delete any npm token and the `NPM_TOKEN` secret if you created them. From then on, the job authenticates with OIDC and signs provenance.
+
+Create a GitHub environment named `npm` for the Release job (*Settings → Environments*). Required reviewers are a good idea; if you restrict its deployment branches and tags, allow tags matching `v*`.
 
 **MCP Registry.** Nothing to set up: `mcp-publisher login github-oidc` proves ownership of the `io.github.erichare/*` namespace from the workflow's OIDC token. The registry checks that `server.json`'s `name` matches `mcpName` in `server/package.json`.
 
